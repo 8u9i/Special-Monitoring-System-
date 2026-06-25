@@ -1,0 +1,6 @@
+{
+  "name": "Hadith Memorization Tracker",
+  "description": "نظام تفاعلي ومبسط لمتابعة حفظ الأحاديث النبوية الشريفة مستوحى من الألعاب ونظام المراحل ومصمم بثيم دافئ مستوحى من الطبيعة والرسوم اليدوية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

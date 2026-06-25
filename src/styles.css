@@ -1,0 +1,99 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-amiri: "Amiri", "Playfair Display", serif;
+  --font-tajawal: "Tajawal", "Inter", sans-serif;
+  --color-leaf: #6B8F6B;
+  --color-forest: #41644A;
+  --color-moss: #A3B18A;
+  --color-stone: #DAD7CD;
+  --color-paper: #FAF9F6;
+  --color-charcoal: #2F2F2F;
+}
+
+/* Base style resets */
+body {
+  font-family: var(--font-tajawal);
+  background-color: var(--color-paper);
+  color: var(--color-charcoal);
+  direction: rtl; /* Arabic support */
+}
+
+/* Custom hand-drawn card borders and sketches */
+.sketch-card {
+  border: 1.5px solid var(--color-charcoal);
+  background-color: #ffffff;
+  box-shadow: 4px 4px 0px 0px var(--color-charcoal);
+  border-radius: 1rem;
+}
+
+.sketch-card-inset {
+  border: 1.5px dashed var(--color-stone);
+  background-color: var(--color-paper);
+  border-radius: 0.75rem;
+}
+
+.sketch-button {
+  border: 1.5px solid var(--color-charcoal);
+  background-color: var(--color-forest);
+  color: #ffffff;
+  box-shadow: 2px 2px 0px 0px var(--color-charcoal);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.sketch-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px var(--color-charcoal);
+}
+
+.sketch-button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px 0px var(--color-charcoal);
+}
+
+.sketch-button-secondary {
+  border: 1.5px solid var(--color-charcoal);
+  background-color: #ffffff;
+  color: var(--color-charcoal);
+  box-shadow: 2px 2px 0px 0px var(--color-charcoal);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.sketch-button-secondary:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px var(--color-charcoal);
+}
+
+.sketch-button-secondary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px 0px var(--color-charcoal);
+}
+
+/* Material icon vertical alignment override */
+.mat-icon {
+  font-family: 'Material Icons' !important;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-stone);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-moss);
+}
