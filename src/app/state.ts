@@ -3,11 +3,10 @@ import {
   signal,
   computed,
   inject,
-  PLATFORM_ID,
 } from "@angular/core";
-import { isPlatformBrowser } from "@angular/common";
 import { HADITHS_DATA, Hadith } from "./hadith-data";
 import { VOCAB_DATA } from "./vocab-data";
+import { ApiService } from "./api.service";
 
 export interface VocabWord {
   word: string;
@@ -24,19 +23,19 @@ export interface Student {
   id: string;
   name: string;
   age?: number;
-  avatar: string; // Tailwind color theme or pre-selected character name
+  avatar: string;
   notes?: string;
   joinedAt: string;
-  memorizedHadithNumbers: number[]; // Hadiths completely memorized
-  reviewHadithNumbers: number[]; // Hadiths in review
-  memorizedSurahNumbers: number[]; // Surahs memorized
-  reviewSurahNumbers: number[]; // Surahs in review
-  memorizedSurahPages: string[]; // Format: 'surahNumber-pageIndex'
-  memorizedVocabWords: string[]; // Format: 'listId-wordIndex'
-  reviewVocabWords: string[]; // Format: 'listId-wordIndex'
-  memorizedEnglishUnits: string[]; // English Units memorized
-  reviewEnglishUnits: string[]; // English Units in review
-  xp: number; // Experience points
+  memorizedHadithNumbers: number[];
+  reviewHadithNumbers: number[];
+  memorizedSurahNumbers: number[];
+  reviewSurahNumbers: number[];
+  memorizedSurahPages: string[];
+  memorizedVocabWords: string[];
+  reviewVocabWords: string[];
+  memorizedEnglishUnits: string[];
+  reviewEnglishUnits: string[];
+  xp: number;
 }
 
 export const QURAN_SURAHS: {
@@ -161,7 +160,7 @@ export const QURAN_SURAHS: {
 ];
 
 export interface EnglishUnit {
-  id: string; // e.g. 'b1-u1'
+  id: string;
   book: number;
   unit: number;
 }
@@ -239,15 +238,11 @@ export const STAGES: Stage[] = [
   },
 ];
 
-const STORAGE_KEY = "hadith_tracker_students";
-const HADITHS_STORAGE_KEY = "hadith_tracker_hadiths";
-
 @Injectable({
   providedIn: "root",
 })
 export class TrackerState {
-  private platformId = inject(PLATFORM_ID);
-  private isBrowser = isPlatformBrowser(this.platformId);
+  private api = inject(ApiService);
 
   // Reactive Signals
   students = signal<Student[]>([]);
@@ -255,153 +250,65 @@ export class TrackerState {
   vocabLists = signal<VocabList[]>([]);
   selectedStudentId = signal<string | null>(null);
 
-
   // Search and filter signals
   searchQuery = signal<string>("");
   categoryFilter = signal<string>("all");
 
   constructor() {
-    this.loadHadithsFromStorage();
-    this.loadVocabFromStorage();
-    this.loadFromStorage();
+    this.loadFromApi();
   }
 
-  private loadVocabFromStorage() {
-    if (this.isBrowser) {
-      try {
-        const stored = localStorage.getItem("hadith_tracker_vocabs");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-            this.vocabLists.set(parsed);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to load vocabs", e);
+  private async loadFromApi() {
+    try {
+      const [students, hadiths, vocabLists] = await Promise.all([
+        this.api.getStudents(),
+        this.api.getHadiths(),
+        this.api.getVocabLists(),
+      ]);
+
+      this.hadiths.set(hadiths.length > 0 ? hadiths : HADITHS_DATA);
+      this.vocabLists.set(vocabLists.length > 0 ? vocabLists : this.getDefaultVocabLists());
+      this.students.set(students.length > 0 ? students : this.getDefaultStudents());
+
+      if (this.students().length > 0 && !this.selectedStudentId()) {
+        this.selectedStudentId.set(this.students()[0].id);
       }
+
+      // If API had no data, seed it
+      if (students.length === 0 || hadiths.length === 0) {
+        await this.seedDatabase();
+      }
+    } catch (e) {
+      console.warn('API not available, falling back to local data', e);
+      this.hadiths.set(HADITHS_DATA);
+      this.vocabLists.set(this.getDefaultVocabLists());
+      const defaults = this.getDefaultStudents();
+      this.students.set(defaults);
+      if (defaults.length > 0) this.selectedStudentId.set(defaults[0].id);
     }
-    // Fallback to static starter dataset
-    const defaultLists: VocabList[] = VOCAB_DATA.map((unit) => ({
+  }
+
+  private getDefaultVocabLists(): VocabList[] {
+    return VOCAB_DATA.map((unit) => ({
       id: `vlist_unit_${unit.unit}`,
       name: `Unit ${unit.unit}`,
       words: unit.words,
     }));
-    this.vocabLists.set(defaultLists);
-    this.saveVocabToStorage(defaultLists);
   }
 
-  saveVocabToStorage(lists: VocabList[]) {
-    if (this.isBrowser) {
-      localStorage.setItem("hadith_tracker_vocabs", JSON.stringify(lists));
+  private async seedDatabase() {
+    try {
+      await this.api.sync({
+        students: this.students(),
+        hadiths: this.hadiths(),
+      });
+    } catch (e) {
+      console.warn('Failed to seed database', e);
     }
   }
 
-  addVocabList(name: string, rawText: string) {
-    const lines = rawText.split("\n").filter((l) => l.trim().length > 0);
-    const words: VocabWord[] = lines
-      .map((line) => {
-        const parts = line.split(":");
-        const word = parts[0]?.trim() || "";
-        const definition = parts.slice(1).join(":").trim() || "";
-        return { word, definition };
-      })
-      .filter((w) => w.word.length > 0);
-
-    const newList: VocabList = {
-      id: `vlist_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      name: name || "قائمة مفردات",
-      words,
-    };
-
-    const current = this.vocabLists();
-    const updated = [...current, newList];
-    this.vocabLists.set(updated);
-    this.saveVocabToStorage(updated);
-    return newList.id;
-  }
-
-  deleteVocabList(id: string) {
-    const updated = this.vocabLists().filter((l) => l.id !== id);
-    this.vocabLists.set(updated);
-    this.saveVocabToStorage(updated);
-  }
-
-  // Load hadiths from storage
-  private loadHadithsFromStorage() {
-    if (this.isBrowser) {
-      try {
-        const stored = localStorage.getItem(HADITHS_STORAGE_KEY);
-        if (stored) {
-          let parsed = JSON.parse(stored) as Hadith[];
-          if (parsed && parsed.length > 0) {
-            // Migration: Replace old reference ("رواه...") with the new narrator from HADITHS_DATA
-            let migrated = false;
-            parsed = parsed.map((h) => {
-              if (h.reference && h.reference.includes("رواه")) {
-                const matched = HADITHS_DATA.find(
-                  (dh) => dh.number === h.number,
-                );
-                if (matched) {
-                  migrated = true;
-                  return { ...h, reference: matched.reference };
-                }
-              }
-              return h;
-            });
-            if (migrated) {
-              this.saveHadithsToStorage(parsed);
-            }
-            this.hadiths.set(parsed);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Error reading localStorage hadiths", e);
-      }
-    }
-    // Fallback to static starter dataset
-    this.hadiths.set(HADITHS_DATA);
-    this.saveHadithsToStorage(HADITHS_DATA);
-  }
-
-  saveHadithsToStorage(data: Hadith[]) {
-    if (this.isBrowser) {
-      try {
-        localStorage.setItem(HADITHS_STORAGE_KEY, JSON.stringify(data));
-      } catch (e) {
-        console.error("Error writing localStorage hadiths", e);
-      }
-    }
-  }
-
-  // Loaded students
-  private loadFromStorage() {
-    if (this.isBrowser) {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          let parsed = JSON.parse(stored) as Student[];
-          if (parsed && parsed.length > 0) {
-            parsed = parsed.map((s) => ({
-              ...s,
-              memorizedSurahNumbers: s.memorizedSurahNumbers || [],
-              reviewSurahNumbers: s.reviewSurahNumbers || [],
-              memorizedEnglishUnits: s.memorizedEnglishUnits || [],
-              reviewEnglishUnits: s.reviewEnglishUnits || [],
-            }));
-            this.students.set(parsed);
-            this.selectedStudentId.set(parsed[0].id);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Error reading localStorage", e);
-      }
-    }
-
-    // Set default beautiful starter data if none exists
-    const defaultStudents: Student[] = [
+  private getDefaultStudents(): Student[] {
+    return [
       {
         id: "student-1",
         name: "أحمد ياسين",
@@ -409,9 +316,7 @@ export class TrackerState {
         avatar: "avatar-leaf",
         notes: "حريص جداً على مراجعة الحديث يومياً ويحب قصص الأنبياء.",
         joinedAt: "2026-03-10",
-        memorizedHadithNumbers: [
-          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-        ],
+        memorizedHadithNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
         reviewHadithNumbers: [19, 20],
         memorizedSurahNumbers: [1, 114, 113, 112],
         reviewSurahNumbers: [111],
@@ -427,8 +332,7 @@ export class TrackerState {
         name: "سارة عبد الله",
         age: 8,
         avatar: "avatar-flower",
-        notes:
-          "ما شاء الله، سريعة الحفظ والتلقين، تتميز بنطقها الفصيح لمخارج الحروف.",
+        notes: "ما شاء الله، سريعة الحفظ والتلقين، تتميز بنطقها الفصيح لمخارج الحروف.",
         joinedAt: "2026-04-01",
         memorizedHadithNumbers: [1, 3, 4, 6, 7, 11, 12, 18, 20],
         reviewHadithNumbers: [2, 5],
@@ -446,10 +350,9 @@ export class TrackerState {
         name: "عمر الخطاب",
         age: 12,
         avatar: "avatar-mountain",
-        notes:
-          "أوشك على إكمال حفظ الأربعين كاملة! يطمح للمشاركة في مسابقة السنة النبوية الكبرى.",
+        notes: "أوشك على إكمال حفظ الأربعين كاملة! يطمح للمشاركة في مسابقة السنة النبوية الكبرى.",
         joinedAt: "2026-01-15",
-        memorizedHadithNumbers: Array.from({ length: 38 }, (_, i) => i + 1), // 1 to 38
+        memorizedHadithNumbers: Array.from({ length: 38 }, (_, i) => i + 1),
         reviewHadithNumbers: [39, 40],
         memorizedSurahNumbers: [1, 2, 36],
         reviewSurahNumbers: [3],
@@ -478,17 +381,7 @@ export class TrackerState {
         reviewEnglishUnits: ["b1-u1"],
         xp: 400,
       },
-    ];
-
-    // Recalculate XP
-    const calculatedStudents = defaultStudents.map((s) => ({
-      ...s,
-      xp: this.calculateXP(s),
-    }));
-
-    this.students.set(calculatedStudents);
-    this.selectedStudentId.set(calculatedStudents[0].id);
-    this.saveToStorage(calculatedStudents);
+    ].map((s) => ({ ...s, xp: this.calculateXP(s) }));
   }
 
   public calculateXP(s: Partial<Student>): number {
@@ -501,16 +394,6 @@ export class TrackerState {
     );
   }
 
-  saveToStorage(data: Student[]) {
-    if (this.isBrowser) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (e) {
-        console.error("Error writing localStorage", e);
-      }
-    }
-  }
-
   // Computed signals
   selectedStudent = computed(() => {
     const id = this.selectedStudentId();
@@ -518,26 +401,19 @@ export class TrackerState {
     return this.students().find((s) => s.id === id) || null;
   });
 
-  // Calculate current stage for any student
   getStudentStage(student: Student): Stage {
     const xp = student.xp;
     return STAGES.find((s) => xp >= s.minXP && xp <= s.maxXP) || STAGES[0];
   }
 
-  // Calculate next stage and target XP remaining
   getStudentNextStageInfo(student: Student) {
     const currentStage = this.getStudentStage(student);
     const nextStage = STAGES.find((s) => s.level === currentStage.level + 1);
-    if (!nextStage) return null; // Already at max level
-
+    if (!nextStage) return null;
     const remaining = nextStage.minXP - student.xp;
-    return {
-      nextStage,
-      remaining,
-    };
+    return { nextStage, remaining };
   }
 
-  // General App Statistics
   stats = computed(() => {
     const list = this.students();
     if (list.length === 0) {
@@ -546,157 +422,20 @@ export class TrackerState {
     const totalStudents = list.length;
     const totalXP = list.reduce((sum, s) => sum + s.xp, 0);
     const averageXP = Math.round((totalXP / totalStudents) * 10) / 10;
-
     let topStudent = list[0];
-    list.forEach((s) => {
-      if (s.xp > topStudent.xp) {
-        topStudent = s;
-      }
-    });
-
-    return {
-      totalStudents,
-      totalXP,
-      averageXP,
-      topStudent: topStudent.xp > 0 ? topStudent : null,
-    };
+    list.forEach((s) => { if (s.xp > topStudent.xp) topStudent = s; });
+    return { totalStudents, totalXP, averageXP, topStudent: topStudent.xp > 0 ? topStudent : null };
   });
 
-  // Hadiths categories
   categories = computed(() => {
     const cats = new Set<string>();
     this.hadiths().forEach((h) => cats.add(h.category));
     return Array.from(cats);
   });
 
-  // Hadith Actions
-  addHadith(
-    title: string,
-    text: string,
-    reference: string,
-    explanation: string,
-    category: string,
-    badgeName?: string,
-    badgeIcon?: string,
-  ) {
-    if (!title.trim() || !text.trim()) return;
-
-    const list = this.hadiths();
-    const nextNum =
-      list.length > 0 ? Math.max(...list.map((h) => h.number)) + 1 : 1;
-
-    const newHadith: Hadith = {
-      number: nextNum,
-      title: title.trim(),
-      text: text.trim(),
-      reference: reference.trim() || "رواية صحيحة",
-      explanation:
-        explanation.trim() || "شرح مبسط وميسر لفهم معاني الحديث النبوي الشريف.",
-      category: category.trim() || "عام",
-      points: 100,
-      badgeName: badgeName?.trim() || `وسام ${title.trim()}`,
-      badgeIcon: badgeIcon?.trim() || "stars",
-    };
-
-    const updated = [...list, newHadith];
-    this.hadiths.set(updated);
-    this.saveHadithsToStorage(updated);
-  }
-
-  updateHadith(
-    oldNumber: number,
-    newNumber: number,
-    title: string,
-    text: string,
-    reference: string,
-    explanation: string,
-    category: string,
-    badgeName?: string,
-    badgeIcon?: string,
-  ): boolean {
-    if (!title.trim() || !text.trim() || !newNumber) return false;
-
-    // Check if the new number already exists for another Hadith
-    if (oldNumber !== newNumber) {
-      const exists = this.hadiths().some((h) => h.number === newNumber);
-      if (exists) {
-        return false;
-      }
-    }
-
-    const updated = this.hadiths().map((h) => {
-      if (h.number === oldNumber) {
-        return {
-          ...h,
-          number: newNumber,
-          title: title.trim(),
-          text: text.trim(),
-          reference: reference.trim(),
-          explanation: explanation.trim(),
-          category: category.trim(),
-          badgeName: badgeName?.trim() || h.badgeName,
-          badgeIcon: badgeIcon?.trim() || h.badgeIcon,
-        };
-      }
-      return h;
-    });
-
-    // Update students' records if the Hadith number changed
-    if (oldNumber !== newNumber) {
-      const updatedStudents = this.students().map((s) => {
-        const memorized = s.memorizedHadithNumbers.map((n) =>
-          n === oldNumber ? newNumber : n,
-        );
-        const review = s.reviewHadithNumbers.map((n) =>
-          n === oldNumber ? newNumber : n,
-        );
-        return {
-          ...s,
-          memorizedHadithNumbers: memorized,
-          reviewHadithNumbers: review,
-        };
-      });
-      this.students.set(updatedStudents);
-      this.saveToStorage(updatedStudents);
-    }
-
-    this.hadiths.set(updated);
-    this.saveHadithsToStorage(updated);
-    return true;
-  }
-
-  deleteHadith(number: number) {
-    // 1. Delete the Hadith from the list
-    const updatedHadiths = this.hadiths().filter((h) => h.number !== number);
-    this.hadiths.set(updatedHadiths);
-    this.saveHadithsToStorage(updatedHadiths);
-
-    // 2. Clean up students' records so they don't refer to a non-existent Hadith number
-    const updatedStudents = this.students().map((s) => {
-      const memorized = s.memorizedHadithNumbers.filter((n) => n !== number);
-      const review = s.reviewHadithNumbers.filter((n) => n !== number);
-      const xp = memorized.length * 100;
-      return {
-        ...s,
-        memorizedHadithNumbers: memorized,
-        reviewHadithNumbers: review,
-        xp,
-      };
-    });
-
-    this.students.set(updatedStudents);
-    this.saveToStorage(updatedStudents);
-  }
-
-  // Actions
-  addStudent(
-    name: string,
-    age?: number,
-    avatar = "avatar-leaf",
-    notes?: string,
-  ) {
+  // ── Students ──
+  addStudent(name: string, age?: number, avatar = "avatar-leaf", notes?: string) {
     if (!name.trim()) return;
-
     const newStudent: Student = {
       id: "student-" + Date.now(),
       name: name.trim(),
@@ -715,343 +454,305 @@ export class TrackerState {
       reviewEnglishUnits: [],
       xp: 0,
     };
-
     const updated = [...this.students(), newStudent];
     this.students.set(updated);
     this.selectedStudentId.set(newStudent.id);
-    this.saveToStorage(updated);
+    this.api.saveStudent(newStudent).catch((e) => console.error('saveStudent failed', e));
   }
 
-  updateStudent(
-    id: string,
-    name: string,
-    age?: number,
-    avatar?: string,
-    notes?: string,
-  ) {
+  updateStudent(id: string, name: string, age?: number, avatar?: string, notes?: string) {
     const updated = this.students().map((s) => {
       if (s.id === id) {
-        return {
-          ...s,
-          name: name.trim(),
-          age: age ? Number(age) : undefined,
-          avatar: avatar || s.avatar,
-          notes: notes?.trim() || undefined,
-        };
+        return { ...s, name: name.trim(), age: age ? Number(age) : undefined, avatar: avatar || s.avatar, notes: notes?.trim() || undefined };
       }
       return s;
     });
-
     this.students.set(updated);
-    this.saveToStorage(updated);
+    const student = updated.find((s) => s.id === id);
+    if (student) this.api.saveStudent(student).catch((e) => console.error('updateStudent failed', e));
   }
 
   deleteStudent(id: string) {
     const updated = this.students().filter((s) => s.id !== id);
     this.students.set(updated);
-
     if (this.selectedStudentId() === id) {
       this.selectedStudentId.set(updated.length > 0 ? updated[0].id : null);
     }
-
-    this.saveToStorage(updated);
+    this.api.deleteStudent(id).catch((e) => console.error('deleteStudent failed', e));
   }
 
-  // Toggle hadith memorization state
-  toggleHadithStatus(
-    studentId: string,
-    hadithNumber: number,
-    newStatus: "memorized" | "review" | "none",
-  ) {
-    const updated = this.students().map((s) => {
+  // ── Hadiths ──
+  addHadith(title: string, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string) {
+    if (!title.trim() || !text.trim()) return;
+    const list = this.hadiths();
+    const nextNum = list.length > 0 ? Math.max(...list.map((h) => h.number)) + 1 : 1;
+    const newHadith: Hadith = {
+      number: nextNum,
+      title: title.trim(),
+      text: text.trim(),
+      reference: reference.trim() || "رواية صحيحة",
+      explanation: explanation.trim() || "شرح مبسط وميسر لفهم معاني الحديث النبوي الشريف.",
+      category: category.trim() || "عام",
+      points: 100,
+      badgeName: badgeName?.trim() || `وسام ${title.trim()}`,
+      badgeIcon: badgeIcon?.trim() || "stars",
+    };
+    const updated = [...list, newHadith];
+    this.hadiths.set(updated);
+    this.api.saveHadith(newHadith).catch((e) => console.error('saveHadith failed', e));
+  }
+
+  updateHadith(oldNumber: number, newNumber: number, title: string, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
+    if (!title.trim() || !text.trim() || !newNumber) return false;
+    if (oldNumber !== newNumber) {
+      if (this.hadiths().some((h) => h.number === newNumber)) return false;
+    }
+    const updated = this.hadiths().map((h) => {
+      if (h.number === oldNumber) {
+        return { ...h, number: newNumber, title: title.trim(), text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim(), badgeName: badgeName?.trim() || h.badgeName, badgeIcon: badgeIcon?.trim() || h.badgeIcon };
+      }
+      return h;
+    });
+    if (oldNumber !== newNumber) {
+      this.students.update((list) => list.map((s) => ({
+        ...s,
+        memorizedHadithNumbers: s.memorizedHadithNumbers.map((n) => n === oldNumber ? newNumber : n),
+        reviewHadithNumbers: s.reviewHadithNumbers.map((n) => n === oldNumber ? newNumber : n),
+      })));
+    }
+    this.hadiths.set(updated);
+    const hadith = updated.find((h) => h.number === newNumber);
+    if (hadith) this.api.saveHadith(hadith).catch((e) => console.error('updateHadith failed', e));
+    return true;
+  }
+
+  deleteHadith(number: number) {
+    const updatedHadiths = this.hadiths().filter((h) => h.number !== number);
+    this.hadiths.set(updatedHadiths);
+    this.students.update((list) => list.map((s) => ({
+      ...s,
+      memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number),
+      reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number),
+      xp: s.memorizedHadithNumbers.filter((n) => n !== number).length * 100,
+    })));
+    this.api.deleteHadith(number).catch((e) => console.error('deleteHadith failed', e));
+  }
+
+  // ── Hadith Status ──
+  toggleHadithStatus(studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
-        let memorized = [...s.memorizedHadithNumbers];
-        let review = [...s.reviewHadithNumbers];
-
-        memorized = memorized.filter((n) => n !== hadithNumber);
-        review = review.filter((n) => n !== hadithNumber);
-
-        if (newStatus === "memorized") {
-          memorized.push(hadithNumber);
-          memorized.sort((a, b) => a - b);
-        } else if (newStatus === "review") {
-          review.push(hadithNumber);
-          review.sort((a, b) => a - b);
-        }
-
-        const updatedStudent = {
-          ...s,
-          memorizedHadithNumbers: memorized,
-          reviewHadithNumbers: review,
-        };
+        let memorized = s.memorizedHadithNumbers.filter((n) => n !== hadithNumber);
+        let review = s.reviewHadithNumbers.filter((n) => n !== hadithNumber);
+        if (newStatus === "memorized") { memorized.push(hadithNumber); memorized.sort((a, b) => a - b); }
+        else if (newStatus === "review") { review.push(hadithNumber); review.sort((a, b) => a - b); }
+        const updatedStudent = { ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    this.api.setHadithStatus(studentId, hadithNumber, newStatus).catch((e) => console.error('setHadithStatus failed', e));
   }
 
   toggleHadithQuick(studentId: string, hadithNumber: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const isMemorized = student.memorizedHadithNumbers.includes(hadithNumber);
-    const newStatus = isMemorized ? "none" : "memorized";
-    this.toggleHadithStatus(studentId, hadithNumber, newStatus);
+    this.toggleHadithStatus(studentId, hadithNumber, isMemorized ? "none" : "memorized");
   }
 
-  // Toggle Quran memorization state
-  toggleSurahStatus(
-    studentId: string,
-    surahNumber: number,
-    newStatus: "memorized" | "review" | "none",
-  ) {
-    const updated = this.students().map((s) => {
+  // ── Surah Status ──
+  toggleSurahStatus(studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
-        let memorized = [...s.memorizedSurahNumbers];
-        let review = [...s.reviewSurahNumbers];
-
-        memorized = memorized.filter((n) => n !== surahNumber);
-        review = review.filter((n) => n !== surahNumber);
-
-        if (newStatus === "memorized") {
-          memorized.push(surahNumber);
-          memorized.sort((a, b) => a - b);
-        } else if (newStatus === "review") {
-          review.push(surahNumber);
-          review.sort((a, b) => a - b);
-        }
-
-        const updatedStudent = {
-          ...s,
-          memorizedSurahNumbers: memorized,
-          reviewSurahNumbers: review,
-        };
+        let memorized = s.memorizedSurahNumbers.filter((n) => n !== surahNumber);
+        let review = s.reviewSurahNumbers.filter((n) => n !== surahNumber);
+        if (newStatus === "memorized") { memorized.push(surahNumber); memorized.sort((a, b) => a - b); }
+        else if (newStatus === "review") { review.push(surahNumber); review.sort((a, b) => a - b); }
+        const updatedStudent = { ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    this.api.setSurahStatus(studentId, surahNumber, newStatus).catch((e) => console.error('setSurahStatus failed', e));
   }
 
   toggleSurahQuick(studentId: string, surahNumber: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const isMemorized = student.memorizedSurahNumbers.includes(surahNumber);
-    const newStatus = isMemorized ? "none" : "memorized";
-    this.toggleSurahStatus(studentId, surahNumber, newStatus);
+    this.toggleSurahStatus(studentId, surahNumber, isMemorized ? "none" : "memorized");
   }
 
-  // Toggle English memorization state
-  toggleEnglishStatus(
-    studentId: string,
-    unitId: string,
-    newStatus: "memorized" | "review" | "none",
-  ) {
-    const updated = this.students().map((s) => {
-      if (s.id === studentId) {
-        let memorized = [...s.memorizedEnglishUnits];
-        let review = [...s.reviewEnglishUnits];
-
-        memorized = memorized.filter((id) => id !== unitId);
-        review = review.filter((id) => id !== unitId);
-
-        if (newStatus === "memorized") {
-          memorized.push(unitId);
-        } else if (newStatus === "review") {
-          review.push(unitId);
-        }
-
-        const updatedStudent = {
-          ...s,
-          memorizedEnglishUnits: memorized,
-          reviewEnglishUnits: review,
-        };
-        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
-      }
-      return s;
-    });
-
-    this.students.set(updated);
-    this.saveToStorage(updated);
-  }
-
-  toggleEnglishQuick(studentId: string, unitId: string) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-
-    const isMemorized = student.memorizedEnglishUnits.includes(unitId);
-    const newStatus = isMemorized ? "none" : "memorized";
-    this.toggleEnglishStatus(studentId, unitId, newStatus);
-  }
-
-  // Toggle Quran Page Status
-  toggleSurahPageStatus(
-    studentId: string,
-    surahNumber: number,
-    pageIndex: number,
-    newStatus: "memorized" | "none",
-  ) {
+  // ── Surah Pages ──
+  toggleSurahPageStatus(studentId: string, surahNumber: number, pageIndex: number, newStatus: "memorized" | "none") {
     const pageId = `${surahNumber}-${pageIndex}`;
-    const updated = this.students().map((s) => {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
-        let memorized = [...(s.memorizedSurahPages || [])];
-        memorized = memorized.filter((id) => id !== pageId);
-
-        if (newStatus === "memorized") {
-          memorized.push(pageId);
-        }
-
+        let memorized = [...(s.memorizedSurahPages || [])].filter((id) => id !== pageId);
+        if (newStatus === "memorized") memorized.push(pageId);
         const updatedStudent = { ...s, memorizedSurahPages: memorized };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    if (newStatus === 'memorized') {
+      this.api.markSurahPage(studentId, pageId).catch((e) => console.error('markSurahPage failed', e));
+    } else {
+      this.api.unmarkSurahPage(studentId, pageId).catch((e) => console.error('unmarkSurahPage failed', e));
+    }
   }
 
   markAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const memorized = [...(student.memorizedSurahPages || [])];
     let changed = false;
     for (let i = 1; i <= pageCount; i++) {
       const pageId = `${surahNumber}-${i}`;
-      if (!memorized.includes(pageId)) {
-        memorized.push(pageId);
-        changed = true;
-      }
+      if (!memorized.includes(pageId)) { memorized.push(pageId); changed = true; }
     }
     if (!changed) return;
-
-    const updated = this.students().map((s) => {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
         const updatedStudent = { ...s, memorizedSurahPages: memorized };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    for (let i = 1; i <= pageCount; i++) {
+      this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => {});
+    }
   }
 
   clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const memorized = (student.memorizedSurahPages || []).filter((id) => {
       if (!id.startsWith(surahNumber + '-')) return true;
       const idx = parseInt(id.split('-')[1], 10);
       return isNaN(idx) || idx > pageCount;
     });
-
-    const updated = this.students().map((s) => {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
         const updatedStudent = { ...s, memorizedSurahPages: memorized };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
   }
 
-  // Toggle Vocab Status
-  toggleVocabStatus(
-    studentId: string,
-    listId: string,
-    wordIndex: number,
-    newStatus: "memorized" | "review" | "none",
-  ) {
-    const vocabId = `${listId}-${wordIndex}`;
-    const updated = this.students().map((s) => {
+  // ── English Status ──
+  toggleEnglishStatus(studentId: string, unitId: string, newStatus: "memorized" | "review" | "none") {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
-        let memorized = [...(s.memorizedVocabWords || [])];
-        let review = [...(s.reviewVocabWords || [])];
-
-        memorized = memorized.filter((id) => id !== vocabId);
-        review = review.filter((id) => id !== vocabId);
-
-        if (newStatus === "memorized") {
-          memorized.push(vocabId);
-        } else if (newStatus === "review") {
-          review.push(vocabId);
-        }
-
-        const updatedStudent = {
-          ...s,
-          memorizedVocabWords: memorized,
-          reviewVocabWords: review,
-        };
+        let memorized = s.memorizedEnglishUnits.filter((id) => id !== unitId);
+        let review = s.reviewEnglishUnits.filter((id) => id !== unitId);
+        if (newStatus === "memorized") memorized.push(unitId);
+        else if (newStatus === "review") review.push(unitId);
+        const updatedStudent = { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    this.api.setEnglishUnitStatus(studentId, unitId, newStatus).catch((e) => console.error('setEnglishUnitStatus failed', e));
+  }
+
+  toggleEnglishQuick(studentId: string, unitId: string) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+    const isMemorized = student.memorizedEnglishUnits.includes(unitId);
+    this.toggleEnglishStatus(studentId, unitId, isMemorized ? "none" : "memorized");
+  }
+
+  // ── Vocab Status ──
+  toggleVocabStatus(studentId: string, listId: string, wordIndex: number, newStatus: "memorized" | "review" | "none") {
+    const vocabId = `${listId}-${wordIndex}`;
+    this.students.update((list) => list.map((s) => {
+      if (s.id === studentId) {
+        let memorized = [...(s.memorizedVocabWords || [])].filter((id) => id !== vocabId);
+        let review = [...(s.reviewVocabWords || [])].filter((id) => id !== vocabId);
+        if (newStatus === "memorized") memorized.push(vocabId);
+        else if (newStatus === "review") review.push(vocabId);
+        const updatedStudent = { ...s, memorizedVocabWords: memorized, reviewVocabWords: review };
+        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
+      }
+      return s;
+    }));
+    this.api.setVocabStatus(studentId, vocabId, newStatus).catch((e) => console.error('setVocabStatus failed', e));
   }
 
   toggleVocabQuick(studentId: string, listId: string, wordIndex: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const vocabId = `${listId}-${wordIndex}`;
     const isMemorized = (student.memorizedVocabWords || []).includes(vocabId);
-    const newStatus = isMemorized ? "none" : "memorized";
-    this.toggleVocabStatus(studentId, listId, wordIndex, newStatus);
+    this.toggleVocabStatus(studentId, listId, wordIndex, isMemorized ? "none" : "memorized");
   }
 
   markAllVocab(studentId: string, listId: string, wordCount: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const memorized = [...(student.memorizedVocabWords || [])];
     let changed = false;
     for (let i = 0; i < wordCount; i++) {
       const vocabId = `${listId}-${i}`;
-      if (!memorized.includes(vocabId)) {
-        memorized.push(vocabId);
-        changed = true;
-      }
+      if (!memorized.includes(vocabId)) { memorized.push(vocabId); changed = true; }
     }
     if (!changed) return;
-
-    const updated = this.students().map((s) => {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
         const updatedStudent = { ...s, memorizedVocabWords: memorized };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+    for (let i = 0; i < wordCount; i++) {
+      this.api.setVocabStatus(studentId, `${listId}-${i}`, 'memorized').catch(() => {});
+    }
   }
 
   clearAllVocab(studentId: string, listId: string, wordCount: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-
     const memorized = (student.memorizedVocabWords || []).filter((id) => {
       if (!id.startsWith(listId + '-')) return true;
       const idx = parseInt(id.split('-')[1], 10);
       return isNaN(idx) || idx >= wordCount;
     });
-
-    const updated = this.students().map((s) => {
+    this.students.update((list) => list.map((s) => {
       if (s.id === studentId) {
         const updatedStudent = { ...s, memorizedVocabWords: memorized };
         return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
       }
       return s;
-    });
-    this.students.set(updated);
-    this.saveToStorage(updated);
+    }));
+  }
+
+  // ── Vocab Lists Management ──
+  addVocabList(name: string, rawText: string) {
+    const lines = rawText.split("\n").filter((l) => l.trim().length > 0);
+    const words: VocabWord[] = lines.map((line) => {
+      const parts = line.split(":");
+      return { word: parts[0]?.trim() || "", definition: parts.slice(1).join(":").trim() || "" };
+    }).filter((w) => w.word.length > 0);
+    const newList: VocabList = {
+      id: `vlist_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      name: name || "قائمة مفردات",
+      words,
+    };
+    const updated = [...this.vocabLists(), newList];
+    this.vocabLists.set(updated);
+    this.api.saveVocabList(newList).catch((e) => console.error('saveVocabList failed', e));
+  }
+
+  deleteVocabList(id: string) {
+    const updated = this.vocabLists().filter((l) => l.id !== id);
+    this.vocabLists.set(updated);
+    this.api.deleteVocabList(id).catch((e) => console.error('deleteVocabList failed', e));
+  }
+
+  saveVocabToStorage(lists: VocabList[]) {
+    // Kept for backwards compatibility but no longer used
   }
 }

@@ -192,7 +192,9 @@ export class StagesComponent {
         return s;
       });
       this.state.students.set(updated);
-      this.state.saveToStorage(updated);
+      for (const s of updated) {
+        if (s.id === studentId) this.state['api'].saveStudent(s).catch(() => {});
+      }
       const updatedStudent = updated.find((s) => s.id === studentId)!;
       this.celebration.trigger(updatedStudent, STAGES[4]);
       this.toast.show(`هنيئاً! تم إتمام حفظ الأربعين لـ ${student.name}!`);
@@ -211,7 +213,9 @@ export class StagesComponent {
         return s;
       });
       this.state.students.set(updated);
-      this.state.saveToStorage(updated);
+      for (const s of updated) {
+        if (s.id === studentId) this.state['api'].saveStudent(s).catch(() => {});
+      }
       this.toast.show('تم تصفير سجل الحفظ.');
       this.modal.confirmState.set(null);
     });
