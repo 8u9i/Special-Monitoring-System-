@@ -17,6 +17,9 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 
 const angularApp = new AngularNodeAppEngine({
   trustProxyHeaders: true,
+  allowedHosts: process.env['RAILWAY_PUBLIC_DOMAIN']
+    ? [process.env['RAILWAY_PUBLIC_DOMAIN'], 'localhost']
+    : ['localhost'],
 });
 
 // PostgreSQL connection pool
