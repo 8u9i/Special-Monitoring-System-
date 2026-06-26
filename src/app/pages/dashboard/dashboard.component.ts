@@ -87,8 +87,7 @@ import { ModalService } from '../../shared/services/modal.service';
             @let stage = state.getStudentStage(student);
             <div [class]="isTop
               ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-none bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20 transition-all duration-300'
-              : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)] transition-all duration-300 hover:border-[var(--color-primary)]/30'"
-              style="animation: fadeSlideIn 0.35s ease-out both; animation-delay: {{ idx * 0.05 }}s">
+              : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)] transition-all duration-300 hover:border-[var(--color-primary)]/30'">
               <div class="flex items-center gap-3 w-full sm:w-auto">
                 <div class="w-12 h-12 rounded-none flex items-center justify-center font-bold text-sm font-inter shrink-0"
                   [class]="isTop ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--color-border)] text-[var(--color-text-secondary)]'">

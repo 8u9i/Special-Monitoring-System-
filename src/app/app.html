@@ -3,7 +3,9 @@
   <app-sidebar />
   <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
     <app-header />
-    <router-outlet />
+    <div style="animation: fadeSlideIn 0.3s ease-out both">
+      <router-outlet />
+    </div>
   </main>
 </div>
 
