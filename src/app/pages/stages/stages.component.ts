@@ -5,6 +5,7 @@ import { TrackerState, Student, STAGES } from '../../state';
 import { ToastService } from '../../shared/services/toast.service';
 import { ModalService } from '../../shared/services/modal.service';
 import { CelebrationService } from '../../shared/services/celebration.service';
+import { ApiService } from '../../api.service';
 
 @Component({
   selector: 'app-stages',
@@ -143,6 +144,7 @@ export class StagesComponent {
   toast = inject(ToastService);
   modal = inject(ModalService);
   celebration = inject(CelebrationService);
+  api = inject(ApiService);
 
   private avatarMap: Record<string, string> = {
     'avatar-leaf': '🌿', 'avatar-mountain': '🏔️', 'avatar-sun': '☀️',
@@ -192,12 +194,11 @@ export class StagesComponent {
         return s;
       });
       this.state.students.set(updated);
-      for (const s of updated) {
-        if (s.id === studentId) this.state['api'].saveStudent(s).catch(() => {});
-      }
+      const saved = updated.find((s) => s.id === studentId);
+      if (saved) this.api.saveStudent(saved).catch(() => {});
       const updatedStudent = updated.find((s) => s.id === studentId)!;
       this.celebration.trigger(updatedStudent, STAGES[4]);
-      this.toast.show(`هنيئاً! تم إتمام حفظ الأربعين لـ ${student.name}!`);
+      this.toast.show(`هنيئاً! تم إتمام حفظ الأربعين لـ ${updatedStudent.name}!`);
       this.modal.confirmState.set(null);
     });
   }
@@ -213,9 +214,8 @@ export class StagesComponent {
         return s;
       });
       this.state.students.set(updated);
-      for (const s of updated) {
-        if (s.id === studentId) this.state['api'].saveStudent(s).catch(() => {});
-      }
+      const savedStudent = updated.find((s) => s.id === studentId);
+      if (savedStudent) this.api.saveStudent(savedStudent).catch(() => {});
       this.toast.show('تم تصفير سجل الحفظ.');
       this.modal.confirmState.set(null);
     });

@@ -11,7 +11,13 @@ import pg from 'pg';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+// Trust Railway proxy headers (x-forwarded-*)
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
+
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: true,
+});
 
 // PostgreSQL connection pool
 const pool = new pg.Pool({
@@ -28,8 +34,81 @@ app.use(express.json());
 // --- Students ---
 app.get('/api/students', async (_req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM students ORDER BY name');
-    res.json(rows);
+    const { rows: students } = await pool.query('SELECT * FROM students ORDER BY name');
+
+    // Fetch all junction table data in bulk
+    const [hadithRows, surahRows, pageRows, vocabRows, englishRows] = await Promise.all([
+      pool.query('SELECT student_id, hadith_number, status FROM student_hadiths'),
+      pool.query('SELECT student_id, surah_number, status FROM student_surahs'),
+      pool.query('SELECT student_id, page_id FROM student_surah_pages'),
+      pool.query('SELECT student_id, vocab_id, status FROM student_vocab'),
+      pool.query('SELECT student_id, unit_id, status FROM student_english_units'),
+    ]);
+
+    // Index junction data by student_id
+    const hadithMap: Record<string, { memorized: number[]; review: number[] }> = {};
+    for (const r of hadithRows.rows) {
+      if (!hadithMap[r.student_id]) hadithMap[r.student_id] = { memorized: [], review: [] };
+      if (r.status === 'memorized') hadithMap[r.student_id].memorized.push(r.hadith_number);
+      else if (r.status === 'review') hadithMap[r.student_id].review.push(r.hadith_number);
+    }
+
+    const surahMap: Record<string, { memorized: number[]; review: number[] }> = {};
+    for (const r of surahRows.rows) {
+      if (!surahMap[r.student_id]) surahMap[r.student_id] = { memorized: [], review: [] };
+      if (r.status === 'memorized') surahMap[r.student_id].memorized.push(r.surah_number);
+      else if (r.status === 'review') surahMap[r.student_id].review.push(r.surah_number);
+    }
+
+    const pageMap: Record<string, string[]> = {};
+    for (const r of pageRows.rows) {
+      if (!pageMap[r.student_id]) pageMap[r.student_id] = [];
+      pageMap[r.student_id].push(r.page_id);
+    }
+
+    const vocabMap: Record<string, { memorized: string[]; review: string[] }> = {};
+    for (const r of vocabRows.rows) {
+      if (!vocabMap[r.student_id]) vocabMap[r.student_id] = { memorized: [], review: [] };
+      if (r.status === 'memorized') vocabMap[r.student_id].memorized.push(r.vocab_id);
+      else if (r.status === 'review') vocabMap[r.student_id].review.push(r.vocab_id);
+    }
+
+    const englishMap: Record<string, { memorized: string[]; review: string[] }> = {};
+    for (const r of englishRows.rows) {
+      if (!englishMap[r.student_id]) englishMap[r.student_id] = { memorized: [], review: [] };
+      if (r.status === 'memorized') englishMap[r.student_id].memorized.push(r.unit_id);
+      else if (r.status === 'review') englishMap[r.student_id].review.push(r.unit_id);
+    }
+
+    // Assemble full student objects
+    const full = students.map((s: any) => {
+      const h = hadithMap[s.id] || { memorized: [], review: [] };
+      const su = surahMap[s.id] || { memorized: [], review: [] };
+      const p = pageMap[s.id] || [];
+      const v = vocabMap[s.id] || { memorized: [], review: [] };
+      const e = englishMap[s.id] || { memorized: [], review: [] };
+
+      return {
+        id: s.id,
+        name: s.name,
+        age: s.age,
+        avatar: s.avatar,
+        notes: s.notes,
+        joinedAt: s.joined_at,
+        memorizedHadithNumbers: h.memorized,
+        reviewHadithNumbers: h.review,
+        memorizedSurahNumbers: su.memorized,
+        reviewSurahNumbers: su.review,
+        memorizedSurahPages: p,
+        memorizedVocabWords: v.memorized,
+        reviewVocabWords: v.review,
+        memorizedEnglishUnits: e.memorized,
+        reviewEnglishUnits: e.review,
+        xp: s.xp,
+      };
+    });
+
+    res.json(full);
   } catch (err) {
     console.error('GET /api/students error:', err);
     res.status(500).json({ error: 'Failed to fetch students' });
