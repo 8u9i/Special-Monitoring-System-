@@ -227,8 +227,8 @@ export class TrackerState {
         await this.seedDatabase();
       } else {
         this.students.set(apiStudents);
-        this.hadiths.set(apiHadiths.length > 0 ? apiHadiths : HADITHS_DATA);
-        this.vocabLists.set(apiVocab.length > 0 ? apiVocab : this.getDefaultVocabLists());
+        this.hadiths.set(apiHadiths); // trust the API — even if empty
+        this.vocabLists.set(apiVocab); // trust the API — even if empty
       }
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
