@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { TrackerState } from '../../state';
 import { ModalService } from '../../shared/services/modal.service';
@@ -157,29 +157,33 @@ import { ModalService } from '../../shared/services/modal.service';
             <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">الحديث لليوم</h3>
           </div>
 
+          @if (hadithOfTheDay(); as hadith) {
           <div class="flex-1 flex flex-col items-center justify-center text-center px-2">
-            <span class="text-[var(--color-primary)] bg-[var(--color-primary-light)] px-3 py-1 rounded-none text-xs font-bold inline-block mb-4">الحديث رقم 11</span>
-            <h4 class="font-bold text-base text-[var(--color-text-primary)] mb-3">فعل المعروف صدقة</h4>
+            <span class="text-[var(--color-primary)] bg-[var(--color-primary-light)] px-3 py-1 rounded-none text-xs font-bold inline-block mb-4">الحديث رقم {{ hadith.number }}</span>
+            <h4 class="font-bold text-base text-[var(--color-text-primary)] mb-3">{{ hadith.title }}</h4>
             <p class="font-amiri text-xl font-bold text-[var(--color-primary-dark)] leading-relaxed mb-4">
-              "كُلُّ مَعْرُوفٍ صَدَقَة"
+              "{{ hadith.text }}"
             </p>
             <p class="text-xs text-[var(--color-text-secondary)] mb-4">
-              الراوي: {{ allHadiths[10]?.reference }}
+              الراوي: {{ hadith.reference }}
             </p>
             <div class="w-full p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)] text-right">
               <span class="text-xs text-[var(--color-primary)] font-bold block mb-1.5 flex items-center gap-1">
                 <span class="material-icons text-sm">spa</span>
                 الدرس والعمل:
               </span>
-              <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                أي عمل طيب تقوم به، كالتوجيه اللطيف أو إماطة الأذى أو الكلمة الطيبة، يكتبه الله لك صدقة.
-              </p>
+              <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">{{ hadith.explanation }}</p>
             </div>
           </div>
 
           <div class="mt-6 pt-4 border-t border-[var(--color-border-light)] text-center">
             <p class="text-[10px] text-[var(--color-text-tertiary)]">تزخر أحاديث الأربعين بقيم الأخلاق والمحامل الإيجابية.</p>
           </div>
+          } @else {
+          <div class="flex-1 flex items-center justify-center">
+            <p class="text-sm text-[var(--color-text-tertiary)]">لا توجد أحاديث مضافة بعد</p>
+          </div>
+          }
         </div>
       </div>
     </div>
@@ -194,6 +198,18 @@ export class DashboardComponent {
     'avatar-leaf': '🌿', 'avatar-mountain': '🏔️', 'avatar-sun': '☀️',
     'avatar-flower': '🌸', 'avatar-water': '💧', 'avatar-shield': '🛡️',
   };
+
+  /** Picks a deterministic random hadith based on today's date */
+  hadithOfTheDay = computed(() => {
+    const hadiths = this.state.hadiths();
+    if (hadiths.length === 0) return null;
+
+    // Use the date as a seed so the same hadith shows all day
+    const today = new Date();
+    const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const index = dateSeed % hadiths.length;
+    return hadiths[index];
+  });
 
   get allHadiths() { return this.state.hadiths(); }
 
