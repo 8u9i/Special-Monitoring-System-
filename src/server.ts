@@ -369,6 +369,24 @@ app.post('/api/sync', async (req, res) => {
       }
     }
 
+    const { vocabLists } = req.body;
+    if (vocabLists && Array.isArray(vocabLists)) {
+      for (const list of vocabLists) {
+        await pool.query(
+          'INSERT INTO vocab_lists (id, name) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET name = $2',
+          [list.id, list.name]
+        );
+        if (list.words && Array.isArray(list.words)) {
+          for (let i = 0; i < list.words.length; i++) {
+            await pool.query(
+              'INSERT INTO vocab_words (list_id, word_index, word, definition) VALUES ($1, $2, $3, $4) ON CONFLICT (list_id, word_index) DO UPDATE SET word = $3, definition = $4',
+              [list.id, i, list.words[i].word, list.words[i].definition || '']
+            );
+          }
+        }
+      }
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('POST /api/sync error:', err);

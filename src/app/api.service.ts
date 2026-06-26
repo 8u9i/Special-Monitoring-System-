@@ -12,6 +12,7 @@ interface ApiResponse<T> {
 interface SyncPayload {
   students?: Partial<Student>[];
   hadiths?: Partial<Hadith>[];
+  vocabLists?: Partial<VocabList>[];
 }
 
 @Injectable({ providedIn: 'root' })

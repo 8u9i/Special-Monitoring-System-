@@ -246,7 +246,11 @@ export class TrackerState {
 
   private async seedDatabase() {
     try {
-      await this.api.sync({ students: this.students(), hadiths: this.hadiths() });
+      await this.api.sync({
+        students: this.students(),
+        hadiths: this.hadiths(),
+        vocabLists: this.getDefaultVocabLists(),
+      });
     } catch (e) {
       console.warn("Seed failed", e);
     }
