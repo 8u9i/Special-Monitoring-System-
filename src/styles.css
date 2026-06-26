@@ -209,3 +209,15 @@ button, a, input, select, textarea, label {
 [dir="rtl"] .material-icons-arrow-rtl {
   transform: scaleX(-1);
 }
+
+/* Staggered fade-in slide animation for leaderboard rows */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

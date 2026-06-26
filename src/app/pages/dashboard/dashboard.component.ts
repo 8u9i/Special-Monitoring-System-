@@ -86,9 +86,10 @@ import { ModalService } from '../../shared/services/modal.service';
             @let isTop = idx === 0 && student.xp > 0;
             @let stage = state.getStudentStage(student);
             <div [class]="isTop
-              ? 'flex items-center justify-between p-4 rounded-none bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20'
-              : 'flex items-center justify-between p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]'">
-              <div class="flex items-center gap-3">
+              ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-none bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20 transition-all duration-300'
+              : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)] transition-all duration-300 hover:border-[var(--color-primary)]/30'"
+              style="animation: fadeSlideIn 0.35s ease-out both; animation-delay: {{ idx * 0.05 }}s">
+              <div class="flex items-center gap-3 w-full sm:w-auto">
                 <div class="w-12 h-12 rounded-none flex items-center justify-center font-bold text-sm font-inter shrink-0"
                   [class]="isTop ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--color-border)] text-[var(--color-text-secondary)]'">
                   {{ idx + 1 }}
@@ -110,8 +111,8 @@ import { ModalService } from '../../shared/services/modal.service';
                   </div>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <div class="flex gap-1.5 text-xs font-semibold font-inter">
+              <div class="flex items-center gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="flex gap-1.5 text-xs font-semibold font-inter flex-wrap">
                   <span class="bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] px-2 py-1 rounded-none flex items-center gap-1">
                     <span class="material-icons text-[10px]">menu_book</span>
                     {{ student.memorizedHadithNumbers.length }}
@@ -126,7 +127,7 @@ import { ModalService } from '../../shared/services/modal.service';
                   </span>
                 </div>
                 <button (click)="goToStudent(student.id)"
-                  class="w-12 h-12 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:bg-[var(--color-canvas)] transition-colors cursor-pointer" title="انتقل لمسار الحفظ" aria-label="انتقل لمسار الحفظ">
+                  class="w-12 h-12 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:bg-[var(--color-canvas)] transition-all duration-200 cursor-pointer shrink-0" title="انتقل لمسار الحفظ" aria-label="انتقل لمسار الحفظ">
                   <span class="material-icons text-sm material-icons-arrow-rtl">arrow_back</span>
                 </button>
               </div>
