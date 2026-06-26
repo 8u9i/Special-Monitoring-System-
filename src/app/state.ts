@@ -220,15 +220,21 @@ export class TrackerState {
       ]);
 
       if (apiStudents.length === 0 && apiHadiths.length === 0) {
-        // First run — seed with defaults
+        // First run — seed everything with defaults
         this.students.set(this.getDefaultStudents());
         this.hadiths.set(HADITHS_DATA);
         this.vocabLists.set(this.getDefaultVocabLists());
         await this.seedDatabase();
       } else {
         this.students.set(apiStudents);
-        this.hadiths.set(apiHadiths); // trust the API — even if empty
-        this.vocabLists.set(apiVocab); // trust the API — even if empty
+        this.hadiths.set(apiHadiths);
+        // Seed default vocab if DB has none yet
+        if (apiVocab.length === 0) {
+          this.vocabLists.set(this.getDefaultVocabLists());
+          await this.api.sync({ vocabLists: this.getDefaultVocabLists() }).catch(() => {});
+        } else {
+          this.vocabLists.set(apiVocab);
+        }
       }
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
