@@ -7,6 +7,7 @@ import {
 } from "@angular/core";
 import { isPlatformBrowser } from "@angular/common";
 import { HADITHS_DATA, Hadith } from "./hadith-data";
+import { VOCAB_DATA } from "./vocab-data";
 
 export interface VocabWord {
   word: string;
@@ -253,9 +254,7 @@ export class TrackerState {
   hadiths = signal<Hadith[]>([]);
   vocabLists = signal<VocabList[]>([]);
   selectedStudentId = signal<string | null>(null);
-  activeTab = signal<
-    "dashboard" | "quran" | "hadith" | "english" | "reference" | "stages"
-  >("dashboard");
+
 
   // Search and filter signals
   searchQuery = signal<string>("");
@@ -273,14 +272,23 @@ export class TrackerState {
         const stored = localStorage.getItem("hadith_tracker_vocabs");
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed && Array.isArray(parsed)) {
+          if (parsed && Array.isArray(parsed) && parsed.length > 0) {
             this.vocabLists.set(parsed);
+            return;
           }
         }
       } catch (e) {
         console.error("Failed to load vocabs", e);
       }
     }
+    // Fallback to static starter dataset
+    const defaultLists: VocabList[] = VOCAB_DATA.map((unit) => ({
+      id: `vlist_unit_${unit.unit}`,
+      name: `Unit ${unit.unit}`,
+      words: unit.words,
+    }));
+    this.vocabLists.set(defaultLists);
+    this.saveVocabToStorage(defaultLists);
   }
 
   saveVocabToStorage(lists: VocabList[]) {
@@ -908,6 +916,53 @@ export class TrackerState {
     this.saveToStorage(updated);
   }
 
+  markAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+
+    const memorized = [...(student.memorizedSurahPages || [])];
+    let changed = false;
+    for (let i = 1; i <= pageCount; i++) {
+      const pageId = `${surahNumber}-${i}`;
+      if (!memorized.includes(pageId)) {
+        memorized.push(pageId);
+        changed = true;
+      }
+    }
+    if (!changed) return;
+
+    const updated = this.students().map((s) => {
+      if (s.id === studentId) {
+        const updatedStudent = { ...s, memorizedSurahPages: memorized };
+        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
+      }
+      return s;
+    });
+    this.students.set(updated);
+    this.saveToStorage(updated);
+  }
+
+  clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+
+    const memorized = (student.memorizedSurahPages || []).filter((id) => {
+      if (!id.startsWith(surahNumber + '-')) return true;
+      const idx = parseInt(id.split('-')[1], 10);
+      return isNaN(idx) || idx > pageCount;
+    });
+
+    const updated = this.students().map((s) => {
+      if (s.id === studentId) {
+        const updatedStudent = { ...s, memorizedSurahPages: memorized };
+        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
+      }
+      return s;
+    });
+    this.students.set(updated);
+    this.saveToStorage(updated);
+  }
+
   // Toggle Vocab Status
   toggleVocabStatus(
     studentId: string,
@@ -951,5 +1006,52 @@ export class TrackerState {
     const isMemorized = (student.memorizedVocabWords || []).includes(vocabId);
     const newStatus = isMemorized ? "none" : "memorized";
     this.toggleVocabStatus(studentId, listId, wordIndex, newStatus);
+  }
+
+  markAllVocab(studentId: string, listId: string, wordCount: number) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+
+    const memorized = [...(student.memorizedVocabWords || [])];
+    let changed = false;
+    for (let i = 0; i < wordCount; i++) {
+      const vocabId = `${listId}-${i}`;
+      if (!memorized.includes(vocabId)) {
+        memorized.push(vocabId);
+        changed = true;
+      }
+    }
+    if (!changed) return;
+
+    const updated = this.students().map((s) => {
+      if (s.id === studentId) {
+        const updatedStudent = { ...s, memorizedVocabWords: memorized };
+        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
+      }
+      return s;
+    });
+    this.students.set(updated);
+    this.saveToStorage(updated);
+  }
+
+  clearAllVocab(studentId: string, listId: string, wordCount: number) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+
+    const memorized = (student.memorizedVocabWords || []).filter((id) => {
+      if (!id.startsWith(listId + '-')) return true;
+      const idx = parseInt(id.split('-')[1], 10);
+      return isNaN(idx) || idx >= wordCount;
+    });
+
+    const updated = this.students().map((s) => {
+      if (s.id === studentId) {
+        const updatedStudent = { ...s, memorizedVocabWords: memorized };
+        return { ...updatedStudent, xp: this.calculateXP(updatedStudent) };
+      }
+      return s;
+    });
+    this.students.set(updated);
+    this.saveToStorage(updated);
   }
 }

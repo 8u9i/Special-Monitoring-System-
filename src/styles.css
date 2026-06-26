@@ -1,99 +1,211 @@
-/* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cause:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-amiri: "Amiri", "Playfair Display", serif;
+  --font-amiri: "Amiri", serif;
+  --font-cause: "Cause", cursive;
+  --font-inter: "Inter", sans-serif;
   --font-tajawal: "Tajawal", "Inter", sans-serif;
-  --color-leaf: #6B8F6B;
-  --color-forest: #41644A;
-  --color-moss: #A3B18A;
-  --color-stone: #DAD7CD;
-  --color-paper: #FAF9F6;
-  --color-charcoal: #2F2F2F;
+
+  /* Canvas & Surface */
+  --color-canvas: #F8F7F4;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+
+  /* Navigation */
+  --color-nav: #1C1C28;
+  --color-nav-hover: #2A2A3C;
+  --color-nav-active: #3A3A4E;
+
+  /* Primary Brand — Muted Orchid/Pink */
+  --color-primary: #B892C8;
+  --color-primary-hover: #A67DB8;
+  --color-primary-light: #E1D1ED;
+  --color-primary-dark: #8B6A9E;
+
+  /* Secondary Accents */
+  --color-amber: #F5D76E;
+  --color-amber-light: #FEF9E7;
+  --color-blue: #7EB8DA;
+  --color-blue-light: #EBF5FB;
+  --color-green: #7BC8A4;
+  --color-green-light: #EAFAF1;
+  --color-rose: #E8A0BF;
+  --color-rose-light: #FDF2F8;
+
+  /* Typography */
+  --color-text-primary: #1C1C28;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-inverse-muted: #9CA3AF;
+
+  /* Borders & Dividers */
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #E5E7EB;
 }
 
-/* Base style resets */
 body {
   font-family: var(--font-tajawal);
-  background-color: var(--color-paper);
-  color: var(--color-charcoal);
-  direction: rtl; /* Arabic support */
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  direction: rtl;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom hand-drawn card borders and sketches */
+/* Card system — flat, rounded, subtle */
 .sketch-card {
-  border: 1.5px solid var(--color-charcoal);
-  background-color: #ffffff;
-  box-shadow: 4px 4px 0px 0px var(--color-charcoal);
-  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .sketch-card-inset {
-  border: 1.5px dashed var(--color-stone);
-  background-color: var(--color-paper);
-  border-radius: 0.75rem;
+  border: 1px solid var(--color-border-light);
+  background-color: var(--color-canvas);
+  border-radius: 0;
 }
 
+/* Button system — pill-shaped, clean */
 .sketch-button {
-  border: 1.5px solid var(--color-charcoal);
-  background-color: var(--color-forest);
-  color: #ffffff;
-  box-shadow: 2px 2px 0px 0px var(--color-charcoal);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: none;
+  border-radius: 0;
+  transition: all 0.15s ease;
+  font-weight: 600;
 }
 
 .sketch-button:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px 0px var(--color-charcoal);
+  background-color: var(--color-primary-hover);
+  box-shadow: none;
+  transform: none;
 }
 
 .sketch-button:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px 0px var(--color-charcoal);
+  transform: scale(0.98);
 }
 
 .sketch-button-secondary {
-  border: 1.5px solid var(--color-charcoal);
-  background-color: #ffffff;
-  color: var(--color-charcoal);
-  box-shadow: 2px 2px 0px 0px var(--color-charcoal);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: none;
+  border-radius: 0;
+  transition: all 0.15s ease;
+  font-weight: 600;
 }
 
 .sketch-button-secondary:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px 0px var(--color-charcoal);
+  background-color: var(--color-canvas);
+  border-color: var(--color-text-tertiary);
+  box-shadow: none;
+  transform: none;
 }
 
 .sketch-button-secondary:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px 0px var(--color-charcoal);
+  transform: scale(0.98);
 }
 
-/* Material icon vertical alignment override */
 .mat-icon {
   font-family: 'Material Icons' !important;
   vertical-align: middle;
   line-height: 1;
 }
 
-/* Scrollbar styling */
+/* Scrollbar — minimal */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-paper);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-stone);
-  border-radius: 4px;
+  background: var(--color-border);
+  border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-moss);
+  background: var(--color-text-tertiary);
+}
+
+/* Animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Touch target minimum size */
+button, a, input, select, textarea, label {
+  min-height: 48px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+  }
+  .animate-bounce {
+    animation: none;
+  }
+}
+
+/* RTL progress bar direction */
+[dir="rtl"] .progress-fill {
+  direction: rtl;
+  float: right;
+}
+
+/* RTL arrow icon flip */
+[dir="rtl"] .icon-arrow-back {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .icon-expand-more {
+  transform: rotate(180deg);
+}
+
+/* Arrow icon in RTL context */
+[dir="rtl"] span.material-icons {
+  direction: ltr;
+}
+
+/* Flip arrow_back icon in RTL */
+.material-icons-arrow-rtl {
+  display: inline-block;
+}
+[dir="rtl"] .material-icons-arrow-rtl {
+  transform: scaleX(-1);
 }
