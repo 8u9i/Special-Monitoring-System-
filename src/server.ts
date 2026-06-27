@@ -368,6 +368,7 @@ app.post('/api/student-hadiths', async (req, res) => {
       [student_id, hadith_number, status]
     );
     res.json(rows[0]);
+    await checkAndAwardBadges(student_id);
   } catch (err) {
     console.error('POST /api/student-hadiths error:', err);
     res.status(500).json({ error: 'Failed to update hadith status' });
@@ -398,6 +399,7 @@ app.post('/api/student-surahs', async (req, res) => {
       [student_id, surah_number, status]
     );
     res.json(rows[0]);
+    await checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update surah status' });
   }
@@ -412,6 +414,7 @@ app.post('/api/student-surah-pages', async (req, res) => {
       [student_id, page_id]
     );
     res.json({ success: true });
+    await checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to save page' });
   }
@@ -482,6 +485,7 @@ app.post('/api/student-vocab', async (req, res) => {
       [student_id, vocab_id, status]
     );
     res.json(rows[0]);
+    await checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update vocab status' });
   }
@@ -499,6 +503,7 @@ app.post('/api/student-english-units', async (req, res) => {
       [student_id, unit_id, status]
     );
     res.json(rows[0]);
+    await checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update english unit status' });
   }
@@ -569,6 +574,120 @@ app.post('/api/sync', async (req, res) => {
     res.status(500).json({ error: 'Sync failed' });
   }
 });
+
+
+// ────────────────────────────────────────────
+// Badges
+// ────────────────────────────────────────────
+
+// Get all badge definitions
+app.get('/api/badges', async (_req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM badge_definitions ORDER BY trail, threshold');
+    res.json(rows.map((r: any) => ({
+      id: r.id, name: r.name, description: r.description,
+      icon: r.icon, trail: r.trail, threshold: r.threshold, points: r.points,
+    })));
+  } catch (err) {
+    console.error('GET /api/badges error:', err);
+    res.status(500).json({ error: 'Failed to fetch badges' });
+  }
+});
+
+// Add custom badge definition
+app.post('/api/badges', async (req, res) => {
+  try {
+    const { name, description, icon, trail, threshold, points } = req.body;
+    const { rows } = await pool.query(
+      'INSERT INTO badge_definitions (name, description, icon, trail, threshold, points) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [name, description || '', icon || 'emoji_events', trail, threshold, points || 0]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('POST /api/badges error:', err);
+    res.status(500).json({ error: 'Failed to create badge' });
+  }
+});
+
+// Delete badge definition
+app.delete('/api/badges/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM badge_definitions WHERE id = $1', [parseInt(req.params.id)]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete badge' });
+  }
+});
+
+// Get earned badges for a student
+app.get('/api/student-badges/:studentId', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT sb.badge_id, sb.earned_at, bd.name, bd.description, bd.icon, bd.trail, bd.threshold, bd.points
+       FROM student_badges sb JOIN badge_definitions bd ON bd.id = sb.badge_id
+       WHERE sb.student_id = $1 ORDER BY sb.earned_at DESC`,
+      [req.params.studentId]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch student badges' });
+  }
+});
+
+// Get all students badges (bulk)
+app.get('/api/student-badges', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT sb.student_id, sb.badge_id, sb.earned_at, bd.name, bd.description, bd.icon, bd.trail, bd.threshold, bd.points
+       FROM student_badges sb JOIN badge_definitions bd ON bd.id = sb.badge_id ORDER BY sb.earned_at DESC`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch student badges' });
+  }
+});
+
+// Auto-award badges for a student (called after progress changes)
+async function checkAndAwardBadges(studentId: string) {
+  try {
+    const [hadithCount, surahCount, pageCount, vocabCount, englishCount, xpRow] = await Promise.all([
+      pool.query("SELECT COUNT(*)::int FROM student_hadiths WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
+      pool.query("SELECT COUNT(*)::int FROM student_vocab WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COUNT(*)::int FROM student_english_units WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COALESCE(xp, 0) as xp FROM students WHERE id = $1", [studentId]),
+    ]);
+
+    const counts: Record<string, number> = {
+      hadith: hadithCount.rows[0].count,
+      quran: surahCount.rows[0].count,
+      pages: pageCount.rows[0].count,
+      vocab: vocabCount.rows[0].count,
+      english: englishCount.rows[0].count,
+      xp: xpRow.rows[0]?.xp || 0,
+    };
+
+    const { rows: allBadges } = await pool.query('SELECT * FROM badge_definitions');
+    const { rows: earned } = await pool.query('SELECT badge_id FROM student_badges WHERE student_id = $1', [studentId]);
+    const earnedIds = new Set(earned.map((r: any) => r.badge_id));
+
+    for (const badge of allBadges) {
+      if (earnedIds.has(badge.id)) continue;
+      if ((counts[badge.trail] || 0) >= badge.threshold) {
+        await pool.query(
+          'INSERT INTO student_badges (student_id, badge_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+          [studentId, badge.id]
+        );
+      }
+    }
+  } catch (err) {
+    console.error('checkAndAwardBadges error:', err);
+  }
+}
+
+// ────────────────────────────────────────────
+// Global error handler
 
 // ────────────────────────────────────────────
 // Global error handler

@@ -99,6 +99,27 @@ export class ApiService {
     await this.request('POST', '/student-english-units', { student_id: studentId, unit_id: unitId, status });
   }
 
+  // ── Badges ──
+  async getBadges(): Promise<any[]> {
+    return this.request('GET', '/badges');
+  }
+
+  async getStudentBadges(studentId: string): Promise<any[]> {
+    return this.request('GET', `/student-badges/${studentId}`);
+  }
+
+  async getAllStudentBadges(): Promise<any[]> {
+    return this.request('GET', '/student-badges');
+  }
+
+  async createBadge(badge: { name: string; description?: string; icon: string; trail: string; threshold: number; points?: number }): Promise<any> {
+    return this.request('POST', '/badges', badge);
+  }
+
+  async deleteBadge(id: number): Promise<ApiResponse<void>> {
+    return this.request('DELETE', `/badges/${id}`);
+  }
+
   // ── Bulk Sync ──
   async sync(data: SyncPayload): Promise<ApiResponse<void>> {
     return this.request('POST', '/sync', data);

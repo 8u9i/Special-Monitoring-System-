@@ -20,6 +20,28 @@ export interface VocabList {
   words: VocabWord[];
 }
 
+export interface BadgeDefinition {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  trail: string;
+  threshold: number;
+  points: number;
+}
+
+export interface StudentBadge {
+  student_id: string;
+  badge_id: number;
+  earned_at: string;
+  name: string;
+  description: string;
+  icon: string;
+  trail: string;
+  threshold: number;
+  points: number;
+}
+
 export interface Student {
   id: string;
   name: string;
@@ -208,6 +230,8 @@ export class TrackerState {
   categoryFilter = signal<string>("all");
   loading = signal(false);
   loaded = signal(false);
+  badgeDefinitions = signal<BadgeDefinition[]>([]);
+  studentBadges = signal<StudentBadge[]>([]);
 
   /**
    * Call after authentication to load data from the API.
@@ -217,16 +241,20 @@ export class TrackerState {
     if (this.loaded()) return;
     this.loading.set(true);
     try {
-      const [apiStudents, apiHadiths, apiVocab] = await Promise.all([
+      const [apiStudents, apiHadiths, apiVocab, apiBadges, apiStudentBadges] = await Promise.all([
         this.api.getStudents(),
         this.api.getHadiths(),
         this.api.getVocabLists(),
+        this.api.getBadges(),
+        this.api.getAllStudentBadges(),
       ]);
 
       // Use real database data only — no auto-seeding of sample data
       this.students.set(apiStudents);
       this.hadiths.set(apiHadiths);
       this.vocabLists.set(apiVocab);
+      this.badgeDefinitions.set(apiBadges);
+      this.studentBadges.set(apiStudentBadges);
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
         this.selectedStudentId.set(this.students()[0].id);
@@ -263,6 +291,27 @@ export class TrackerState {
     const nextStage = STAGES.find((s) => s.level === currentStage.level + 1);
     if (!nextStage) return null;
     return { nextStage, remaining: nextStage.minXP - student.xp };
+  }
+
+  getStudentBadges(studentId: string): StudentBadge[] {
+    return this.studentBadges().filter((b) => b.student_id === studentId);
+  }
+
+  getStudentBadgesByTrail(studentId: string, trail: string): StudentBadge[] {
+    return this.studentBadges().filter((b) => b.student_id === studentId && b.trail === trail);
+  }
+
+  async refreshBadges() {
+    try {
+      const [badges, studentBadges] = await Promise.all([
+        this.api.getBadges(),
+        this.api.getAllStudentBadges(),
+      ]);
+      this.badgeDefinitions.set(badges);
+      this.studentBadges.set(studentBadges);
+    } catch (e) {
+      console.error('refreshBadges', e);
+    }
   }
 
   stats = computed(() => {
