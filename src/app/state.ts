@@ -43,8 +43,6 @@ export interface Student {
   memorizedSurahNumbers: number[];
   reviewSurahNumbers: number[];
   memorizedSurahPages: string[];
-  memorizedVocabWords: string[];
-  reviewVocabWords: string[];
   memorizedEnglishUnits: number[];
   reviewEnglishUnits: number[];
   xp: number;
@@ -251,7 +249,6 @@ export class TrackerState {
     return (s.memorizedHadithNumbers?.length || 0) * 100 +
       (s.memorizedSurahNumbers?.length || 0) * 150 +
       (s.memorizedSurahPages?.length || 0) * 20 +
-      (s.memorizedVocabWords?.length || 0) * 5 +
       (s.memorizedEnglishUnits?.length || 0) * 100;
   }
 
@@ -322,8 +319,7 @@ export class TrackerState {
     const newStudent: Student = {
       id: "student-" + Date.now(), name: name.trim(), age: age ? Number(age) : undefined, avatar, notes: notes?.trim() || undefined,
       joinedAt: new Date().toISOString().split("T")[0], memorizedHadithNumbers: [], reviewHadithNumbers: [],
-      memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedVocabWords: [],
-      reviewVocabWords: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
+      memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
     };
     this.students.update((list) => [...list, newStudent]);
     this.selectedStudentId.set(newStudent.id);
@@ -349,20 +345,20 @@ export class TrackerState {
   // ──────────────────────────────
   // Hadith actions
   // ──────────────────────────────
-  addHadith(title: string, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string) {
-    if (!title.trim() || !text.trim()) return;
+  addHadith(text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string) {
+    if (!text.trim()) return;
     const list = this.hadiths();
     const nextNum = list.length > 0 ? Math.max(...list.map((h) => h.number)) + 1 : 1;
-    const newHadith: Hadith = { number: nextNum, title: title.trim(), text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${title.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
+    const newHadith: Hadith = { number: nextNum, text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${category.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
     this.hadiths.update((prev) => [...prev, newHadith]);
     this.api.saveHadith(newHadith).catch((e) => { console.error('saveHadith', e); this.toast.show("فشل حفظ الحديث", "error"); });
   }
 
-  updateHadith(oldNumber: number, newNumber: number, title: string, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
-    if (!title.trim() || !text.trim() || !newNumber) return false;
+  updateHadith(oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
+    if (!text.trim() || !newNumber) return false;
     if (oldNumber !== newNumber && this.hadiths().some((h) => h.number === newNumber)) return false;
     this.hadiths.update((list) => list.map((h) =>
-      h.number === oldNumber ? { ...h, number: newNumber, title: title.trim(), text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim(), badgeName: badgeName?.trim() || h.badgeName, badgeIcon: badgeIcon?.trim() || h.badgeIcon } : h
+      h.number === oldNumber ? { ...h, number: newNumber, text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim(), badgeName: badgeName?.trim() || h.badgeName, badgeIcon: badgeIcon?.trim() || h.badgeIcon } : h
     ));
     if (oldNumber !== newNumber) {
       this.students.update((list) => list.map((s) => ({

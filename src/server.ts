@@ -300,7 +300,6 @@ app.get('/api/hadiths', async (_req, res) => {
     // Map snake_case DB columns to camelCase frontend interface
     const hadiths = rows.map((r: any) => ({
       number: r.number,
-      title: r.title,
       text: r.text,
       reference: r.reference,
       explanation: r.explanation,
@@ -318,13 +317,13 @@ app.get('/api/hadiths', async (_req, res) => {
 
 app.post('/api/hadiths', async (req, res) => {
   try {
-    const { number, title, text, reference, explanation, category, points, badge_name, badge_icon } = req.body;
+    const { number, text, reference, explanation, category, points, badge_name, badge_icon } = req.body;
     const { rows } = await pool.query(
-      `INSERT INTO hadiths (number, title, text, reference, explanation, category, points, badge_name, badge_icon)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       ON CONFLICT (number) DO UPDATE SET title = $2, text = $3, reference = $4, explanation = $5, category = $6, points = $7, badge_name = $8, badge_icon = $9
+      `INSERT INTO hadiths (number, text, reference, explanation, category, points, badge_name, badge_icon)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5, points = $6, badge_name = $7, badge_icon = $8
        RETURNING *`,
-      [number, title, text, reference || '', explanation || '', category || 'عام', points || 100, badge_name || '', badge_icon || 'stars']
+      [number, text, reference || '', explanation || '', category || 'عام', points || 100, badge_name || '', badge_icon || 'stars']
     );
     res.json(rows[0]);
   } catch (err) {
@@ -516,10 +515,10 @@ app.post('/api/sync', async (req, res) => {
     if (hadiths && Array.isArray(hadiths)) {
       for (const h of hadiths) {
         await pool.query(
-          `INSERT INTO hadiths (number, title, text, reference, explanation, category, points, badge_name, badge_icon)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           ON CONFLICT (number) DO UPDATE SET title = $2, text = $3, reference = $4, explanation = $5, category = $6`,
-          [h.number, h.title, h.text, h.reference || '', h.explanation || '', h.category || 'عام', h.points || 100, h.badgeName || '', h.badgeIcon || 'stars']
+          `INSERT INTO hadiths (number, text, reference, explanation, category, points, badge_name, badge_icon)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5`,
+          [h.number, h.text, h.reference || '', h.explanation || '', h.category || 'عام', h.points || 100, h.badgeName || '', h.badgeIcon || 'stars']
         );
       }
     }

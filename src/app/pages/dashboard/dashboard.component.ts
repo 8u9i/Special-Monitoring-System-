@@ -160,7 +160,7 @@ import { ModalService } from '../../shared/services/modal.service';
           @if (hadithOfTheDay(); as hadith) {
           <div class="flex-1 flex flex-col items-center justify-center text-center px-2">
             <span class="text-[var(--color-primary)] bg-[var(--color-primary-light)] px-3 py-1 rounded-none text-xs font-bold inline-block mb-4">الحديث رقم {{ hadith.number }}</span>
-            <h4 class="font-bold text-base text-[var(--color-text-primary)] mb-3">{{ hadith.title }}</h4>
+            <h4 class="font-bold text-base text-[var(--color-text-primary)] mb-3">{{ hadith.category }}</h4>
             <p class="font-amiri text-xl font-bold text-[var(--color-primary-dark)] leading-relaxed mb-4">
               "{{ hadith.text }}"
             </p>

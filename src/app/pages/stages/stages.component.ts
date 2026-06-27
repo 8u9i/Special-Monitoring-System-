@@ -209,7 +209,7 @@ export class StagesComponent {
     this.modal.confirm(`هل تريد تصفير سجل حفظ الطالب (${student.name})؟`, () => {
       const updated = this.state.students().map((s) => {
         if (s.id === studentId) {
-          return { ...s, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 };
+          return { ...s, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 };
         }
         return s;
       });

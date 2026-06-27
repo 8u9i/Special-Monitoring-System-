@@ -132,7 +132,7 @@ export class SidebarComponent {
     return 'الأحاديث';
   }
 
-  getProgressValue(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[]; memorizedVocabWords: string[] }): string {
+  getProgressValue(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[] }): string {
     const url = this.router.url;
     if (url.includes('/quran')) {
       return `${student.memorizedSurahNumbers.length} / 114`;

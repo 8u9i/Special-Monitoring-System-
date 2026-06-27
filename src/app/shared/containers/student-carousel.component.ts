@@ -49,7 +49,7 @@ export class StudentCarouselComponent {
     return this.avatarMap[key] || '🌿';
   }
 
-  getRouteProgress(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[]; memorizedVocabWords: string[] }) {
+  getRouteProgress(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[] }) {
     const url = this.router.url;
     if (url.includes('/quran')) {
       return { done: student.memorizedSurahNumbers.length, total: 114 };

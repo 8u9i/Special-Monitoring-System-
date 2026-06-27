@@ -24,15 +24,6 @@ import { ModalService } from '../services/modal.service';
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
-            <label for="addHadithTitleInput" class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">عنوان الحديث *</label>
-            <input id="addHadithTitleInput" type="text" formControlName="title" placeholder="عنوان مختصر للحديث"
-              class="w-full rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
-            @if (form.get('title')?.invalid && form.get('title')?.touched) {
-            <p class="text-[10px] text-red-500 mt-1">العنوان مطلوب (3 أحرف على الأقل).</p>
-            }
-          </div>
-
-          <div>
             <label for="addHadithText" class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">نص الحديث *</label>
             <textarea id="addHadithText" formControlName="text" rows="3" placeholder="نص الحديث..."
               class="w-full font-amiri text-lg text-center rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 focus:outline-none focus:border-[var(--color-primary)] transition-colors"></textarea>
@@ -132,7 +123,6 @@ export class AddHadithModalComponent implements OnInit {
   showNewCategoryInput = signal(false);
 
   form = new FormGroup({
-    title: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
     text: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(5)] }),
     reference: new FormControl('رواه البخاري ومسلم', { nonNullable: true, validators: [Validators.required] }),
     explanation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -167,7 +157,6 @@ export class AddHadithModalComponent implements OnInit {
     const val = this.form.value;
     const cat = val.category || 'عام';
     this.state.addHadith(
-      val.title || '',
       val.text || '',
       val.reference || '',
       val.explanation || '',
@@ -176,7 +165,7 @@ export class AddHadithModalComponent implements OnInit {
       val.badgeIcon || undefined,
     );
     this.modal.showAddHadith.set(false);
-    this.form.reset({ reference: 'رواه البخاري ومسلم', badgeIcon: 'stars', title: '' });
+    this.form.reset({ reference: 'رواه البخاري ومسلم', badgeIcon: 'stars' });
     this.showNewCategoryInput.set(false);
     this.toast.show('تم إضافة الحديث الشريف بنجاح!');
   }

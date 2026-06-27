@@ -178,11 +178,9 @@ export class EditHadithModalComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.form.invalid) return;
     const val = this.form.value;
-    const cat = val.category || '';
     const success = this.state.updateHadith(
       this.selectedHadithForEdit()?.number ?? 0,
       val.number || 0,
-      cat,
       val.text || '',
       val.reference || '',
       val.explanation || '',

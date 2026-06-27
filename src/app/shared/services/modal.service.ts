@@ -6,7 +6,6 @@ export class ModalService {
   readonly showEditStudent = signal(false);
   readonly showAddHadith = signal(false);
   readonly showEditHadith = signal(false);
-  readonly showAddVocabList = signal(false);
   readonly confirmState = signal<{
     isOpen: boolean;
     message: string;

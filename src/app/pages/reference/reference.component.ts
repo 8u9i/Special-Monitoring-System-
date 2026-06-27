@@ -179,7 +179,6 @@ export class ReferenceComponent {
     const cat = this.state.categoryFilter();
     return this.state.hadiths().filter((h) => {
       const matchesQuery =
-        h.title.toLowerCase().includes(query) ||
         h.category.toLowerCase().includes(query) ||
         h.text.toLowerCase().includes(query) ||
         h.number.toString() === query ||
