@@ -65,6 +65,9 @@ setInterval(() => {
 // PostgreSQL connection pool
 const pool = new pg.Pool({
   connectionString: process.env['DATABASE_URL'] || 'postgresql://postgres:***@localhost:5432/hadith_tracker',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
 });
 
 // ────────────────────────────────────────────
@@ -373,7 +376,7 @@ app.post('/api/student-hadiths', async (req, res) => {
       [student_id, hadith_number, status]
     );
     res.json(rows[0]);
-    await checkAndAwardBadges(student_id);
+    checkAndAwardBadges(student_id);
   } catch (err) {
     console.error('POST /api/student-hadiths error:', err);
     res.status(500).json({ error: 'Failed to update hadith status' });
@@ -404,7 +407,7 @@ app.post('/api/student-surahs', async (req, res) => {
       [student_id, surah_number, status]
     );
     res.json(rows[0]);
-    await checkAndAwardBadges(student_id);
+    checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update surah status' });
   }
@@ -419,7 +422,7 @@ app.post('/api/student-surah-pages', async (req, res) => {
       [student_id, page_id]
     );
     res.json({ success: true });
-    await checkAndAwardBadges(student_id);
+    checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to save page' });
   }
@@ -490,7 +493,7 @@ app.post('/api/student-vocab', async (req, res) => {
       [student_id, vocab_id, status]
     );
     res.json(rows[0]);
-    await checkAndAwardBadges(student_id);
+    checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update vocab status' });
   }
@@ -508,7 +511,7 @@ app.post('/api/student-english-units', async (req, res) => {
       [student_id, unit_id, status]
     );
     res.json(rows[0]);
-    await checkAndAwardBadges(student_id);
+    checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update english unit status' });
   }
