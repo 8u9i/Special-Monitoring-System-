@@ -191,11 +191,11 @@ app.get('/api/students', async (_req, res) => {
     const { rows: students } = await pool.query('SELECT * FROM students ORDER BY name');
 
     // Fetch all junction table data in bulk
-    const [hadithRows, surahRows, pageRows, vocabRows, englishRows] = await Promise.all([
+    const [hadithRows, surahRows, pageRows, englishRows] = await Promise.all([
       pool.query('SELECT student_id, hadith_number, status FROM student_hadiths'),
       pool.query('SELECT student_id, surah_number, status FROM student_surahs'),
       pool.query('SELECT student_id, page_id FROM student_surah_pages'),
-      pool.query('SELECT student_id, vocab_id, status FROM student_vocab'),
+
       pool.query('SELECT student_id, unit_number, status FROM student_english_progress'),
     ]);
 
@@ -220,12 +220,6 @@ app.get('/api/students', async (_req, res) => {
       pageMap[r.student_id].push(r.page_id);
     }
 
-    const vocabMap: Record<string, { memorized: string[]; review: string[] }> = {};
-    for (const r of vocabRows.rows) {
-      if (!vocabMap[r.student_id]) vocabMap[r.student_id] = { memorized: [], review: [] };
-      if (r.status === 'memorized') vocabMap[r.student_id].memorized.push(r.vocab_id);
-      else if (r.status === 'review') vocabMap[r.student_id].review.push(r.vocab_id);
-    }
 
     const englishMap: Record<string, { memorized: number[]; review: number[] }> = {};
     for (const r of englishRows.rows) {
@@ -239,7 +233,6 @@ app.get('/api/students', async (_req, res) => {
       const h = hadithMap[s.id] || { memorized: [], review: [] };
       const su = surahMap[s.id] || { memorized: [], review: [] };
       const p = pageMap[s.id] || [];
-      const v = vocabMap[s.id] || { memorized: [], review: [] };
       const e = englishMap[s.id] || { memorized: [], review: [] };
 
       return {
@@ -254,11 +247,10 @@ app.get('/api/students', async (_req, res) => {
         memorizedSurahNumbers: su.memorized,
         reviewSurahNumbers: su.review,
         memorizedSurahPages: p,
-        memorizedVocabWords: v.memorized,
-        reviewVocabWords: v.review,
+        
         memorizedEnglishUnits: e.memorized,
         reviewEnglishUnits: e.review,
-        xp: h.memorized.length * 100 + su.memorized.length * 150 + p.length * 20 + v.memorized.length * 5 + e.memorized.length * 100,
+        xp: h.memorized.length * 100 + su.memorized.length * 150 + p.length * 20 + e.memorized.length * 100,
       };
     });
 
@@ -616,7 +608,7 @@ async function checkAndAwardBadges(studentId: string) {
       pool.query("SELECT COUNT(*)::int FROM student_hadiths WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
-      pool.query("SELECT COUNT(*)::int FROM student_vocab WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COALESCE(SUM(0), 0)::int FROM students WHERE id = $1", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_english_progress WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COALESCE(xp, 0) as xp FROM students WHERE id = $1", [studentId]),
     ]);
