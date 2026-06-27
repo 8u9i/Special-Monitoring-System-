@@ -4,8 +4,8 @@ import {
   computed,
   inject,
 } from "@angular/core";
-import { HADITHS_DATA, Hadith } from "./hadith-data";
-import { VOCAB_DATA } from "./vocab-data";
+import { Hadith } from "./hadith-data";
+
 import { ApiService } from "./api.service";
 import { ToastService } from "./shared/services/toast.service";
 
@@ -221,60 +221,19 @@ export class TrackerState {
         this.api.getVocabLists(),
       ]);
 
-      if (apiStudents.length === 0 && apiHadiths.length === 0) {
-        // First run — seed everything with defaults
-        this.students.set(this.getDefaultStudents());
-        this.hadiths.set(HADITHS_DATA);
-        this.vocabLists.set(this.getDefaultVocabLists());
-        await this.seedDatabase();
-      } else {
-        this.students.set(apiStudents);
-        this.hadiths.set(apiHadiths);
-        // Seed default vocab if DB has none yet
-        if (apiVocab.length === 0) {
-          this.vocabLists.set(this.getDefaultVocabLists());
-          await this.api.sync({ vocabLists: this.getDefaultVocabLists() }).catch(() => this.toast.show("فشل مزامنة البيانات", "error"));
-        } else {
-          this.vocabLists.set(apiVocab);
-        }
-      }
+      // Use real database data only — no auto-seeding of sample data
+      this.students.set(apiStudents);
+      this.hadiths.set(apiHadiths);
+      this.vocabLists.set(apiVocab);
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
         this.selectedStudentId.set(this.students()[0].id);
       }
     } catch (e) {
-      console.error("Failed to load from API, using seed data", e);
-      this.students.set(this.getDefaultStudents());
-      this.hadiths.set(HADITHS_DATA);
-      this.vocabLists.set(this.getDefaultVocabLists());
-      if (this.students().length > 0) this.selectedStudentId.set(this.students()[0].id);
+      console.error("Failed to load from API", e);
+      this.toast.show("فشل تحميل البيانات من قاعدة البيانات", "error");
     }
     this.loading.set(false);
-  }
-
-  private async seedDatabase() {
-    try {
-      await this.api.sync({
-        students: this.students(),
-        hadiths: this.hadiths(),
-        vocabLists: this.getDefaultVocabLists(),
-      });
-    } catch (e) {
-      console.warn("Seed failed", e);
-    }
-  }
-
-  private getDefaultVocabLists(): VocabList[] {
-    return VOCAB_DATA.map((unit) => ({ id: `vlist_unit_${unit.unit}`, name: `Unit ${unit.unit}`, words: unit.words }));
-  }
-
-  private getDefaultStudents(): Student[] {
-    return [
-      { id: "student-1", name: "أحمد ياسين", age: 10, avatar: "avatar-leaf", notes: "حريص جداً على مراجعة الحديث يومياً ويحب قصص الأنبياء.", joinedAt: "2026-03-10", memorizedHadithNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], reviewHadithNumbers: [19, 20], memorizedSurahNumbers: [1, 114, 113, 112], reviewSurahNumbers: [111], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: ["b1-u1", "b1-u2"], reviewEnglishUnits: ["b1-u3"], xp: 0 },
-      { id: "student-2", name: "سارة عبد الله", age: 8, avatar: "avatar-flower", notes: "ما شاء الله، سريعة الحفظ والتلقين، تتميز بنطقها الفصيح لمخارج الحروف.", joinedAt: "2026-04-01", memorizedHadithNumbers: [1, 3, 4, 6, 7, 11, 12, 18, 20], reviewHadithNumbers: [2, 5], memorizedSurahNumbers: [1, 114], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 },
-      { id: "student-3", name: "عمر الخطاب", age: 12, avatar: "avatar-mountain", notes: "أوشك على إكمال حفظ الأربعين كاملة! يطمح للمشاركة في مسابقة السنة النبوية الكبرى.", joinedAt: "2026-01-15", memorizedHadithNumbers: Array.from({ length: 38 }, (_, i) => i + 1), reviewHadithNumbers: [39, 40], memorizedSurahNumbers: [1, 2, 36], reviewSurahNumbers: [3], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: ["b1-u1", "b1-u2", "b1-u3", "b1-u4"], reviewEnglishUnits: [], xp: 0 },
-      { id: "student-4", name: "فاطمة الزهراء", age: 9, avatar: "avatar-sun", notes: "بدأت مؤخراً وتتحمس كثيراً لنيل الأوسمة والمكافآت التفاعلية.", joinedAt: "2026-05-20", memorizedHadithNumbers: [1, 6, 11, 20], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [1], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: [], reviewEnglishUnits: ["b1-u1"], xp: 0 },
-    ].map((s) => ({ ...s, xp: this.calculateXP(s) }));
   }
 
   public calculateXP(s: Partial<Student>): number {
