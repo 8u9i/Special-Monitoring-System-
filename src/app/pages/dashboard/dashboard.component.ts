@@ -177,7 +177,7 @@ import { ModalService } from '../../shared/services/modal.service';
           </div>
 
           <div class="mt-6 pt-4 border-t border-[var(--color-border-light)] text-center">
-            <p class="text-[10px] text-[var(--color-text-tertiary)]">تزخر أحاديث الأربعين بقيم الأخلاق والمحامل الإيجابية.</p>
+            <p class="text-[10px] text-[var(--color-text-tertiary)]">الأحاديث مأخوذة من كتاب إتحاف الأخيار للشيخ سعيد بن مبروك القنوبي</p>
           </div>
           } @else {
           <div class="flex-1 flex items-center justify-center">
