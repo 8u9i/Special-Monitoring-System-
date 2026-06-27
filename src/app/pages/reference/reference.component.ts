@@ -132,28 +132,21 @@ import { ModalService } from '../../shared/services/modal.service';
             <span class="material-icons text-[var(--color-primary)]">translate</span>
             دليل المفردات الإنجليزية
           </h3>
-          <p class="text-xs text-[var(--color-text-secondary)] mt-1">قوائم المفردات المخصصة</p>
+          <p class="text-xs text-[var(--color-text-secondary)] mt-1">الوحدات والكلمات</p>
         </div>
-        <button (click)="modal.showAddVocabList.set(true)"
-          class="sketch-button py-2.5 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer">
-          <span class="material-icons text-sm">add_circle</span>
-          إضافة قائمة مفردات
-        </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        @for (list of state.vocabLists(); track list.id) {
+        @for (unit of state.englishUnits(); track unit.unitNumber) {
         <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
           <div class="flex justify-between items-start mb-3 pb-3 border-b border-[var(--color-border-light)]">
             <h4 class="font-inter font-bold text-[var(--color-text-primary)] flex items-center gap-2">
               <span class="material-icons text-[var(--color-primary)]">list_alt</span>
-              {{ list.name }}
+              الوحدة {{ unit.unitNumber }}
             </h4>
-            <button (click)="onDeleteVocabList(list.id)" class="text-[var(--color-text-tertiary)] hover:text-red-500 transition-colors cursor-pointer p-2 min-w-12 min-h-12 flex items-center justify-center" aria-label="حذف القائمة">
-              <span class="material-icons text-sm">delete</span>
-            </button>
+            <span class="text-xs text-[var(--color-text-secondary)]">{{ unit.words.length }} كلمة</span>
           </div>
           <div class="space-y-1.5">
-            @for (word of list.words; track $index) {
+            @for (word of unit.words; track $index) {
             <div class="flex justify-between items-center text-sm p-2.5 bg-[var(--color-canvas)] rounded-none border border-[var(--color-border-light)]">
               <span class="font-bold text-[var(--color-text-primary)] text-sm">{{ word.word }}</span>
               <span class="text-[var(--color-text-secondary)] text-xs">{{ word.definition }}</span>
@@ -164,7 +157,7 @@ import { ModalService } from '../../shared/services/modal.service';
         } @empty {
         <div class="col-span-1 md:col-span-2 text-center py-10 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
           <span class="material-icons text-4xl text-[var(--color-text-tertiary)]">translate</span>
-          <p class="text-[var(--color-text-secondary)] mt-2 font-semibold text-sm">لا يوجد قوائم مفردات بعد</p>
+          <p class="text-[var(--color-text-secondary)] mt-2 font-semibold text-sm">لا توجد وحدات إنجليزية بعد</p>
         </div>
         }
       </div>
@@ -227,11 +220,4 @@ export class ReferenceComponent {
     this.router.navigate(['/hadith']);
   }
 
-  onDeleteVocabList(id: string) {
-    this.modal.confirm('هل أنت متأكد من حذف قائمة المفردات هذه؟', () => {
-      this.state.deleteVocabList(id);
-      this.toast.show('تم الحذف.');
-      this.modal.confirmState.set(null);
-    });
-  }
 }

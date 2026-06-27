@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import type { Student, VocabList } from './state';
+import type { Student } from './state';
 import type { Hadith } from './hadith-data';
 
 type Status = 'memorized' | 'review' | 'none';
@@ -12,7 +12,6 @@ interface ApiResponse<T> {
 interface SyncPayload {
   students?: Partial<Student>[];
   hadiths?: Partial<Hadith>[];
-  vocabLists?: Partial<VocabList>[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -76,32 +75,18 @@ export class ApiService {
     await this.request('DELETE', `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
   }
 
-  // ── Vocab Lists ──
-  async getVocabLists(): Promise<VocabList[]> {
-    return this.request('GET', '/vocab-lists');
-  }
-
-  async saveVocabList(list: { id: string; name: string; words: { word: string; definition: string }[] }): Promise<ApiResponse<void>> {
-    return this.request('POST', '/vocab-lists', list);
-  }
-
-  async deleteVocabList(id: string): Promise<ApiResponse<void>> {
-    return this.request('DELETE', `/vocab-lists/${id}`);
-  }
-
-  // ── Student Vocab Status ──
-  async setVocabStatus(studentId: string, vocabId: string, status: Status): Promise<void> {
-    await this.request('POST', '/student-vocab', { student_id: studentId, vocab_id: vocabId, status });
-  }
-
   // ── English Units ──
-  async setEnglishUnitStatus(studentId: string, unitId: string, status: Status): Promise<void> {
-    await this.request('POST', '/student-english-units', { student_id: studentId, unit_id: unitId, status });
-  }
-
-  // ── English Units ──
-  async getEnglishUnits(): Promise<any[]> {
+  async getEnglishUnits(): Promise<{ unitNumber: number; words: { word: string; definition: string }[] }[]> {
     return this.request('GET', '/english-units');
+  }
+
+  // ── Student English Progress ──
+  async setEnglishProgress(studentId: string, unitNumber: number, status: Status): Promise<void> {
+    await this.request('POST', '/student-english-progress', { student_id: studentId, unit_number: unitNumber, status });
+  }
+
+  async deleteEnglishProgress(studentId: string, unitNumber: number): Promise<void> {
+    await this.request('DELETE', `/student-english-progress/${studentId}/${unitNumber}`);
   }
 
   // ── Badges ──

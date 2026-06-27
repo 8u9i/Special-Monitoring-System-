@@ -1,4 +1,7 @@
-import { VocabWord } from './state';
+interface VocabWord {
+  word: string;
+  definition: string;
+}
 
 export interface VocabUnit {
   unit: number;

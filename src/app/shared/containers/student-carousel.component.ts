@@ -49,14 +49,14 @@ export class StudentCarouselComponent {
     return this.avatarMap[key] || '🌿';
   }
 
-  getRouteProgress(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: string[]; memorizedVocabWords: string[] }) {
+  getRouteProgress(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[]; memorizedVocabWords: string[] }) {
     const url = this.router.url;
     if (url.includes('/quran')) {
       return { done: student.memorizedSurahNumbers.length, total: 114 };
     }
     if (url.includes('/english')) {
-      const totalVocab = this.state.vocabLists().reduce((sum, l) => sum + l.words.length, 0);
-      return { done: (student.memorizedVocabWords || []).length, total: totalVocab };
+      const totalUnits = this.state.englishUnits().length;
+      return { done: student.memorizedEnglishUnits.length, total: totalUnits };
     }
     // Default: hadith or any other page
     return { done: student.memorizedHadithNumbers.length, total: this.state.hadiths().length };

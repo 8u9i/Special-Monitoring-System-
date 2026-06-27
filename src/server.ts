@@ -196,7 +196,7 @@ app.get('/api/students', async (_req, res) => {
       pool.query('SELECT student_id, surah_number, status FROM student_surahs'),
       pool.query('SELECT student_id, page_id FROM student_surah_pages'),
       pool.query('SELECT student_id, vocab_id, status FROM student_vocab'),
-      pool.query('SELECT student_id, unit_id, status FROM student_english_units'),
+      pool.query('SELECT student_id, unit_number, status FROM student_english_progress'),
     ]);
 
     // Index junction data by student_id
@@ -227,11 +227,11 @@ app.get('/api/students', async (_req, res) => {
       else if (r.status === 'review') vocabMap[r.student_id].review.push(r.vocab_id);
     }
 
-    const englishMap: Record<string, { memorized: string[]; review: string[] }> = {};
+    const englishMap: Record<string, { memorized: number[]; review: number[] }> = {};
     for (const r of englishRows.rows) {
       if (!englishMap[r.student_id]) englishMap[r.student_id] = { memorized: [], review: [] };
-      if (r.status === 'memorized') englishMap[r.student_id].memorized.push(r.unit_id);
-      else if (r.status === 'review') englishMap[r.student_id].review.push(r.unit_id);
+      if (r.status === 'memorized') englishMap[r.student_id].memorized.push(r.unit_number);
+      else if (r.status === 'review') englishMap[r.student_id].review.push(r.unit_number);
     }
 
     // Assemble full student objects
@@ -440,87 +440,64 @@ app.delete('/api/student-surah-pages/:studentId/:pageId', async (req, res) => {
   }
 });
 
-// --- Vocab Lists ---
-app.get('/api/vocab-lists', async (_req, res) => {
+// --- English Units (from english_unit_words) ---
+app.get('/api/english-units', async (_req, res) => {
   try {
-    const { rows: lists } = await pool.query('SELECT * FROM vocab_lists ORDER BY name');
-    for (const list of lists) {
-      const { rows: words } = await pool.query('SELECT * FROM vocab_words WHERE list_id = $1 ORDER BY word_index', [list.id]);
-      list.words = words;
+    const { rows } = await pool.query(
+      'SELECT unit_number, word_index, word, definition FROM english_unit_words ORDER BY unit_number, word_index'
+    );
+    const unitMap: Record<number, { word: string; definition: string }[]> = {};
+    for (const r of rows) {
+      if (!unitMap[r.unit_number]) unitMap[r.unit_number] = [];
+      unitMap[r.unit_number].push({ word: r.word, definition: r.definition });
     }
-    res.json(lists);
+    const result = Object.entries(unitMap).map(([unitNumber, words]) => ({
+      unitNumber: Number(unitNumber),
+      words,
+    }));
+    res.json(result);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch vocab lists' });
+    console.error('GET /api/english-units error:', err);
+    res.status(500).json({ error: 'Failed to fetch english units' });
   }
 });
 
-app.post('/api/vocab-lists', async (req, res) => {
+// --- Student English Progress ---
+app.post('/api/student-english-progress', async (req, res) => {
   try {
-    const { id, name, words } = req.body;
-    await pool.query('INSERT INTO vocab_lists (id, name) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET name = $2', [id, name]);
-    if (words && Array.isArray(words)) {
-      for (let i = 0; i < words.length; i++) {
-        await pool.query(
-          'INSERT INTO vocab_words (list_id, word_index, word, definition) VALUES ($1, $2, $3, $4) ON CONFLICT (list_id, word_index) DO UPDATE SET word = $3, definition = $4',
-          [id, i, words[i].word, words[i].definition || '']
-        );
-      }
-    }
-    res.json({ success: true, id });
+    const { student_id, unit_number, status } = req.body;
+    const { rows } = await pool.query(
+      `INSERT INTO student_english_progress (student_id, unit_number, status)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (student_id, unit_number) DO UPDATE SET status = $3
+       RETURNING *`,
+      [student_id, unit_number, status]
+    );
+    res.json(rows[0]);
+    checkAndAwardBadges(student_id);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to save vocab list' });
+    console.error('POST /api/student-english-progress error:', err);
+    res.status(500).json({ error: 'Failed to update english progress' });
   }
 });
 
-app.delete('/api/vocab-lists/:id', async (req, res) => {
+app.delete('/api/student-english-progress/:studentId/:unitNumber', async (req, res) => {
   try {
-    await pool.query('DELETE FROM vocab_lists WHERE id = $1', [req.params.id]);
+    await pool.query(
+      'DELETE FROM student_english_progress WHERE student_id = $1 AND unit_number = $2',
+      [req.params.studentId, parseInt(req.params.unitNumber)]
+    );
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to delete vocab list' });
-  }
-});
-
-// --- Student Vocab Status ---
-app.post('/api/student-vocab', async (req, res) => {
-  try {
-    const { student_id, vocab_id, status } = req.body;
-    const { rows } = await pool.query(
-      `INSERT INTO student_vocab (student_id, vocab_id, status)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (student_id, vocab_id) DO UPDATE SET status = $3
-       RETURNING *`,
-      [student_id, vocab_id, status]
-    );
-    res.json(rows[0]);
-    checkAndAwardBadges(student_id);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update vocab status' });
-  }
-});
-
-// --- Student English Units ---
-app.post('/api/student-english-units', async (req, res) => {
-  try {
-    const { student_id, unit_id, status } = req.body;
-    const { rows } = await pool.query(
-      `INSERT INTO student_english_units (student_id, unit_id, status)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (student_id, unit_id) DO UPDATE SET status = $3
-       RETURNING *`,
-      [student_id, unit_id, status]
-    );
-    res.json(rows[0]);
-    checkAndAwardBadges(student_id);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update english unit status' });
+    console.error('DELETE /api/student-english-progress error:', err);
+    res.status(500).json({ error: 'Failed to delete english progress' });
   }
 });
 
 // --- Bulk save (for initial load / full sync) ---
 app.post('/api/sync', async (req, res) => {
   try {
-    const { students, hadiths, vocabLists } = req.body;
+    const { students, hadiths } = req.body;
 
     // Validate array sizes to prevent DoS
     const MAX_ARRAY = 500;
@@ -530,10 +507,6 @@ app.post('/api/sync', async (req, res) => {
     }
     if (hadiths && Array.isArray(hadiths) && hadiths.length > MAX_ARRAY) {
       res.status(400).json({ error: 'Too many hadiths (max ' + MAX_ARRAY + ')' });
-      return;
-    }
-    if (vocabLists && Array.isArray(vocabLists) && vocabLists.length > 100) {
-      res.status(400).json({ error: 'Too many vocab lists (max 100)' });
       return;
     }
 
@@ -559,74 +532,10 @@ app.post('/api/sync', async (req, res) => {
       }
     }
 
-    if (vocabLists && Array.isArray(vocabLists)) {
-      for (const list of vocabLists) {
-        await pool.query(
-          'INSERT INTO vocab_lists (id, name) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET name = $2',
-          [list.id, list.name]
-        );
-        if (list.words && Array.isArray(list.words)) {
-          for (let i = 0; i < list.words.length; i++) {
-            await pool.query(
-              'INSERT INTO vocab_words (list_id, word_index, word, definition) VALUES ($1, $2, $3, $4) ON CONFLICT (list_id, word_index) DO UPDATE SET word = $3, definition = $4',
-              [list.id, i, list.words[i].word, list.words[i].definition || '']
-            );
-          }
-        }
-      }
-    }
-
     res.json({ success: true });
   } catch (err) {
     console.error('POST /api/sync error:', err);
     res.status(500).json({ error: 'Sync failed' });
-  }
-});
-
-
-// ────────────────────────────────────────────
-
-// --- English Units with Vocab ---
-app.get("/api/english-units", async (_req, res) => {
-  try {
-    const { rows } = await pool.query(
-      "SELECT eu.id, eu.book, eu.unit, eu.title, eu.vocab_list_id, vl.name as list_name" +
-      " FROM english_units eu LEFT JOIN vocab_lists vl ON vl.id = eu.vocab_list_id" +
-      " ORDER BY eu.book, eu.unit"
-    );
-
-    // Fetch vocab words for units that have linked lists
-    const listIds = rows.filter((r: any) => r.vocab_list_id).map((r: any) => r.vocab_list_id);
-    let vocabWords: any[] = [];
-    if (listIds.length > 0) {
-      const { rows: words } = await pool.query(
-        "SELECT list_id, word, definition FROM vocab_words WHERE list_id = ANY($1) ORDER BY list_id, word_index",
-        [listIds]
-      );
-      vocabWords = words;
-    }
-
-    // Group words by list_id
-    const wordsByList: Record<string, any[]> = {};
-    for (const w of vocabWords) {
-      if (!wordsByList[w.list_id]) wordsByList[w.list_id] = [];
-      wordsByList[w.list_id].push({ word: w.word, definition: w.definition });
-    }
-
-    const result = rows.map((r: any) => ({
-      id: r.id,
-      book: r.book,
-      unit: r.unit,
-      title: r.title,
-      vocabListId: r.vocab_list_id,
-      listName: r.list_name,
-      words: wordsByList[r.vocab_list_id] || [],
-    }));
-
-    res.json(result);
-  } catch (err) {
-    console.error("GET /api/english-units error:", err);
-    res.status(500).json({ error: "Failed to fetch english units" });
   }
 });
 
@@ -708,7 +617,7 @@ async function checkAndAwardBadges(studentId: string) {
       pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_vocab WHERE student_id = $1 AND status = 'memorized'", [studentId]),
-      pool.query("SELECT COUNT(*)::int FROM student_english_units WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+      pool.query("SELECT COUNT(*)::int FROM student_english_progress WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COALESCE(xp, 0) as xp FROM students WHERE id = $1", [studentId]),
     ]);
 

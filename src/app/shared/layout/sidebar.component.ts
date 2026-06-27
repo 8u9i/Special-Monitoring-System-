@@ -132,15 +132,14 @@ export class SidebarComponent {
     return 'الأحاديث';
   }
 
-  getProgressValue(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: string[]; memorizedVocabWords: string[] }): string {
+  getProgressValue(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[]; memorizedVocabWords: string[] }): string {
     const url = this.router.url;
     if (url.includes('/quran')) {
       return `${student.memorizedSurahNumbers.length} / 114`;
     }
     if (url.includes('/english')) {
-      const totalVocab = this.state.vocabLists().reduce((sum, l) => sum + l.words.length, 0);
-      const done = (student.memorizedVocabWords || []).length;
-      return `${done} / ${totalVocab}`;
+      const totalUnits = this.state.englishUnits().length;
+      return `${student.memorizedEnglishUnits.length} / ${totalUnits}`;
     }
     return `${student.memorizedHadithNumbers.length} / ${this.state.hadiths().length}`;
   }

@@ -9,17 +9,6 @@ import { Hadith } from "./hadith-data";
 import { ApiService } from "./api.service";
 import { ToastService } from "./shared/services/toast.service";
 
-export interface VocabWord {
-  word: string;
-  definition: string;
-}
-
-export interface VocabList {
-  id: string;
-  name: string;
-  words: VocabWord[];
-}
-
 export interface BadgeDefinition {
   id: number;
   name: string;
@@ -56,8 +45,8 @@ export interface Student {
   memorizedSurahPages: string[];
   memorizedVocabWords: string[];
   reviewVocabWords: string[];
-  memorizedEnglishUnits: string[];
-  reviewEnglishUnits: string[];
+  memorizedEnglishUnits: number[];
+  reviewEnglishUnits: number[];
   xp: number;
 }
 
@@ -182,29 +171,9 @@ export const QURAN_SURAHS: {
   { number: 114, name: "الناس" },
 ];
 
-export interface EnglishUnit {
-  id: string;
-  book: number;
-  unit: number;
-}
-
-export interface EnglishUnitWithVocab {
-  id: string;
-  book: number;
-  unit: number;
-  title: string;
-  vocabListId: string | null;
-  listName: string | null;
+export interface EnglishUnitWithWords {
+  unitNumber: number;
   words: { word: string; definition: string }[];
-}
-
-export const ENGLISH_BOOKS = [1, 2, 3, 4, 5, 6];
-export const ENGLISH_UNITS_PER_BOOK = 30;
-export const ENGLISH_UNITS: EnglishUnit[] = [];
-for (const b of ENGLISH_BOOKS) {
-  for (let u = 1; u <= ENGLISH_UNITS_PER_BOOK; u++) {
-    ENGLISH_UNITS.push({ id: `b${b}-u${u}`, book: b, unit: u });
-  }
 }
 
 export interface Stage {
@@ -234,7 +203,6 @@ export class TrackerState {
   // Reactive Signals
   students = signal<Student[]>([]);
   hadiths = signal<Hadith[]>([]);
-  vocabLists = signal<VocabList[]>([]);
   selectedStudentId = signal<string | null>(null);
   searchQuery = signal<string>("");
   categoryFilter = signal<string>("all");
@@ -242,7 +210,7 @@ export class TrackerState {
   loaded = signal(false);
   badgeDefinitions = signal<BadgeDefinition[]>([]);
   studentBadges = signal<StudentBadge[]>([]);
-  englishUnits = signal<EnglishUnitWithVocab[]>([]);
+  englishUnits = signal<EnglishUnitWithWords[]>([]);
 
   /**
    * Call after authentication to load data from the API.
@@ -252,10 +220,9 @@ export class TrackerState {
     if (this.loaded()) return;
     this.loading.set(true);
     try {
-      const [apiStudents, apiHadiths, apiVocab, apiBadges, apiStudentBadges, apiEnglishUnits] = await Promise.all([
+      const [apiStudents, apiHadiths, apiBadges, apiStudentBadges, apiEnglishUnits] = await Promise.all([
         this.api.getStudents(),
         this.api.getHadiths(),
-        this.api.getVocabLists(),
         this.api.getBadges(),
         this.api.getAllStudentBadges(),
         this.api.getEnglishUnits(),
@@ -264,7 +231,6 @@ export class TrackerState {
       // Use real database data only — no auto-seeding of sample data
       this.students.set(apiStudents);
       this.hadiths.set(apiHadiths);
-      this.vocabLists.set(apiVocab);
       this.badgeDefinitions.set(apiBadges);
       this.studentBadges.set(apiStudentBadges);
       this.englishUnits.set(apiEnglishUnits);
@@ -489,83 +455,22 @@ export class TrackerState {
     }));
   }
 
-  toggleEnglishStatus(studentId: string, unitId: string, newStatus: "memorized" | "review" | "none") {
+  toggleEnglishStatus(studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") {
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      let memorized = s.memorizedEnglishUnits.filter((id) => id !== unitId);
-      let review = s.reviewEnglishUnits.filter((id) => id !== unitId);
-      if (newStatus === "memorized") memorized.push(unitId);
-      else if (newStatus === "review") review.push(unitId);
+      let memorized = s.memorizedEnglishUnits.filter((n) => n !== unitNumber);
+      let review = s.reviewEnglishUnits.filter((n) => n !== unitNumber);
+      if (newStatus === "memorized") { memorized.push(unitNumber); memorized.sort((a, b) => a - b); }
+      else if (newStatus === "review") { review.push(unitNumber); review.sort((a, b) => a - b); }
       return { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review, xp: this.calculateXP({ ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review }) };
     }));
-    this.api.setEnglishUnitStatus(studentId, unitId, newStatus).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
+    this.api.setEnglishProgress(studentId, unitNumber, newStatus).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
     const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
-  toggleEnglishQuick(studentId: string, unitId: string) {
+  toggleEnglishQuick(studentId: string, unitNumber: number) {
     const student = this.students().find((s) => s.id === studentId);
     if (!student) return;
-    this.toggleEnglishStatus(studentId, unitId, student.memorizedEnglishUnits.includes(unitId) ? "none" : "memorized");
+    this.toggleEnglishStatus(studentId, unitNumber, student.memorizedEnglishUnits.includes(unitNumber) ? "none" : "memorized");
   }
-
-  toggleVocabStatus(studentId: string, listId: string, wordIndex: number, newStatus: "memorized" | "review" | "none") {
-    const vocabId = `${listId}-${wordIndex}`;
-    this.students.update((list) => list.map((s) => {
-      if (s.id !== studentId) return s;
-      let memorized = [...(s.memorizedVocabWords || [])].filter((id) => id !== vocabId);
-      let review = [...(s.reviewVocabWords || [])].filter((id) => id !== vocabId);
-      if (newStatus === "memorized") memorized.push(vocabId);
-      else if (newStatus === "review") review.push(vocabId);
-      return { ...s, memorizedVocabWords: memorized, reviewVocabWords: review, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized, reviewVocabWords: review }) };
-    }));
-    this.api.setVocabStatus(studentId, vocabId, newStatus).catch((e) => { console.error('setVocab', e); this.toast.show("فشل تحديث حالة المفردات", "error"); });
-    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
-  }
-
-  toggleVocabQuick(studentId: string, listId: string, wordIndex: number) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-    const vocabId = `${listId}-${wordIndex}`;
-    this.toggleVocabStatus(studentId, listId, wordIndex, (student.memorizedVocabWords || []).includes(vocabId) ? "none" : "memorized");
-  }
-
-  markAllVocab(studentId: string, listId: string, wordCount: number) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-    const memorized = [...(student.memorizedVocabWords || [])];
-    let changed = false;
-    for (let i = 0; i < wordCount; i++) { const id = `${listId}-${i}`; if (!memorized.includes(id)) { memorized.push(id); changed = true; } }
-    if (!changed) return;
-    this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedVocabWords: memorized, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized }) } : s));
-    for (let i = 0; i < wordCount; i++) this.api.setVocabStatus(studentId, `${listId}-${i}`, 'memorized').catch(() => this.toast.show("فشل تحديث المفردات", "error"));
-    const _upd2 = this.students().find(s => s.id === studentId); if (_upd2) this.persistStudentXP(_upd2);
-  }
-
-  clearAllVocab(studentId: string, listId: string, wordCount: number) {
-    this.students.update((list) => list.map((s) => {
-      if (s.id !== studentId) return s;
-      const memorized = (s.memorizedVocabWords || []).filter((id) => !id.startsWith(listId + '-'));
-      return { ...s, memorizedVocabWords: memorized, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized }) };
-    }));
-  }
-
-  // ──────────────────────────────
-  // Vocab list management
-  // ──────────────────────────────
-  addVocabList(name: string, rawText: string) {
-    const words = rawText.split("\n").filter((l) => l.trim()).map((line) => {
-      const parts = line.split(":");
-      return { word: parts[0]?.trim() || "", definition: parts.slice(1).join(":").trim() || "" };
-    }).filter((w) => w.word);
-    const newList: VocabList = { id: `vlist_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`, name: name || "قائمة مفردات", words };
-    this.vocabLists.update((prev) => [...prev, newList]);
-    this.api.saveVocabList(newList).catch((e) => { console.error('saveVocabList', e); this.toast.show("فشل حفظ قائمة المفردات", "error"); });
-  }
-
-  deleteVocabList(id: string) {
-    this.vocabLists.update((prev) => prev.filter((l) => l.id !== id));
-    this.api.deleteVocabList(id).catch((e) => { console.error('deleteVocabList', e); this.toast.show("فشل حذف قائمة المفردات", "error"); });
-  }
-
-  saveVocabToStorage(_lists: VocabList[]) {} // kept for compat
 }

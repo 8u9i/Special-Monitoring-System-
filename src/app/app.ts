@@ -9,7 +9,6 @@ import { AddStudentModalComponent } from './shared/modals/add-student-modal.comp
 import { EditStudentModalComponent } from './shared/modals/edit-student-modal.component';
 import { AddHadithModalComponent } from './shared/modals/add-hadith-modal.component';
 import { EditHadithModalComponent } from './shared/modals/edit-hadith-modal.component';
-import { AddVocabListModalComponent } from './shared/modals/add-vocab-list-modal.component';
 import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TrackerState } from './state';
@@ -30,7 +29,6 @@ import { AuthService } from './auth.service';
     EditStudentModalComponent,
     AddHadithModalComponent,
     EditHadithModalComponent,
-    AddVocabListModalComponent,
   ],
   template: `
     @if (!auth.authChecked()) {
@@ -70,7 +68,6 @@ import { AuthService } from './auth.service';
       <app-edit-student-modal />
       <app-add-hadith-modal />
       <app-edit-hadith-modal />
-      <app-add-vocab-list-modal />
     }
   `,
 })
