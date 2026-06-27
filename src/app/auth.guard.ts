@@ -8,14 +8,13 @@ export const authGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const state = inject(TrackerState);
 
-  // If we already know we're not authenticated, redirect immediately (no API call)
-  if (auth.authenticated() === false) {
+  // If we already confirmed not authenticated, redirect immediately
+  if (auth.authChecked() && !auth.authenticated()) {
     return router.createUrlTree(['/login']);
   }
 
   const ok = await auth.checkAuth();
   if (ok) {
-    // Ensure data is loaded (handles browser refresh on protected pages)
     await state.loadAll();
     return true;
   }

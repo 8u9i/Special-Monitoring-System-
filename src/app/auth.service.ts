@@ -4,16 +4,22 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
-  authenticated = signal<boolean | null>(null); // null = unknown
+
+  /** Has the initial auth check completed? */
+  authChecked = signal(false);
+  /** Is the user authenticated? */
+  authenticated = signal(false);
 
   async checkAuth(): Promise<boolean> {
     try {
       const res = await fetch('/api/auth/check', { credentials: 'same-origin' });
       const data = await res.json();
       this.authenticated.set(data.authenticated);
+      this.authChecked.set(true);
       return data.authenticated;
     } catch {
       this.authenticated.set(false);
+      this.authChecked.set(true);
       return false;
     }
   }
