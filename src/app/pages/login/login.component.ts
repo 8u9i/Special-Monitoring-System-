@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
@@ -267,9 +267,14 @@ import { AuthService } from '../../auth.service';
     }
   `,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
+
+  async ngOnInit() {
+    const ok = await this.auth.checkAuth();
+    if (ok) this.router.navigate(['/dashboard']);
+  }
 
   username = '';
   password = '';
