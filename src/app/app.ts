@@ -51,20 +51,9 @@ import { AuthService } from './auth.service';
       </div>
     } @else {
       <!-- FULLY AUTHENTICATED + DATA LOADED -->
-      <!-- Mobile hamburger button -->
-      <button (click)="sidebarOpen.set(!sidebarOpen())"
-        class="md:hidden fixed top-3 left-3 z-50 p-2 rounded-none bg-[var(--color-nav)] text-white shadow-lg cursor-pointer border-none">
-        <span class="material-icons">{{ sidebarOpen() ? 'close' : 'menu' }}</span>
-      </button>
-
-      <!-- Mobile sidebar overlay -->
-      @if (sidebarOpen()) {
-        <div class="md:hidden fixed inset-0 bg-black/40 z-30" (click)="sidebarOpen.set(false)"></div>
-      }
-
       <!-- Main layout with sidebar + header -->
       <div class="min-h-screen bg-[#FAF9F6] text-[#2F2F2F] font-sans antialiased flex flex-col md:flex-row">
-        <app-sidebar [class]="sidebarOpen() ? '' : 'max-md:hidden'" />
+        <app-sidebar />
         <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
           <app-header />
           <div style="animation: fadeSlideIn 0.3s ease-out both">
@@ -89,7 +78,6 @@ export class App implements OnInit {
   private router = inject(Router);
   auth = inject(AuthService);
   state = inject(TrackerState);
-  sidebarOpen = signal(false);
 
   async ngOnInit() {
     const ok = await this.auth.checkAuth();
