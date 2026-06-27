@@ -99,6 +99,11 @@ export class ApiService {
     await this.request('POST', '/student-english-units', { student_id: studentId, unit_id: unitId, status });
   }
 
+  // ── English Units ──
+  async getEnglishUnits(): Promise<any[]> {
+    return this.request('GET', '/english-units');
+  }
+
   // ── Badges ──
   async getBadges(): Promise<any[]> {
     return this.request('GET', '/badges');

@@ -188,6 +188,16 @@ export interface EnglishUnit {
   unit: number;
 }
 
+export interface EnglishUnitWithVocab {
+  id: string;
+  book: number;
+  unit: number;
+  title: string;
+  vocabListId: string | null;
+  listName: string | null;
+  words: { word: string; definition: string }[];
+}
+
 export const ENGLISH_BOOKS = [1, 2, 3, 4, 5, 6];
 export const ENGLISH_UNITS_PER_BOOK = 30;
 export const ENGLISH_UNITS: EnglishUnit[] = [];
@@ -232,6 +242,7 @@ export class TrackerState {
   loaded = signal(false);
   badgeDefinitions = signal<BadgeDefinition[]>([]);
   studentBadges = signal<StudentBadge[]>([]);
+  englishUnits = signal<EnglishUnitWithVocab[]>([]);
 
   /**
    * Call after authentication to load data from the API.
@@ -241,12 +252,13 @@ export class TrackerState {
     if (this.loaded()) return;
     this.loading.set(true);
     try {
-      const [apiStudents, apiHadiths, apiVocab, apiBadges, apiStudentBadges] = await Promise.all([
+      const [apiStudents, apiHadiths, apiVocab, apiBadges, apiStudentBadges, apiEnglishUnits] = await Promise.all([
         this.api.getStudents(),
         this.api.getHadiths(),
         this.api.getVocabLists(),
         this.api.getBadges(),
         this.api.getAllStudentBadges(),
+        this.api.getEnglishUnits(),
       ]);
 
       // Use real database data only — no auto-seeding of sample data
@@ -255,6 +267,7 @@ export class TrackerState {
       this.vocabLists.set(apiVocab);
       this.badgeDefinitions.set(apiBadges);
       this.studentBadges.set(apiStudentBadges);
+      this.englishUnits.set(apiEnglishUnits);
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
         this.selectedStudentId.set(this.students()[0].id);

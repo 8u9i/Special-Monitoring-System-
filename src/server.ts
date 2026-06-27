@@ -585,6 +585,51 @@ app.post('/api/sync', async (req, res) => {
 
 
 // ────────────────────────────────────────────
+
+// --- English Units with Vocab ---
+app.get("/api/english-units", async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT eu.id, eu.book, eu.unit, eu.title, eu.vocab_list_id, vl.name as list_name" +
+      " FROM english_units eu LEFT JOIN vocab_lists vl ON vl.id = eu.vocab_list_id" +
+      " ORDER BY eu.book, eu.unit"
+    );
+
+    // Fetch vocab words for units that have linked lists
+    const listIds = rows.filter((r: any) => r.vocab_list_id).map((r: any) => r.vocab_list_id);
+    let vocabWords: any[] = [];
+    if (listIds.length > 0) {
+      const { rows: words } = await pool.query(
+        "SELECT list_id, word, definition FROM vocab_words WHERE list_id = ANY($1) ORDER BY list_id, word_index",
+        [listIds]
+      );
+      vocabWords = words;
+    }
+
+    // Group words by list_id
+    const wordsByList: Record<string, any[]> = {};
+    for (const w of vocabWords) {
+      if (!wordsByList[w.list_id]) wordsByList[w.list_id] = [];
+      wordsByList[w.list_id].push({ word: w.word, definition: w.definition });
+    }
+
+    const result = rows.map((r: any) => ({
+      id: r.id,
+      book: r.book,
+      unit: r.unit,
+      title: r.title,
+      vocabListId: r.vocab_list_id,
+      listName: r.list_name,
+      words: wordsByList[r.vocab_list_id] || [],
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error("GET /api/english-units error:", err);
+    res.status(500).json({ error: "Failed to fetch english units" });
+  }
+});
+
 // Badges
 // ────────────────────────────────────────────
 
