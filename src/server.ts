@@ -297,7 +297,19 @@ app.delete('/api/students/:id', async (req, res) => {
 app.get('/api/hadiths', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM hadiths ORDER BY number');
-    res.json(rows);
+    // Map snake_case DB columns to camelCase frontend interface
+    const hadiths = rows.map((r: any) => ({
+      number: r.number,
+      title: r.title,
+      text: r.text,
+      reference: r.reference,
+      explanation: r.explanation,
+      category: r.category,
+      points: r.points,
+      badgeName: r.badge_name,
+      badgeIcon: r.badge_icon,
+    }));
+    res.json(hadiths);
   } catch (err) {
     console.error('GET /api/hadiths error:', err);
     res.status(500).json({ error: 'Failed to fetch hadiths' });
