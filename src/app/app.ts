@@ -41,7 +41,7 @@ import { AuthService } from './auth.service';
       <router-outlet />
     } @else if (state.loading()) {
       <!-- Authenticated but data still loading -->
-      <div class="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+      <div class="min-h-screen bg-[var(--color-canvas)] flex items-center justify-center">
         <div class="flex flex-col items-center gap-4">
           <div class="w-10 h-10 border-3 border-[var(--color-border)] border-t-[var(--color-primary)] rounded-full animate-spin"></div>
           <p class="text-sm text-[var(--color-text-secondary)] font-medium">جاري التحميل...</p>
@@ -50,7 +50,7 @@ import { AuthService } from './auth.service';
     } @else {
       <!-- FULLY AUTHENTICATED + DATA LOADED -->
       <!-- Main layout with sidebar + header -->
-      <div class="min-h-screen bg-[#FAF9F6] text-[#2F2F2F] font-sans antialiased flex flex-col md:flex-row">
+      <div class="min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] font-sans antialiased flex flex-col md:flex-row">
         <app-sidebar />
         <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
           <app-header />
