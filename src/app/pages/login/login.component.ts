@@ -2,6 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
+import { TrackerState } from '../../state';
 
 @Component({
   selector: 'app-login',
@@ -270,10 +271,14 @@ import { AuthService } from '../../auth.service';
 export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private state = inject(TrackerState);
 
   async ngOnInit() {
     const ok = await this.auth.checkAuth();
-    if (ok) this.router.navigate(['/dashboard']);
+    if (ok) {
+      await this.state.loadAll();
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   username = '';
@@ -291,6 +296,7 @@ export class LoginComponent implements OnInit {
     this.loading.set(false);
 
     if (result.success) {
+      await this.state.loadAll();
       this.router.navigate(['/dashboard']);
     } else {
       this.error.set(result.error || 'بيانات الدخول غير صحيحة');

@@ -206,13 +206,15 @@ export class TrackerState {
   selectedStudentId = signal<string | null>(null);
   searchQuery = signal<string>("");
   categoryFilter = signal<string>("all");
-  loading = signal(true);
+  loading = signal(false);
+  loaded = signal(false);
 
-  constructor() {
-    this.loadAll();
-  }
-
-  private async loadAll() {
+  /**
+   * Call after authentication to load data from the API.
+   * Does nothing if already loaded.
+   */
+  async loadAll() {
+    if (this.loaded()) return;
     this.loading.set(true);
     try {
       const [apiStudents, apiHadiths, apiVocab] = await Promise.all([
@@ -229,11 +231,13 @@ export class TrackerState {
       if (this.students().length > 0 && !this.selectedStudentId()) {
         this.selectedStudentId.set(this.students()[0].id);
       }
+      this.loaded.set(true);
     } catch (e) {
       console.error("Failed to load from API", e);
       this.toast.show("فشل تحميل البيانات من قاعدة البيانات", "error");
+    } finally {
+      this.loading.set(false);
     }
-    this.loading.set(false);
   }
 
   public calculateXP(s: Partial<Student>): number {
