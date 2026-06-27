@@ -17,5 +17,9 @@ COPY --from=build /app/scripts ./scripts
 
 EXPOSE 4000
 ENV PORT=4000
+ENV NODE_ENV=production
+
+# Auth env vars — set these in Railway dashboard
+# AUTH_USER, AUTH_PASS, COOKIE_SECRET, DATABASE_URL
 
 CMD ["sh", "-c", "node scripts/migrate.mjs && node dist/app/server/server.mjs"]

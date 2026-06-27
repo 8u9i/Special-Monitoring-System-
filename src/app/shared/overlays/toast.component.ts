@@ -6,7 +6,11 @@ import { ToastService } from '../services/toast.service';
   template: `
     @if (toast.message(); as msg) {
     <button (click)="toast.message.set(null)" class="fixed bottom-6 right-6 z-50 px-5 py-3 bg-[var(--color-nav)] text-white rounded-none shadow-lg flex items-center gap-3 animate-fade-in cursor-pointer border-none" aria-label="إخفاء الإشعار">
-      <span class="material-icons text-[var(--color-green)] text-lg">check_circle</span>
+      @if (toast.type() === 'error') {
+        <span class="material-icons text-red-400 text-lg">error</span>
+      } @else {
+        <span class="material-icons text-[var(--color-green)] text-lg">check_circle</span>
+      }
       <span class="text-sm font-semibold">{{ msg }}</span>
       <span class="material-icons text-[var(--color-text-tertiary)] text-base mr-2" aria-hidden="true">close</span>
     </button>

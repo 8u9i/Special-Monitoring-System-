@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { TrackerState } from '../../state';
 import { ToastService } from '../services/toast.service';
@@ -9,10 +9,10 @@ import { ModalService } from '../services/modal.service';
   imports: [ReactiveFormsModule],
   template: `
     @if (modal.showAddStudent()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div class="w-full max-w-md p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl">
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="addStudentTitle" (click)="close()">
+      <div class="w-full max-w-md p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="addStudentTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">person_add</span>
             تسجيل طالب جديد
           </h3>
@@ -103,5 +103,14 @@ export class AddStudentModalComponent {
     this.modal.showAddStudent.set(false);
     this.form.reset({ avatar: 'avatar-leaf' });
     this.toast.show('تم إضافة الطالب بنجاح!');
+  }
+
+  close() {
+    this.modal.showAddStudent.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
   }
 }

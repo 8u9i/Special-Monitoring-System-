@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { TrackerState, Student } from '../../state';
 import { ToastService } from '../services/toast.service';
@@ -9,10 +9,10 @@ import { ModalService } from '../services/modal.service';
   imports: [ReactiveFormsModule],
   template: `
     @if (modal.showEditStudent()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div class="w-full max-w-md p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl">
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="editStudentTitle" (click)="close()">
+      <div class="w-full max-w-md p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="editStudentTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">edit</span>
             تعديل بيانات الطالب
           </h3>
@@ -130,5 +130,14 @@ export class EditStudentModalComponent implements OnInit, OnDestroy {
     this.state.updateStudent(val.id || '', val.name || '', val.age || undefined, val.avatar || 'avatar-leaf', val.notes || '');
     this.modal.showEditStudent.set(false);
     this.toast.show('تم تحديث بيانات الطالب بنجاح!');
+  }
+
+  close() {
+    this.modal.showEditStudent.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
   }
 }

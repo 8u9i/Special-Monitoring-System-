@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TrackerState } from '../../state';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -86,6 +87,13 @@ import { TrackerState } from '../../state';
 
       <!-- Bottom Section -->
       <div class="p-5 border-t border-white/10">
+        <button
+          (click)="logout()"
+          class="flex items-center gap-3 w-full px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium cursor-pointer mb-2"
+        >
+          <span class="material-icons text-xl">logout</span>
+          <span>تسجيل الخروج</span>
+        </button>
         <div class="flex items-center gap-3 px-3 py-2 rounded-none bg-white/5 text-[var(--color-text-inverse-muted)] text-xs">
           <span class="material-icons text-sm">verified</span>
           <span class="font-medium">v1.0 — متابع الحفظ</span>
@@ -97,6 +105,7 @@ import { TrackerState } from '../../state';
 export class SidebarComponent {
   state = inject(TrackerState);
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   avatarMap: Record<string, string> = {
     'avatar-leaf': '🌿',
@@ -139,5 +148,9 @@ export class SidebarComponent {
   isTracksMenuActive(): boolean {
     const url = this.router.url;
     return url.includes('/quran') || url.includes('/hadith') || url.includes('/english');
+  }
+
+  logout() {
+    this.auth.logout();
   }
 }

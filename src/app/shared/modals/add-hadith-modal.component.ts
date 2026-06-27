@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TrackerState } from '../../state';
@@ -10,10 +10,10 @@ import { ModalService } from '../services/modal.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   template: `
     @if (modal.showAddHadith()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-      <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl">
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="addHadithTitle" (click)="close()">
+      <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="addHadithTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">add_box</span>
             إضافة حديث شريف جديد
           </h3>
@@ -23,6 +23,15 @@ import { ModalService } from '../services/modal.service';
         </div>
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+          <div>
+            <label for="addHadithTitleInput" class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">عنوان الحديث *</label>
+            <input id="addHadithTitleInput" type="text" formControlName="title" placeholder="عنوان مختصر للحديث"
+              class="w-full rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
+            @if (form.get('title')?.invalid && form.get('title')?.touched) {
+            <p class="text-[10px] text-red-500 mt-1">العنوان مطلوب (3 أحرف على الأقل).</p>
+            }
+          </div>
+
           <div>
             <label for="addHadithText" class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">نص الحديث *</label>
             <textarea id="addHadithText" formControlName="text" rows="3" placeholder="نص الحديث..."
@@ -123,6 +132,7 @@ export class AddHadithModalComponent implements OnInit {
   showNewCategoryInput = signal(false);
 
   form = new FormGroup({
+    title: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
     text: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(5)] }),
     reference: new FormControl('رواه البخاري ومسلم', { nonNullable: true, validators: [Validators.required] }),
     explanation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -157,7 +167,7 @@ export class AddHadithModalComponent implements OnInit {
     const val = this.form.value;
     const cat = val.category || 'عام';
     this.state.addHadith(
-      cat,
+      val.title || '',
       val.text || '',
       val.reference || '',
       val.explanation || '',
@@ -166,8 +176,17 @@ export class AddHadithModalComponent implements OnInit {
       val.badgeIcon || undefined,
     );
     this.modal.showAddHadith.set(false);
-    this.form.reset({ reference: 'رواه البخاري ومسلم', badgeIcon: 'stars' });
+    this.form.reset({ reference: 'رواه البخاري ومسلم', badgeIcon: 'stars', title: '' });
     this.showNewCategoryInput.set(false);
     this.toast.show('تم إضافة الحديث الشريف بنجاح!');
+  }
+
+  close() {
+    this.modal.showAddHadith.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
   }
 }

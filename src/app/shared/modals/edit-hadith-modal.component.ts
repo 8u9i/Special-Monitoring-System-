@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TrackerState } from '../../state';
@@ -11,10 +11,10 @@ import { ModalService } from '../services/modal.service';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     @if (modal.showEditHadith()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-      <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl">
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="editHadithTitle" (click)="close()">
+      <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="editHadithTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">edit_note</span>
             تعديل الحديث رقم {{ form.get('number')?.value }}
           </h3>
@@ -196,5 +196,14 @@ export class EditHadithModalComponent implements OnInit, OnDestroy {
     } else {
       this.toast.show('فشل التحديث — ربما الرقم مستخدم مسبقاً.');
     }
+  }
+
+  close() {
+    this.modal.showEditHadith.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
   }
 }

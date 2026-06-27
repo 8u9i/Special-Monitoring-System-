@@ -7,6 +7,7 @@ import {
 import { HADITHS_DATA, Hadith } from "./hadith-data";
 import { VOCAB_DATA } from "./vocab-data";
 import { ApiService } from "./api.service";
+import { ToastService } from "./shared/services/toast.service";
 
 export interface VocabWord {
   word: string;
@@ -196,6 +197,7 @@ export const STAGES: Stage[] = [
 @Injectable({ providedIn: "root" })
 export class TrackerState {
   private api = inject(ApiService);
+  private toast = inject(ToastService);
 
   // Reactive Signals
   students = signal<Student[]>([]);
@@ -231,7 +233,7 @@ export class TrackerState {
         // Seed default vocab if DB has none yet
         if (apiVocab.length === 0) {
           this.vocabLists.set(this.getDefaultVocabLists());
-          await this.api.sync({ vocabLists: this.getDefaultVocabLists() }).catch(() => {});
+          await this.api.sync({ vocabLists: this.getDefaultVocabLists() }).catch(() => this.toast.show("فشل مزامنة البيانات", "error"));
         } else {
           this.vocabLists.set(apiVocab);
         }
@@ -327,7 +329,7 @@ export class TrackerState {
     };
     this.students.update((list) => [...list, newStudent]);
     this.selectedStudentId.set(newStudent.id);
-    this.api.saveStudent(newStudent).catch((e) => console.error('saveStudent', e));
+    this.api.saveStudent(newStudent).catch((e) => { console.error('saveStudent', e); this.toast.show("فشل حفظ بيانات الطالب", "error"); });
   }
 
   updateStudent(id: string, name: string, age?: number, avatar?: string, notes?: string) {
@@ -335,7 +337,7 @@ export class TrackerState {
       s.id === id ? { ...s, name: name.trim(), age: age ? Number(age) : undefined, avatar: avatar || s.avatar, notes: notes?.trim() || undefined } : s
     ));
     const student = this.students().find((s) => s.id === id);
-    if (student) this.api.saveStudent(student).catch((e) => console.error('updateStudent', e));
+    if (student) this.api.saveStudent(student).catch((e) => { console.error('updateStudent', e); this.toast.show("فشل تحديث بيانات الطالب", "error"); });
   }
 
   deleteStudent(id: string) {
@@ -343,7 +345,7 @@ export class TrackerState {
     if (this.selectedStudentId() === id) {
       this.selectedStudentId.set(this.students().length > 0 ? this.students()[0].id : null);
     }
-    this.api.deleteStudent(id).catch((e) => console.error('deleteStudent', e));
+    this.api.deleteStudent(id).catch((e) => { console.error('deleteStudent', e); this.toast.show("فشل حذف الطالب", "error"); });
   }
 
   // ──────────────────────────────
@@ -355,7 +357,7 @@ export class TrackerState {
     const nextNum = list.length > 0 ? Math.max(...list.map((h) => h.number)) + 1 : 1;
     const newHadith: Hadith = { number: nextNum, title: title.trim(), text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${title.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
     this.hadiths.update((prev) => [...prev, newHadith]);
-    this.api.saveHadith(newHadith).catch((e) => console.error('saveHadith', e));
+    this.api.saveHadith(newHadith).catch((e) => { console.error('saveHadith', e); this.toast.show("فشل حفظ الحديث", "error"); });
   }
 
   updateHadith(oldNumber: number, newNumber: number, title: string, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
@@ -370,16 +372,16 @@ export class TrackerState {
       })));
     }
     const hadith = this.hadiths().find((h) => h.number === newNumber);
-    if (hadith) this.api.saveHadith(hadith).catch((e) => console.error('updateHadith', e));
+    if (hadith) this.api.saveHadith(hadith).catch((e) => { console.error('updateHadith', e); this.toast.show("فشل تحديث الحديث", "error"); });
     return true;
   }
 
   deleteHadith(number: number) {
     this.hadiths.update((list) => list.filter((h) => h.number !== number));
     this.students.update((list) => list.map((s) => ({
-      ...s, memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number), reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number), xp: s.memorizedHadithNumbers.filter((n) => n !== number).length * 100,
+      ...s, memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number), reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number), xp: this.calculateXP({ ...s, memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number), reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number) }),
     })));
-    this.api.deleteHadith(number).catch((e) => console.error('deleteHadith', e));
+    this.api.deleteHadith(number).catch((e) => { console.error('deleteHadith', e); this.toast.show("فشل حذف الحديث", "error"); });
   }
 
   // ──────────────────────────────
@@ -394,7 +396,7 @@ export class TrackerState {
       else if (newStatus === "review") { review.push(hadithNumber); review.sort((a, b) => a - b); }
       return { ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review, xp: this.calculateXP({ ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review }) };
     }));
-    this.api.setHadithStatus(studentId, hadithNumber, newStatus).catch((e) => console.error('setHadithStatus', e));
+    this.api.setHadithStatus(studentId, hadithNumber, newStatus).catch((e) => { console.error('setHadithStatus', e); this.toast.show("فشل تحديث حالة الحديث", "error"); });
   }
 
   toggleHadithQuick(studentId: string, hadithNumber: number) {
@@ -412,7 +414,7 @@ export class TrackerState {
       else if (newStatus === "review") { review.push(surahNumber); review.sort((a, b) => a - b); }
       return { ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review, xp: this.calculateXP({ ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review }) };
     }));
-    this.api.setSurahStatus(studentId, surahNumber, newStatus).catch((e) => console.error('setSurahStatus', e));
+    this.api.setSurahStatus(studentId, surahNumber, newStatus).catch((e) => { console.error('setSurahStatus', e); this.toast.show("فشل تحديث حالة السورة", "error"); });
   }
 
   toggleSurahQuick(studentId: string, surahNumber: number) {
@@ -429,8 +431,8 @@ export class TrackerState {
       if (newStatus === "memorized") memorized.push(pageId);
       return { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) };
     }));
-    if (newStatus === 'memorized') this.api.markSurahPage(studentId, pageId).catch(() => {});
-    else this.api.unmarkSurahPage(studentId, pageId).catch(() => {});
+    if (newStatus === 'memorized') this.api.markSurahPage(studentId, pageId).catch(() => this.toast.show("فشل تحديث صفحة السورة", "error"));
+    else this.api.unmarkSurahPage(studentId, pageId).catch(() => this.toast.show("فشل تحديث صفحة السورة", "error"));
   }
 
   markAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
@@ -441,7 +443,7 @@ export class TrackerState {
     for (let i = 1; i <= pageCount; i++) { const id = `${surahNumber}-${i}`; if (!memorized.includes(id)) { memorized.push(id); changed = true; } }
     if (!changed) return;
     this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) } : s));
-    for (let i = 1; i <= pageCount; i++) this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => {});
+    for (let i = 1; i <= pageCount; i++) this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => this.toast.show("فشل تحديث صفحات السورة", "error"));
   }
 
   clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
@@ -461,7 +463,7 @@ export class TrackerState {
       else if (newStatus === "review") review.push(unitId);
       return { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review, xp: this.calculateXP({ ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review }) };
     }));
-    this.api.setEnglishUnitStatus(studentId, unitId, newStatus).catch((e) => console.error('setEnglish', e));
+    this.api.setEnglishUnitStatus(studentId, unitId, newStatus).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
   }
 
   toggleEnglishQuick(studentId: string, unitId: string) {
@@ -480,7 +482,7 @@ export class TrackerState {
       else if (newStatus === "review") review.push(vocabId);
       return { ...s, memorizedVocabWords: memorized, reviewVocabWords: review, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized, reviewVocabWords: review }) };
     }));
-    this.api.setVocabStatus(studentId, vocabId, newStatus).catch((e) => console.error('setVocab', e));
+    this.api.setVocabStatus(studentId, vocabId, newStatus).catch((e) => { console.error('setVocab', e); this.toast.show("فشل تحديث حالة المفردات", "error"); });
   }
 
   toggleVocabQuick(studentId: string, listId: string, wordIndex: number) {
@@ -498,7 +500,7 @@ export class TrackerState {
     for (let i = 0; i < wordCount; i++) { const id = `${listId}-${i}`; if (!memorized.includes(id)) { memorized.push(id); changed = true; } }
     if (!changed) return;
     this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedVocabWords: memorized, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized }) } : s));
-    for (let i = 0; i < wordCount; i++) this.api.setVocabStatus(studentId, `${listId}-${i}`, 'memorized').catch(() => {});
+    for (let i = 0; i < wordCount; i++) this.api.setVocabStatus(studentId, `${listId}-${i}`, 'memorized').catch(() => this.toast.show("فشل تحديث المفردات", "error"));
   }
 
   clearAllVocab(studentId: string, listId: string, wordCount: number) {
@@ -519,12 +521,12 @@ export class TrackerState {
     }).filter((w) => w.word);
     const newList: VocabList = { id: `vlist_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`, name: name || "قائمة مفردات", words };
     this.vocabLists.update((prev) => [...prev, newList]);
-    this.api.saveVocabList(newList).catch((e) => console.error('saveVocabList', e));
+    this.api.saveVocabList(newList).catch((e) => { console.error('saveVocabList', e); this.toast.show("فشل حفظ قائمة المفردات", "error"); });
   }
 
   deleteVocabList(id: string) {
     this.vocabLists.update((prev) => prev.filter((l) => l.id !== id));
-    this.api.deleteVocabList(id).catch((e) => console.error('deleteVocabList', e));
+    this.api.deleteVocabList(id).catch((e) => { console.error('deleteVocabList', e); this.toast.show("فشل حذف قائمة المفردات", "error"); });
   }
 
   saveVocabToStorage(_lists: VocabList[]) {} // kept for compat

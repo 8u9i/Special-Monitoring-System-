@@ -36,7 +36,7 @@ import { TrackerState, Student } from '../../state';
           @let minTarget = nextStageInfo.nextStage.minXP; @let prevTarget = stage.minXP;
           @let currentInLevel = student.xp - prevTarget; @let totalRequiredInLevel = minTarget - prevTarget;
           @let percentageInLevel = (currentInLevel / totalRequiredInLevel) * 100;
-          <div class="w-full bg-[var(--color-border)] rounded-none h-1.5 overflow-hidden mt-2">
+          <div class="w-full bg-[var(--color-border)] rounded-none h-1.5 overflow-hidden mt-2 flex justify-end">
             <div class="bg-[var(--color-primary)] h-full rounded-none transition-all" [style.width.%]="percentageInLevel"></div>
           </div>
           } @else {

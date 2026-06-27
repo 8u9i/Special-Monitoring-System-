@@ -77,7 +77,7 @@ import { ToastService } from '../../shared/services/toast.service';
               <div class="flex-1">
                 <h4 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">{{ list.name }}</h4>
                 <div class="flex items-center gap-3 mt-2">
-                  <div class="flex-1 h-2 bg-[var(--color-canvas)] rounded-none overflow-hidden">
+                  <div class="flex-1 h-2 bg-[var(--color-canvas)] rounded-none overflow-hidden flex justify-end">
                     <div class="h-full bg-[var(--color-primary)] rounded-none transition-all duration-300"
                       [style.width.%]="progress.percent"></div>
                   </div>

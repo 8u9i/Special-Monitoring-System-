@@ -93,7 +93,7 @@ import { ApiService } from '../../api.service';
                       <span>الأحاديث:</span>
                       <span class="text-[var(--color-primary-dark)]">{{ student.memorizedHadithNumbers.length }} / {{ state.hadiths().length }}</span>
                     </div>
-                    <div class="w-full bg-[var(--color-border)] rounded-none h-1 overflow-hidden">
+                    <div class="w-full bg-[var(--color-border)] rounded-none h-1 overflow-hidden flex justify-end">
                       <div class="bg-[var(--color-primary)] h-full rounded-none transition-all"
                         [style.width.%]="(student.memorizedHadithNumbers.length / (state.hadiths().length || 1)) * 100"></div>
                     </div>
@@ -209,7 +209,7 @@ export class StagesComponent {
     this.modal.confirm(`هل تريد تصفير سجل حفظ الطالب (${student.name})؟`, () => {
       const updated = this.state.students().map((s) => {
         if (s.id === studentId) {
-          return { ...s, memorizedHadithNumbers: [], reviewHadithNumbers: [], xp: 0 };
+          return { ...s, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedVocabWords: [], reviewVocabWords: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 };
         }
         return s;
       });

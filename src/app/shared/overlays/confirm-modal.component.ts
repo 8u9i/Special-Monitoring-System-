@@ -1,16 +1,16 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { ModalService } from '../services/modal.service';
 
 @Component({
   selector: 'app-confirm-modal',
   template: `
     @if (modal.confirmState()) {
-    <div class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-      <div class="w-full max-w-sm p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl">
+    <div class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" (click)="close()">
+      <div class="w-full max-w-sm p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl" (click)="$event.stopPropagation()">
         <div class="w-14 h-14 rounded-none bg-red-50 text-red-500 mx-auto flex items-center justify-center mb-4">
           <span class="material-icons text-2xl">warning</span>
         </div>
-        <h3 class="font-inter font-bold text-lg text-[var(--color-text-primary)] mb-2">تأكيد الإجراء</h3>
+        <h3 id="confirmTitle" class="font-inter font-bold text-lg text-[var(--color-text-primary)] mb-2">تأكيد الإجراء</h3>
         <p class="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
           {{ modal.confirmState()!.message }}
         </p>
@@ -31,4 +31,13 @@ import { ModalService } from '../services/modal.service';
 })
 export class ConfirmModalComponent {
   modal = inject(ModalService);
+
+  close() {
+    this.modal.confirmState.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
+  }
 }

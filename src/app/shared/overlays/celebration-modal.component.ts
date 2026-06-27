@@ -1,12 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { CelebrationService } from '../services/celebration.service';
 
 @Component({
   selector: 'app-celebration-modal',
   template: `
     @if (celeb.show()) { @let student = celeb.student(); @let stage = celeb.stage();
-    <div class="fixed inset-0 bg-black/60 z-55 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
-      <div class="w-full max-w-md p-8 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl relative overflow-hidden">
+    <div class="fixed inset-0 bg-black/60 z-55 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle" (click)="close()">
+      <div class="w-full max-w-md p-8 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl relative overflow-hidden" (click)="$event.stopPropagation()">
         <div class="w-20 h-20 rounded-none bg-[var(--color-amber-light)] flex items-center justify-center mx-auto mb-5 relative">
           @if (stage) {
           <span class="material-icons text-4xl text-[var(--color-amber)]">{{ stage.badgeIcon }}</span>
@@ -15,7 +15,7 @@ import { CelebrationService } from '../services/celebration.service';
         </div>
 
         <p class="text-[10px] text-[var(--color-primary-dark)] font-bold tracking-widest uppercase">ارتقاء مبارك!</p>
-        <h3 class="font-inter text-2xl font-bold text-[var(--color-text-primary)] mt-2 mb-4">مبارك الارتقاء!</h3>
+        <h3 id="celebrationTitle" class="font-inter text-2xl font-bold text-[var(--color-text-primary)] mt-2 mb-4">مبارك الارتقاء!</h3>
 
         @if (student && stage) {
         <div class="my-4 p-5 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
@@ -62,5 +62,14 @@ export class CelebrationModalComponent {
 
   getAvatarEmoji(key: string): string {
     return this.avatarMap[key] || '🌿';
+  }
+
+  close() {
+    this.celeb.dismiss();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.close();
   }
 }
