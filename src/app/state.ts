@@ -293,6 +293,13 @@ export class TrackerState {
     return { nextStage, remaining: nextStage.minXP - student.xp };
   }
 
+  private persistStudentXP(student: Student) {
+    this.api.saveStudent(student).catch((e) => {
+      console.error('persistStudentXP', e);
+      this.toast.show("فشل حفظ النقاط", "error");
+    });
+  }
+
   getStudentBadges(studentId: string): StudentBadge[] {
     return this.studentBadges().filter((b) => b.student_id === studentId);
   }
@@ -409,6 +416,7 @@ export class TrackerState {
       return { ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review, xp: this.calculateXP({ ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review }) };
     }));
     this.api.setHadithStatus(studentId, hadithNumber, newStatus).catch((e) => { console.error('setHadithStatus', e); this.toast.show("فشل تحديث حالة الحديث", "error"); });
+    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
   toggleHadithQuick(studentId: string, hadithNumber: number) {
@@ -427,6 +435,7 @@ export class TrackerState {
       return { ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review, xp: this.calculateXP({ ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review }) };
     }));
     this.api.setSurahStatus(studentId, surahNumber, newStatus).catch((e) => { console.error('setSurahStatus', e); this.toast.show("فشل تحديث حالة السورة", "error"); });
+    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
   toggleSurahQuick(studentId: string, surahNumber: number) {
@@ -456,6 +465,7 @@ export class TrackerState {
     if (!changed) return;
     this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) } : s));
     for (let i = 1; i <= pageCount; i++) this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => this.toast.show("فشل تحديث صفحات السورة", "error"));
+    const _upd2 = this.students().find(s => s.id === studentId); if (_upd2) this.persistStudentXP(_upd2);
   }
 
   clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
@@ -476,6 +486,7 @@ export class TrackerState {
       return { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review, xp: this.calculateXP({ ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review }) };
     }));
     this.api.setEnglishUnitStatus(studentId, unitId, newStatus).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
+    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
   toggleEnglishQuick(studentId: string, unitId: string) {
@@ -495,6 +506,7 @@ export class TrackerState {
       return { ...s, memorizedVocabWords: memorized, reviewVocabWords: review, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized, reviewVocabWords: review }) };
     }));
     this.api.setVocabStatus(studentId, vocabId, newStatus).catch((e) => { console.error('setVocab', e); this.toast.show("فشل تحديث حالة المفردات", "error"); });
+    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
   toggleVocabQuick(studentId: string, listId: string, wordIndex: number) {
@@ -513,6 +525,7 @@ export class TrackerState {
     if (!changed) return;
     this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedVocabWords: memorized, xp: this.calculateXP({ ...s, memorizedVocabWords: memorized }) } : s));
     for (let i = 0; i < wordCount; i++) this.api.setVocabStatus(studentId, `${listId}-${i}`, 'memorized').catch(() => this.toast.show("فشل تحديث المفردات", "error"));
+    const _upd2 = this.students().find(s => s.id === studentId); if (_upd2) this.persistStudentXP(_upd2);
   }
 
   clearAllVocab(studentId: string, listId: string, wordCount: number) {

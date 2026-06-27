@@ -255,11 +255,16 @@ app.get('/api/students', async (_req, res) => {
         reviewVocabWords: v.review,
         memorizedEnglishUnits: e.memorized,
         reviewEnglishUnits: e.review,
-        xp: s.xp,
+        xp: h.memorized.length * 100 + su.memorized.length * 150 + p.length * 20 + v.memorized.length * 5 + e.memorized.length * 100,
       };
     });
 
     res.json(full);
+
+    // Background: persist recalculated XP to DB (self-healing)
+    for (const s of full) {
+      pool.query('UPDATE students SET xp = $1 WHERE id = $2', [s.xp, s.id]).catch(() => {});
+    }
   } catch (err) {
     console.error('GET /api/students error:', err);
     res.status(500).json({ error: 'Failed to fetch students' });
