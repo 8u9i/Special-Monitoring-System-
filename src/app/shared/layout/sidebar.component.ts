@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TrackerState } from '../../state';
 import { AuthService } from '../../auth.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -88,6 +89,13 @@ import { AuthService } from '../../auth.service';
       <!-- Bottom Section -->
       <div class="p-5 border-t border-white/10">
         <button
+          (click)="theme.toggle()"
+          class="flex items-center gap-3 w-full px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium cursor-pointer mb-2"
+        >
+          <span class="material-icons text-xl">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
+          <span>{{ theme.isDark() ? 'الوضع الفاتح' : 'الوضع الداكن' }}</span>
+        </button>
+        <button
           (click)="logout()"
           class="flex items-center gap-3 w-full px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium cursor-pointer mb-2"
         >
@@ -106,6 +114,7 @@ export class SidebarComponent {
   state = inject(TrackerState);
   private router = inject(Router);
   private auth = inject(AuthService);
+  theme = inject(ThemeService);
 
   avatarMap: Record<string, string> = {
     'avatar-leaf': '🌿',

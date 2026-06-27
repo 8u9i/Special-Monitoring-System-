@@ -48,6 +48,84 @@
   --color-divider: #E5E7EB;
 }
 
+/* ══════════════════════════════════════════════
+   Dark Mode — overrides @theme variables
+   ══════════════════════════════════════════════ */
+body.dark {
+  /* Canvas & Surface */
+  --color-canvas: #0F1117;
+  --color-surface: #1A1B23;
+  --color-surface-elevated: #22232E;
+
+  /* Navigation — slightly lighter than canvas */
+  --color-nav: #13141B;
+  --color-nav-hover: #22232E;
+  --color-nav-active: #2A2B38;
+
+  /* Primary — slightly brighter for dark backgrounds */
+  --color-primary: #C9A3D9;
+  --color-primary-hover: #B892C8;
+  --color-primary-light: #2D1F38;
+  --color-primary-dark: #A67DB8;
+
+  /* Secondary Accents — muted for dark */
+  --color-amber: #F5D76E;
+  --color-amber-light: #2A2518;
+  --color-blue: #7EB8DA;
+  --color-blue-light: #152028;
+  --color-green: #7BC8A4;
+  --color-green-light: #152018;
+  --color-rose: #E8A0BF;
+  --color-rose-light: #2A1520;
+
+  /* Typography */
+  --color-text-primary: #E8E8ED;
+  --color-text-secondary: #9CA3AF;
+  --color-text-tertiary: #6B7280;
+  --color-text-inverse: #1C1C28;
+  --color-text-inverse-muted: #6B7280;
+
+  /* Borders & Dividers */
+  --color-border: #2A2B38;
+  --color-border-light: #22232E;
+  --color-divider: #2A2B38;
+}
+
+body.dark .sketch-card { border-color: var(--color-border); }
+body.dark .sketch-card-inset { border-color: var(--color-border-light); background: var(--color-canvas); }
+
+/* Auto-detect dark mode if no preference saved */
+@media (prefers-color-scheme: dark) {
+  body:not(.light) {
+    --color-canvas: #0F1117;
+    --color-surface: #1A1B23;
+    --color-surface-elevated: #22232E;
+    --color-nav: #13141B;
+    --color-nav-hover: #22232E;
+    --color-nav-active: #2A2B38;
+    --color-primary: #C9A3D9;
+    --color-primary-hover: #B892C8;
+    --color-primary-light: #2D1F38;
+    --color-primary-dark: #A67DB8;
+    --color-amber: #F5D76E;
+    --color-amber-light: #2A2518;
+    --color-blue: #7EB8DA;
+    --color-blue-light: #152028;
+    --color-green: #7BC8A4;
+    --color-green-light: #152018;
+    --color-rose: #E8A0BF;
+    --color-rose-light: #2A1520;
+    --color-text-primary: #E8E8ED;
+    --color-text-secondary: #9CA3AF;
+    --color-text-tertiary: #6B7280;
+    --color-text-inverse: #1C1C28;
+    --color-text-inverse-muted: #6B7280;
+    --color-border: #2A2B38;
+    --color-border-light: #22232E;
+    --color-divider: #2A2B38;
+  }
+}
+
 body {
   font-family: var(--font-tajawal);
   background-color: var(--color-canvas);
