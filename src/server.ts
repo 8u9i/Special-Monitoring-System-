@@ -71,17 +71,7 @@ const pool = new pg.Pool({
 // Security middleware
 // ────────────────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-    },
-  },
+  contentSecurityPolicy: false,
   hsts: { maxAge: 31536000, includeSubDomains: true },
 }))
 
