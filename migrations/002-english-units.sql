@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS english_units (
 -- Seed the 180 English units (6 books × 30 units)
 INSERT INTO english_units (id, book, unit, title)
 SELECT
-  'b' || b.b || '-u' || LPAD(u.u::text, 2, '0'),
+  'b' || b.b || '-u' || u.u,
   b.b,
   u.u,
   'Book ' || b.b || ' - Unit ' || u.u
