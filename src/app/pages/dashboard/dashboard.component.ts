@@ -91,9 +91,12 @@ import { ModalService } from '../../shared/services/modal.service';
             <div class="flex items-center gap-2 mb-2">
               <span class="material-icons text-[var(--color-green)]">auto_stories</span>
               <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">تقدم حفظ القرآن الكريم</h3>
+            @if (state.selectedStudent(); as s) {
+              <p class="text-xs text-[var(--color-primary-dark)] font-semibold">{{ s.name }}</p>
+            }
             </div>
             <p class="text-sm text-[var(--color-text-secondary)] mb-4">
-              تم حفظ <span class="font-bold text-[var(--color-primary)]">{{ state.quranProgress().totalMemorized }}</span> من 114 سورة بواسطة جميع الطلاب
+              حفظ <span class="font-bold text-[var(--color-primary)]">{{ state.quranProgress().totalMemorized }}</span> من 114 سورة
             </p>
 
             <!-- Segment bar -->

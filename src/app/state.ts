@@ -306,19 +306,12 @@ export class TrackerState {
   });
 
   quranProgress = computed(() => {
-    const list = this.students();
-    if (list.length === 0) return { totalMemorized: 0, percentage: 0, topSurahs: 0 };
-    // Get unique surahs memorized by ANY student
-    const allSurahs = new Set<number>();
-    let topCount = 0;
-    for (const s of list) {
-      for (const n of s.memorizedSurahNumbers) allSurahs.add(n);
-      if (s.memorizedSurahNumbers.length > topCount) topCount = s.memorizedSurahNumbers.length;
-    }
+    const student = this.selectedStudent();
+    if (!student) return { totalMemorized: 0, percentage: 0 };
+    const count = student.memorizedSurahNumbers.length;
     return {
-      totalMemorized: allSurahs.size,
-      percentage: Math.round((allSurahs.size / 114) * 100),
-      topSurahs: topCount,
+      totalMemorized: count,
+      percentage: Math.round((count / 114) * 100),
     };
   });
 
