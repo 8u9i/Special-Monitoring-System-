@@ -16,6 +16,42 @@ interface SurahInfo {
   template: `
     <div class="space-y-8">
       <app-student-carousel />
+      <!-- Quran Progress Bar -->
+      @if (state.selectedStudent(); as qStudent) {
+      <div class="bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] overflow-hidden">
+        <div class="p-5 flex flex-col sm:flex-row items-center gap-5">
+          <div class="relative w-24 h-24 shrink-0">
+            <svg class="w-24 h-24 -rotate-90" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-border-light)" stroke-width="8" />
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" stroke-width="8"
+                stroke-linecap="round"
+                [attr.stroke-dasharray]="326.73"
+                [attr.stroke-dashoffset]="326.73 * (1 - state.quranProgress().percentage / 100)"
+                class="transition-all duration-1000 ease-out" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-xl font-bold text-[var(--color-primary)] font-inter">{{ state.quranProgress().percentage }}%</span>
+            </div>
+          </div>
+          <div class="flex-1 text-center sm:text-right">
+            <h3 class="font-inter text-base font-bold text-[var(--color-text-primary)] mb-1">تقدم {{ qStudent.name }} في حفظ القرآن</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] mb-3">
+              حفظ <span class="font-bold text-[var(--color-primary)]">{{ state.quranProgress().totalMemorized }}</span> من 114 سورة
+            </p>
+            <div class="w-full h-2.5 bg-[var(--color-canvas)] rounded-none overflow-hidden">
+              <div class="bg-[var(--color-green)] h-full transition-all duration-1000 ease-out"
+                [style.width.%]="state.quranProgress().percentage"></div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5 text-xs text-[var(--color-text-tertiary)]">
+              <span>0</span>
+              <span class="font-semibold text-[var(--color-text-secondary)]">{{ state.quranProgress().totalMemorized }} / 114</span>
+              <span>114</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
 
       @if (state.selectedStudent(); as student) {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
