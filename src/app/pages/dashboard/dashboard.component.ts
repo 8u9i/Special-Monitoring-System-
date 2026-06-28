@@ -68,6 +68,49 @@ import { ModalService } from '../../shared/services/modal.service';
           }
         </div>
       </div>
+      <!-- Quran Progress -->
+      <div class="bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] overflow-hidden">
+        <div class="p-6 flex flex-col sm:flex-row items-center gap-6">
+          <!-- Circular Progress -->
+          <div class="relative w-28 h-28 shrink-0">
+            <svg class="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-border-light)" stroke-width="8" />
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" stroke-width="8"
+                stroke-linecap="round"
+                [attr.stroke-dasharray]="326.73"
+                [attr.stroke-dashoffset]="326.73 * (1 - state.quranProgress().percentage / 100)"
+                class="transition-all duration-1000 ease-out" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-2xl font-bold text-[var(--color-primary)] font-inter">{{ state.quranProgress().percentage }}%</span>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 text-center sm:text-right">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="material-icons text-[var(--color-green)]">auto_stories</span>
+              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">تقدم حفظ القرآن الكريم</h3>
+            </div>
+            <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+              تم حفظ <span class="font-bold text-[var(--color-primary)]">{{ state.quranProgress().totalMemorized }}</span> من 114 سورة بواسطة جميع الطلاب
+            </p>
+
+            <!-- Segment bar -->
+            <div class="w-full h-3 bg-[var(--color-canvas)] rounded-none overflow-hidden flex">
+              <div class="bg-[var(--color-green)] h-full transition-all duration-1000 ease-out"
+                [style.width.%]="state.quranProgress().percentage"
+                title="{{ state.quranProgress().totalMemorized }} سورة محفوظة"></div>
+            </div>
+
+            <div class="flex items-center justify-between mt-2 text-xs">
+              <span class="text-[var(--color-text-tertiary)]">0</span>
+              <span class="text-[var(--color-text-secondary)] font-semibold">{{ state.quranProgress().totalMemorized }} / 114 سورة</span>
+              <span class="text-[var(--color-text-tertiary)]">114</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
