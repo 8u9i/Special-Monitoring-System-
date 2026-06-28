@@ -9,7 +9,6 @@ import { ToastService } from '../../shared/services/toast.service';
   selector: 'app-english-trail',
   imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
   template: `
-    <style>@import url('https://fonts.googleapis.com/css2?family=Cause:wght@100..900&display=swap');</style>
     <div class="space-y-8" style="font-family: 'Cause', sans-serif;">
       <app-student-carousel />
 

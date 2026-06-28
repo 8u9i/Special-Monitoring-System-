@@ -603,11 +603,10 @@ app.get('/api/student-badges', async (_req, res) => {
 // Auto-award badges for a student (called after progress changes)
 async function checkAndAwardBadges(studentId: string) {
   try {
-    const [hadithCount, surahCount, pageCount, vocabCount, englishCount, xpRow] = await Promise.all([
+    const [hadithCount, surahCount, pageCount, englishCount, xpRow] = await Promise.all([
       pool.query("SELECT COUNT(*)::int FROM student_hadiths WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
-      pool.query("SELECT COALESCE(SUM(0), 0)::int FROM students WHERE id = $1", [studentId]),
       pool.query("SELECT COUNT(*)::int FROM student_english_progress WHERE student_id = $1 AND status = 'memorized'", [studentId]),
       pool.query("SELECT COALESCE(xp, 0) as xp FROM students WHERE id = $1", [studentId]),
     ]);
@@ -616,7 +615,6 @@ async function checkAndAwardBadges(studentId: string) {
       hadith: hadithCount.rows[0].count,
       quran: surahCount.rows[0].count,
       pages: pageCount.rows[0].count,
-      vocab: vocabCount.rows[0].count,
       english: englishCount.rows[0].count,
       xp: xpRow.rows[0]?.xp || 0,
     };

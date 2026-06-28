@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cause:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cause:wght@100..900&family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&display=swap');
 
 @import "tailwindcss";
 
@@ -240,8 +240,17 @@ textarea:focus-visible {
 }
 
 /* Touch target minimum size */
-button, a, input, select, textarea, label {
+input, select, textarea {
   min-height: 48px;
+}
+button, a, label {
+  min-height: 44px;
+}
+/* Small inline buttons (e.g. page numbers, badge buttons) */
+button.text-\[10px\], button.text-\[9px\],
+a.text-\[10px\], a.text-\[9px\],
+[class*="text-\[10px\]"], [class*="text-\[9px\]"] {
+  min-height: auto;
 }
 
 /* Reduced motion preference */

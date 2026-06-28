@@ -454,11 +454,16 @@ export class TrackerState {
   }
 
   clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
+    const student = this.students().find((s) => s.id === studentId);
+    if (!student) return;
+    const memorized = (student.memorizedSurahPages || []).filter((id) => !id.startsWith(surahNumber + '-'));
+    if (memorized.length === (student.memorizedSurahPages || []).length) return;
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      const memorized = (s.memorizedSurahPages || []).filter((id) => !id.startsWith(surahNumber + '-'));
       return { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) };
     }));
+    for (let i = 1; i <= pageCount; i++) this.api.unmarkSurahPage(studentId, `${surahNumber}-${i}`).catch(() => this.toast.show("فشل تحديث صفحات السورة", "error"));
+    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
   }
 
   toggleEnglishStatus(studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") {
