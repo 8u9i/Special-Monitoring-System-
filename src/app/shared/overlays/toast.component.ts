@@ -5,7 +5,7 @@ import { ToastService } from '../services/toast.service';
   selector: 'app-toast',
   template: `
     @if (toast.message(); as msg) {
-    <button (click)="toast.message.set(null)" class="fixed bottom-6 right-6 z-50 px-5 py-3 bg-[var(--color-nav)] text-white rounded-none shadow-lg flex items-center gap-3 animate-fade-in cursor-pointer border-none" aria-label="إخفاء الإشعار">
+    <button (click)="toast.message.set(null)" class="fixed bottom-6 right-6 z-50 px-5 py-3 bg-[var(--color-primary-dark)] text-white shadow-lg flex items-center gap-3 cursor-pointer border-none" aria-label="إخفاء الإشعار">
       @if (toast.type() === 'error') {
         <span class="material-icons text-red-400 text-lg">error</span>
       } @else {

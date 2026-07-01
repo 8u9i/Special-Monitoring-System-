@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TrackerState } from '../../state';
 import { AuthService } from '../../auth.service';
@@ -8,101 +8,128 @@ import { ThemeService } from '../services/theme.service';
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <aside class="w-full md:w-64 bg-[var(--color-nav)] flex flex-col justify-between shrink-0">
+    <!-- Mobile hamburger bar (visible only on small screens) -->
+    <div class="md:hidden flex items-center justify-between p-4 bg-[var(--color-nav)] border-b border-white/[0.04]">
+      <button (click)="toggleMenu()" class="text-white/60 hover:text-white transition-colors cursor-pointer border-none" aria-label="فتح القائمة">
+        <span class="material-icons text-2xl">menu</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-[var(--color-primary)] flex items-center justify-center">
+          <span class="material-icons text-white text-sm">eco</span>
+        </div>
+        <span class="font-tajawal text-sm font-bold text-white">يا إخوتي</span>
+      </div>
+      <div class="w-8"></div>
+    </div>
+
+    <!-- Desktop sidebar + Mobile overlay -->
+    @if (mobileMenuOpen()) {
+    <div class="fixed inset-0 z-40 md:hidden" (click)="closeMenu()">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    </div>
+    }
+
+    <aside class="
+      w-full md:w-64 bg-[var(--color-nav)] flex flex-col justify-between shrink-0 border-l border-white/[0.04]
+      md:block
+      fixed md:static top-0 right-0 z-50 h-full md:h-auto
+      transition-transform duration-300 ease-out
+      max-md:max-w-xs
+      max-md:shadow-2xl
+      max-md:[transform:translateX(100%)]
+      max-md:[&.open]:translate-x-0
+    " [class.open]="mobileMenuOpen()">
       <div class="p-5">
-        <!-- App Identity -->
-        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/10">
-          <div class="w-10 h-10 rounded-none bg-[var(--color-primary)] flex items-center justify-center">
+        <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/[0.06]">
+          <div class="w-10 h-10 bg-[var(--color-primary)] flex items-center justify-center">
             <span class="material-icons text-white text-xl">eco</span>
           </div>
-          <div>
+          <div class="flex-1">
             <h1 class="font-tajawal text-lg font-bold text-white tracking-tight">يا إخوتي</h1>
-            <p class="text-xs text-[var(--color-text-inverse-muted)] font-medium">متابع الحفظ التفاعلي</p>
+            <p class="text-xs text-white/40 font-medium">متابع الحفظ التفاعلي</p>
           </div>
+          <button (click)="closeMenu()" class="md:hidden text-white/40 hover:text-white transition-colors cursor-pointer border-none" aria-label="إغلاق القائمة">
+            <span class="material-icons">close</span>
+          </button>
         </div>
 
-        <!-- Selected Student Card -->
         @if (state.selectedStudent(); as student) {
-        <div class="mb-6 p-4 rounded-none bg-white/5 border border-white/5">
+        <div class="mb-6 p-4 bg-white/[0.04] border border-white/[0.06]">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-2 h-2 rounded-none bg-[var(--color-green)]"></div>
-            <p class="text-[11px] text-[var(--color-text-inverse-muted)] font-semibold uppercase tracking-wider">الطالب المحدد</p>
+            <div class="w-2 h-2 bg-[var(--color-green)]"></div>
+            <p class="text-[11px] text-white/40 font-semibold tracking-wider">الطالب المحدد</p>
           </div>
           <div class="flex items-center gap-2.5 mb-3">
             <span class="text-xl">{{ getAvatarEmoji(student.avatar) }}</span>
             <span class="font-bold text-white text-sm">{{ student.name }}</span>
           </div>
           <div class="flex items-center justify-between text-xs">
-            <span class="text-[var(--color-text-inverse-muted)]">{{ getProgressLabel() }}:</span>
+            <span class="text-white/40">{{ getProgressLabel() }}:</span>
             <span class="font-semibold text-[var(--color-primary)]">{{ getProgressValue(student) }}</span>
           </div>
           <div class="flex items-center justify-between text-xs mt-2">
-            <span class="text-[var(--color-text-inverse-muted)]">المرحلة:</span>
+            <span class="text-white/40">المرحلة:</span>
             <span class="font-semibold text-[var(--color-amber)]">{{ getStudentStageName(student) }}</span>
           </div>
         </div>
         }
 
-        <!-- Navigation -->
-        <nav class="space-y-1">
-          <a routerLink="/dashboard" routerLinkActive="bg-white/10 text-white" [routerLinkActiveOptions]="{ exact: true }"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+        <nav class="space-y-0.5">
+          <a (click)="closeMenu()" routerLink="/dashboard" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]" [routerLinkActiveOptions]="{ exact: true }"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">home</span>
             <span>الرئيسية</span>
           </a>
 
-          <div class="pt-2 pb-1">
-            <p class="px-4 text-[11px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">مسارات التعلم</p>
+          <div class="pt-3 pb-1">
+            <p class="px-4 text-[11px] font-bold text-white/20 tracking-widest mb-1">مسارات التعلم</p>
           </div>
-          <a routerLink="/hadith" routerLinkActive="bg-white/10 text-white"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+          <a (click)="closeMenu()" routerLink="/hadith" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">menu_book</span>
             <span>مسار الأحاديث</span>
           </a>
-          <a routerLink="/quran" routerLinkActive="bg-white/10 text-white"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+          <a (click)="closeMenu()" routerLink="/quran" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">auto_stories</span>
             <span>مسار القرآن</span>
           </a>
-          <a routerLink="/english" routerLinkActive="bg-white/10 text-white"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+          <a (click)="closeMenu()" routerLink="/english" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">translate</span>
             <span>مسار الإنجليزية</span>
           </a>
 
           <div class="pt-4 pb-1">
-            <p class="px-4 text-[11px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">أدوات</p>
+            <p class="px-4 text-[11px] font-bold text-white/20 tracking-widest mb-1">أدوات</p>
           </div>
-          <a routerLink="/reference" routerLinkActive="bg-white/10 text-white"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+          <a (click)="closeMenu()" routerLink="/reference" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">library_books</span>
             <span>المناهج التعليمية</span>
           </a>
-          <a routerLink="/stages" routerLinkActive="bg-white/10 text-white"
-            class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+          <a (click)="closeMenu()" routerLink="/stages" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">manage_accounts</span>
             <span>لوحة الإدارة</span>
           </a>
         </nav>
       </div>
 
-      <!-- Bottom Section -->
-      <div class="p-5 border-t border-white/10">
+      <div class="p-5 border-t border-white/[0.06]">
         <button
           (click)="theme.toggle()"
-          class="flex items-center gap-3 w-full px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium cursor-pointer mb-2"
-        >
+          class="flex items-center gap-3 w-full px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium cursor-pointer mb-1 border-none">
           <span class="material-icons text-xl">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
           <span>{{ theme.isDark() ? 'الوضع الفاتح' : 'الوضع الداكن' }}</span>
         </button>
         <button
           (click)="logout()"
-          class="flex items-center gap-3 w-full px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium cursor-pointer mb-2"
-        >
+          class="flex items-center gap-3 w-full px-4 py-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium cursor-pointer mb-2 border-none">
           <span class="material-icons text-xl">logout</span>
           <span>تسجيل الخروج</span>
         </button>
-        <div class="flex items-center gap-3 px-3 py-2 rounded-none bg-white/5 text-[var(--color-text-inverse-muted)] text-xs">
+        <div class="flex items-center gap-3 px-3 py-2 bg-white/[0.03] text-white/30 text-xs">
           <span class="material-icons text-sm">verified</span>
           <span class="font-medium">v1.0 — متابع الحفظ</span>
         </div>
@@ -115,6 +142,20 @@ export class SidebarComponent {
   private router = inject(Router);
   private auth = inject(AuthService);
   theme = inject(ThemeService);
+  mobileMenuOpen = signal(false);
+
+  toggleMenu() {
+    this.mobileMenuOpen.update((v) => !v);
+  }
+
+  closeMenu() {
+    this.mobileMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.closeMenu();
+  }
 
   avatarMap: Record<string, string> = {
     'avatar-leaf': '🌿',

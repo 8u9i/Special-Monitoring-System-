@@ -8,7 +8,7 @@ import { ModalService } from '../services/modal.service';
   selector: 'app-header',
   imports: [],
   template: `
-    <header class="mb-6 p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <header class="mb-6 panel p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div class="relative z-10">
         <div class="flex items-center gap-2 mb-2 text-[var(--color-primary)]">
           <span class="material-icons text-lg">yard</span>
@@ -25,7 +25,7 @@ import { ModalService } from '../services/modal.service';
       <div class="shrink-0 flex gap-2 relative z-10">
         <button
           (click)="modalService.showAddStudent.set(true)"
-          class="sketch-button flex items-center gap-2 px-5 py-2.5 text-sm font-semibold cursor-pointer"
+          class="btn btn-primary btn-md"
         >
           <span class="material-icons text-lg">person_add</span>
           <span>إضافة طالب</span>

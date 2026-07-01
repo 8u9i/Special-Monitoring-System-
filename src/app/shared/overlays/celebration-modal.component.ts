@@ -5,9 +5,9 @@ import { CelebrationService } from '../services/celebration.service';
   selector: 'app-celebration-modal',
   template: `
     @if (celeb.show()) { @let student = celeb.student(); @let stage = celeb.stage();
-    <div class="fixed inset-0 bg-black/60 z-55 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle" (click)="close()">
-      <div class="w-full max-w-md p-8 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl relative overflow-hidden" (click)="$event.stopPropagation()">
-        <div class="w-20 h-20 rounded-none bg-[var(--color-amber-light)] flex items-center justify-center mx-auto mb-5 relative">
+    <div class="fixed inset-0 bg-black/60 z-55 flex items-center justify-center p-4 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle" (click)="close()">
+      <div class="modal-panel max-w-md text-center relative overflow-hidden" (click)="$event.stopPropagation()">
+        <div class="w-20 h-20 bg-[var(--color-amber-light)] flex items-center justify-center mx-auto mb-5 relative">
           @if (stage) {
           <span class="material-icons text-4xl text-[var(--color-amber)]">{{ stage.badgeIcon }}</span>
           }
@@ -18,7 +18,7 @@ import { CelebrationService } from '../services/celebration.service';
         <h3 id="celebrationTitle" class="font-tajawal text-2xl font-bold text-[var(--color-text-primary)] mt-2 mb-4">مبارك الارتقاء!</h3>
 
         @if (student && stage) {
-        <div class="my-4 p-5 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
+        <div class="my-4 p-5 bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
           <p class="text-xs text-[var(--color-text-secondary)] font-semibold">ارتقى البطل:</p>
           <p class="font-bold text-xl text-[var(--color-text-primary)] my-1 flex items-center justify-center gap-2">
             <span>{{ getAvatarEmoji(student.avatar) }}</span>
@@ -38,7 +38,7 @@ import { CelebrationService } from '../services/celebration.service';
 
         <div class="mt-6 w-full">
           <button (click)="celeb.dismiss()"
-            class="w-full sketch-button py-3 text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
+            class="btn btn-primary btn-md w-full">
             <span class="material-icons">spa</span>
             مواصلة رحلة الحفظ
           </button>

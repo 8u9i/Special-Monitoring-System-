@@ -69,7 +69,7 @@ import { TrackerState } from '../../state';
             </div>
           }
 
-          <button type="submit" class="login-btn" [disabled]="loading() || !username || !password">
+              <button type="submit" class="btn btn-primary btn-lg w-full" [disabled]="loading() || !username || !password">
             @if (loading()) {
               <span class="spinner"></span>
               <span>جاري الدخول...</span>
@@ -213,37 +213,6 @@ import { TrackerState } from '../../state';
 
     .error-msg .material-icons {
       font-size: 1.1rem;
-    }
-
-    .login-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      width: 100%;
-      padding: 0.85rem;
-      background: var(--color-primary);
-      color: white;
-      border: none;
-      font-family: var(--font-tajawal);
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s;
-      min-height: 48px;
-    }
-
-    .login-btn:hover:not(:disabled) {
-      background: var(--color-primary-hover);
-    }
-
-    .login-btn:active:not(:disabled) {
-      transform: scale(0.98);
-    }
-
-    .login-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
 
     .spinner {

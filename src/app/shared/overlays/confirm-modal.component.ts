@@ -5,9 +5,9 @@ import { ModalService } from '../services/modal.service';
   selector: 'app-confirm-modal',
   template: `
     @if (modal.confirmState()) {
-    <div class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" (click)="close()">
-      <div class="w-full max-w-sm p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] text-center shadow-xl" (click)="$event.stopPropagation()">
-        <div class="w-14 h-14 rounded-none bg-red-50 text-red-500 mx-auto flex items-center justify-center mb-4">
+    <div class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" (click)="close()">
+      <div class="modal-panel max-w-sm text-center" (click)="$event.stopPropagation()">
+        <div class="w-14 h-14 bg-red-50 text-red-500 mx-auto flex items-center justify-center mb-4">
           <span class="material-icons text-2xl">warning</span>
         </div>
         <h3 id="confirmTitle" class="font-tajawal font-bold text-lg text-[var(--color-text-primary)] mb-2">تأكيد الإجراء</h3>
@@ -16,11 +16,11 @@ import { ModalService } from '../services/modal.service';
         </p>
         <div class="flex gap-3 w-full">
           <button (click)="modal.confirmState.set(null)"
-            class="flex-1 py-2.5 text-sm font-semibold bg-[var(--color-canvas)] border border-[var(--color-border)] text-[var(--color-text-secondary)] rounded-none hover:bg-[var(--color-border)] transition-colors cursor-pointer">
+            class="btn btn-outline btn-md flex-1">
             إلغاء
           </button>
           <button (click)="modal.confirmState()!.onConfirm()"
-            class="flex-1 py-2.5 text-sm font-semibold bg-red-500 text-white rounded-none hover:bg-red-600 transition-colors cursor-pointer">
+            class="btn btn-md flex-1 bg-red-500 text-white hover:bg-red-600">
             تأكيد
           </button>
         </div>

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-student-carousel',
   template: `
-    <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
+    <div class="panel p-5">
       <h3 class="font-tajawal text-sm font-bold mb-3 text-[var(--color-text-secondary)] flex items-center gap-2">
         <span class="material-icons text-[var(--color-primary)] text-lg">psychology</span>
         اختر الطالب
@@ -16,8 +16,8 @@ import { Router } from '@angular/router';
         @let progress = getRouteProgress(student);
         <button (click)="state.selectedStudentId.set(student.id)"
           [class]="isSelected
-            ? 'flex items-center gap-2.5 px-4 py-2.5 rounded-none bg-[var(--color-primary)] text-white font-semibold transition-all cursor-pointer text-sm'
-            : 'flex items-center gap-2.5 px-4 py-2.5 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all cursor-pointer text-sm'">
+            ? 'flex items-center gap-2.5 px-4 py-2.5 bg-[var(--color-primary)] text-white font-semibold transition-all cursor-pointer text-sm'
+            : 'flex items-center gap-2.5 px-4 py-2.5 bg-[var(--color-canvas)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all cursor-pointer text-sm'">
           <span class="text-lg leading-none select-none">{{ getAvatarEmoji(student.avatar) }}</span>
           <div class="text-right">
             <p class="font-bold text-sm">{{ student.name }}</p>
@@ -27,9 +27,9 @@ import { Router } from '@angular/router';
           </div>
         </button>
         } @empty {
-        <div class="w-full text-center py-6 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
-          <span class="material-icons text-3xl text-[var(--color-text-tertiary)]">group_off</span>
-          <p class="text-[var(--color-text-secondary)] font-medium mt-1 text-sm">يرجى تسجيل الطلاب أولاً</p>
+        <div class="w-full empty-state py-6 mx-0">
+          <span class="empty-state-icon">group_off</span>
+          <p class="empty-state-text">يرجى تسجيل الطلاب أولاً</p>
         </div>
         }
       </div>

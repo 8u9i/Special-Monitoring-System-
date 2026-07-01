@@ -9,35 +9,34 @@ import { ToastService } from '../../shared/services/toast.service';
   selector: 'app-english-trail',
   imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
   template: `
-    <div class="space-y-8" style="font-family: 'Cause', sans-serif;">
+    <div class="space-y-6" style="font-family: 'Cause', sans-serif;">
       <app-student-carousel />
 
       @if (state.selectedStudent(); as student) {
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <app-student-stage-card [student]="student" />
 
-        <div class="space-y-6 lg:col-span-2">
-          <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
-            <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-                <span class="material-icons text-[var(--color-primary)]">language</span>
+        <div class="space-y-4 lg:col-span-2">
+          <div class="panel p-6">
+            <div class="panel-header">
+              <h3 class="panel-title">
+                <span class="panel-title-icon">language</span>
                 الوحدات الإنجليزية
               </h3>
               <div class="flex flex-col items-end gap-1 text-xs font-medium text-[var(--color-text-secondary)]">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-none bg-[var(--color-primary)]"></span> محفوظ</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-none bg-[var(--color-amber)]"></span> مراجعة</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-none bg-[var(--color-border)]"></span> لم يبدأ</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-[var(--color-primary)]"></span> محفوظ</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-[var(--color-amber)]"></span> مراجعة</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-[var(--color-border)]"></span> لم يبدأ</span>
               </div>
             </div>
 
-            <!-- Units Grid -->
             <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
               @for (unit of state.englishUnits(); track unit.unitNumber) {
               @let unitStatus = getUnitStatus(student, unit.unitNumber);
               <button (click)="onUnitClick(unit)"
-                class="aspect-square rounded-none border flex flex-col items-center justify-center transition-all hover:scale-105 cursor-pointer"
+                class="aspect-square border flex flex-col items-center justify-center transition-all hover:scale-105 cursor-pointer"
                 [class.bg-[var(--color-surface)]]="unitStatus === 'none'"
-                [class.bg-emerald-50]="unitStatus === 'memorized'"
+                [class.bg-[var(--color-green-light)]]="unitStatus === 'memorized'"
                 [class.bg-[var(--color-amber-light)]]="unitStatus === 'review'"
                 [class.border-[var(--color-primary)]]="unitStatus === 'memorized' || selectedUnit()?.unitNumber === unit.unitNumber"
                 [class.border-[var(--color-amber)]]="unitStatus === 'review'"
@@ -57,17 +56,16 @@ import { ToastService } from '../../shared/services/toast.service';
                   [class.text-[var(--color-amber)]]="unitStatus === 'review'">{{ unit.words.length }} كلمة</span>
               </button>
               } @empty {
-              <div class="col-span-full text-center py-8 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
-                <span class="material-icons text-3xl text-[var(--color-text-tertiary)]">translate</span>
-                <p class="text-[var(--color-text-secondary)] font-medium mt-2 text-sm">لا توجد وحدات إنجليزية بعد</p>
+              <div class="col-span-full empty-state">
+                <span class="empty-state-icon">translate</span>
+                <p class="empty-state-text">لا توجد وحدات إنجليزية بعد</p>
               </div>
               }
             </div>
           </div>
 
-          <!-- Unit Detail -->
           @if (selectedUnit(); as unit) {
-          <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
+          <div class="panel p-6">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border-light)]">
               <div class="flex-1">
                 <h4 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">الوحدة {{ unit.unitNumber }}</h4>
@@ -75,28 +73,28 @@ import { ToastService } from '../../shared/services/toast.service';
               </div>
               <div class="flex items-center gap-2 mr-4">
                 <button (click)="onMarkUnit(student.id, unit.unitNumber)"
-                  class="px-3 py-2 rounded-none text-xs font-semibold border transition-all cursor-pointer"
+                  class="btn btn-sm"
                   [class]="getUnitStatus(student, unit.unitNumber) === 'memorized'
-                    ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
-                    : 'bg-[var(--color-canvas)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'"
+                    ? 'btn-primary'
+                    : 'btn-outline'"
                   [attr.aria-label]="getUnitStatus(student, unit.unitNumber) === 'memorized' ? 'محفوظ' : 'تحديد كمحفوظ'">
-                  <span class="material-icons text-sm align-middle">{{ getUnitStatus(student, unit.unitNumber) === 'memorized' ? 'check_circle' : 'check_circle_outline' }}</span>
+                  <span class="material-icons text-sm">{{ getUnitStatus(student, unit.unitNumber) === 'memorized' ? 'check_circle' : 'check_circle_outline' }}</span>
                   {{ getUnitStatus(student, unit.unitNumber) === 'memorized' ? 'محفوظ' : 'تحديد كمحفوظ' }}
                 </button>
                 <button (click)="onReviewUnit(student.id, unit.unitNumber)"
-                  class="px-3 py-2 rounded-none text-xs font-semibold border transition-all cursor-pointer"
+                  class="btn btn-sm"
                   [class]="getUnitStatus(student, unit.unitNumber) === 'review'
-                    ? 'bg-[var(--color-amber)] text-white border-[var(--color-amber)]'
-                    : 'bg-[var(--color-canvas)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-amber)] hover:text-[var(--color-amber)]'"
+                    ? 'bg-[var(--color-amber)] text-[var(--color-text-primary)]'
+                    : 'btn-outline'"
                   aria-label="مراجعة">
-                  <span class="material-icons text-sm align-middle">sync</span>
+                  <span class="material-icons text-sm">sync</span>
                   مراجعة
                 </button>
                 @if (getUnitStatus(student, unit.unitNumber) !== 'none') {
                 <button (click)="onClearUnit(student.id, unit.unitNumber)"
-                  class="px-3 py-2 rounded-none text-xs font-semibold border bg-[var(--color-canvas)] text-red-500 border-red-200 hover:bg-red-50 transition-all cursor-pointer"
+                  class="btn btn-sm border border-red-200 bg-[var(--color-surface)] text-red-500 hover:bg-red-50"
                   aria-label="مسح التحديد">
-                  <span class="material-icons text-sm align-middle">restart_alt</span>
+                  <span class="material-icons text-sm">restart_alt</span>
                   مسح
                 </button>
                 }
@@ -105,7 +103,7 @@ import { ToastService } from '../../shared/services/toast.service';
 
             <div class="grid grid-cols-2 gap-2">
               @for (word of unit.words; track $index) {
-              <div class="flex items-center gap-2 p-2.5 rounded-none border border-[var(--color-border-light)]">
+              <div class="flex items-center gap-2 p-2.5 border border-[var(--color-border-light)]">
                 <div class="min-w-0 flex-1">
                   <p class="font-bold text-[var(--color-text-primary)] text-sm leading-tight">{{ word.word }}</p>
                   <p class="text-[11px] leading-tight text-[var(--color-text-secondary)]">{{ word.definition }}</p>

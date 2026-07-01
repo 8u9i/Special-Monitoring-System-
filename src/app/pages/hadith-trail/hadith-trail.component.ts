@@ -11,27 +11,27 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
   selector: 'app-hadith-trail',
   imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
   template: `
-    <div class="space-y-8">
+    <div class="space-y-6">
       <app-student-carousel />
 
       @if (state.selectedStudent(); as student) {
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <app-student-stage-card [student]="student" />
 
-        <div class="space-y-6 lg:col-span-2">
-          <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
-            <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-                <span class="material-icons text-[var(--color-primary)]">alt_route</span>
+        <div class="space-y-4 lg:col-span-2">
+          <div class="panel p-6">
+            <div class="panel-header">
+              <h3 class="panel-title">
+                <span class="panel-title-icon">alt_route</span>
                 مسار الأحاديث
               </h3>
               <p class="text-xs text-[var(--color-text-secondary)]">اضغط على الباب لعرض الأحاديث</p>
             </div>
 
-            <div class="space-y-2 max-h-[600px] overflow-y-auto pl-1">
+            <div class="space-y-1 max-h-[600px] overflow-y-auto">
               @for (group of groupedHadiths(); track group.category) {
               @let isCategoryExpanded = expandedCategory() === group.category;
-              <div class="rounded-none border transition-all"
+              <div class="border transition-all"
                 [class.border-[var(--color-primary)]]="isCategoryExpanded"
                 [class.border-[var(--color-border-light)]]="!isCategoryExpanded">
                 <button (click)="toggleCategory(group.category)"
@@ -42,9 +42,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                   <span class="font-bold text-sm flex-1 text-right text-[var(--color-text-primary)]">
                     {{ group.category }}
                   </span>
-                  <span class="text-[11px] font-semibold text-[var(--color-primary-dark)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded-none">
-                    {{ group.hadiths.length }}
-                  </span>
+                  <span class="tag tag-primary">{{ group.hadiths.length }}</span>
                   <span class="material-icons text-sm text-[var(--color-text-tertiary)] transition-transform flex-shrink-0"
                     [class.rotate-180]="isCategoryExpanded">expand_more</span>
                 </button>
@@ -59,11 +57,11 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                       class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                       [class.bg-[var(--color-surface)]]="isExpanded"
                       [class.hover:bg-[var(--color-surface)]]="!isExpanded">
-                      <span class="w-7 h-7 rounded-none flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all"
+                      <span class="badge-number transition-all"
                         [ngClass]="{
-                          'bg-[var(--color-primary)] text-white': hadithStatus === 'memorized',
-                          'bg-[var(--color-amber)] text-[var(--color-text-primary)]': hadithStatus === 'review',
-                          'bg-[var(--color-surface)] text-[var(--color-text-tertiary)] border border-[var(--color-border)]': hadithStatus === 'none'
+                          'badge-number-memorized': hadithStatus === 'memorized',
+                          'badge-number-review': hadithStatus === 'review',
+                          'badge-number-none': hadithStatus === 'none'
                         }">
                         {{ idx + 1 }}
                       </span>
@@ -78,7 +76,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
 
                     @if (isExpanded) {
                     <div class="border-t border-[var(--color-border-light)] p-4 bg-[var(--color-surface)]">
-                      <div class="p-4 rounded-none bg-[var(--color-amber-light)] border border-[var(--color-amber)]/20 text-center mb-4">
+                      <div class="p-4 bg-[var(--color-amber-light)] border border-[var(--color-amber)]/20 text-center mb-4">
                         <p class="font-amiri text-base font-bold text-[var(--color-text-primary)] leading-relaxed select-all">
                           "{{ hadith.text }}"
                         </p>
@@ -88,7 +86,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                         <span class="font-semibold">الراوي:</span> {{ hadith.reference }}
                       </p>
 
-                      <div class="p-3 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)] mb-4">
+                      <div class="p-3 bg-[var(--color-canvas)] border border-[var(--color-border-light)] mb-4">
                         <span class="text-xs text-[var(--color-primary)] font-bold flex items-center gap-1 mb-1">
                           <span class="material-icons text-sm">spa</span>
                           المعنى المبسط:
@@ -103,22 +101,22 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                         <div class="grid grid-cols-3 gap-2">
                           <button (click)="setHadithStatus(student.id, hadith.number, 'memorized')"
                             [class]="hadithStatus === 'memorized'
-                              ? 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-primary)] text-white font-semibold cursor-pointer text-xs'
-                              : 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] transition-all cursor-pointer text-xs'">
+                              ? 'btn btn-primary btn-sm flex items-center justify-center gap-1.5'
+                              : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
                             <span class="material-icons text-sm">check_circle</span>
                             تم الحفظ
                           </button>
                           <button (click)="setHadithStatus(student.id, hadith.number, 'review')"
                             [class]="hadithStatus === 'review'
-                              ? 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-amber)] text-[var(--color-text-primary)] font-semibold cursor-pointer text-xs'
-                              : 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-amber)] transition-all cursor-pointer text-xs'">
+                              ? 'btn btn-sm flex items-center justify-center gap-1.5 bg-[var(--color-amber)] text-[var(--color-text-primary)]'
+                              : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
                             <span class="material-icons text-sm">menu_book</span>
                             قيد المراجعة
                           </button>
                           <button (click)="setHadithStatus(student.id, hadith.number, 'none')"
                             [class]="hadithStatus === 'none'
-                              ? 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-border)] text-[var(--color-text-secondary)] font-semibold cursor-pointer text-xs'
-                              : 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-text-tertiary)] transition-all cursor-pointer text-xs'">
+                              ? 'btn btn-sm flex items-center justify-center gap-1.5 bg-[var(--color-border)] text-[var(--color-text-secondary)]'
+                              : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
                             <span class="material-icons text-sm">restart_alt</span>
                             إعادة ضبط
                           </button>
@@ -132,9 +130,9 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                 }
               </div>
               } @empty {
-              <div class="text-center py-10 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
-                <span class="material-icons text-4xl text-[var(--color-text-tertiary)]">menu_book</span>
-                <p class="text-[var(--color-text-secondary)] mt-2 font-semibold text-sm">لا توجد أحاديث مضافة بعد</p>
+              <div class="empty-state">
+                <span class="empty-state-icon">menu_book</span>
+                <p class="empty-state-text">لا توجد أحاديث مضافة بعد</p>
                 <p class="text-xs text-[var(--color-text-tertiary)] mt-1">أضف أحاديث من صفحة المناهج التعليمية</p>
               </div>
               }

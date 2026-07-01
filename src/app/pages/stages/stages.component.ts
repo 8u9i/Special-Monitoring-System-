@@ -16,36 +16,36 @@ import { ApiService } from '../../api.service';
         <!-- Admin Tools Column -->
         <div class="space-y-4 lg:col-span-1">
           <!-- Stats Card -->
-          <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-            <h3 class="font-tajawal text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
-              <span class="material-icons text-[var(--color-primary)]">dashboard</span>
+          <div class="panel p-5">
+            <h3 class="panel-title">
+              <span class="panel-title-icon">dashboard</span>
               إحصائيات الإدارة
             </h3>
             <div class="space-y-3">
               <div class="flex justify-between items-center p-3 bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
                 <span class="text-xs font-medium text-[var(--color-text-secondary)]">إجمالي الطلاب</span>
-                <span class="font-bold text-sm text-[var(--color-primary-dark)]">{{ state.students().length }}</span>
+                <span class="badge-number-sm">{{ state.students().length }}</span>
               </div>
               <div class="flex justify-between items-center p-3 bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
                 <span class="text-xs font-medium text-[var(--color-text-secondary)]">مجموع النقاط</span>
-                <span class="font-bold text-sm text-[var(--color-primary-dark)]">{{ totalXP }} XP</span>
+                <span class="badge-number-sm">{{ totalXP }} XP</span>
               </div>
               <div class="flex justify-between items-center p-3 bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
                 <span class="text-xs font-medium text-[var(--color-text-secondary)]">أعلى طالب</span>
-                <span class="font-bold text-sm text-[var(--color-primary-dark)]">{{ topStudentName }}</span>
+                <span class="badge-number-sm">{{ topStudentName }}</span>
               </div>
             </div>
           </div>
 
           <!-- Batch Actions -->
-          <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-            <h3 class="font-tajawal text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
-              <span class="material-icons text-[var(--color-primary)]">build</span>
+          <div class="panel p-5">
+            <h3 class="panel-title">
+              <span class="panel-title-icon">build</span>
               أدوات الإدارة
             </h3>
             <div class="space-y-2">
               <button (click)="showAddStudent()"
-                class="w-full flex items-center gap-2 px-4 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-none hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer">
+                class="btn btn-primary btn-md w-full">
                 <span class="material-icons text-sm">person_add</span>
                 إضافة طالب جديد
               </button>
@@ -59,13 +59,13 @@ import { ApiService } from '../../api.service';
 
         <!-- Students Directory -->
         <div class="space-y-4 lg:col-span-2">
-          <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
+          <div class="panel p-5">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
               <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <span class="material-icons text-[var(--color-primary)]">people</span>
                 الطلاب النشطون
               </h3>
-              <span class="text-xs text-[var(--color-primary-dark)] font-semibold bg-[var(--color-primary-light)] px-3 py-1 rounded-none">
+              <span class="tag tag-primary">
                 {{ state.students().length }} طلاب
               </span>
             </div>
@@ -73,11 +73,11 @@ import { ApiService } from '../../api.service';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               @for (student of state.students(); track student.id) {
               @let stage = state.getStudentStage(student);
-              <div class="bg-[var(--color-canvas)] rounded-none p-4 border border-[var(--color-border-light)] flex flex-col justify-between">
+              <div class="panel p-4 flex flex-col justify-between bg-[var(--color-canvas)]">
                 <div>
                   <div class="flex items-start justify-between gap-2 mb-3">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-9 h-9 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-lg shrink-0">
+                      <div class="w-9 h-9 bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-lg shrink-0">
                         {{ getAvatarEmoji(student.avatar) }}
                       </div>
                       <div>
@@ -85,7 +85,7 @@ import { ApiService } from '../../api.service';
                         <p class="text-[11px] text-[var(--color-text-tertiary)] font-medium">{{ student.age ? student.age + ' سنة' : 'غير محدد' }}</p>
                       </div>
                     </div>
-                    <span class="text-[11px] font-bold bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] px-2 py-0.5 rounded-none">{{ stage.name }}</span>
+                    <span class="tag tag-primary">{{ stage.name }}</span>
                   </div>
 
                   <div class="my-3">
@@ -93,14 +93,13 @@ import { ApiService } from '../../api.service';
                       <span>الأحاديث:</span>
                       <span class="text-[var(--color-primary-dark)]">{{ student.memorizedHadithNumbers.length }} / {{ state.hadiths().length }}</span>
                     </div>
-                    <div class="w-full bg-[var(--color-border)] rounded-none h-1 overflow-hidden flex justify-end">
-                      <div class="bg-[var(--color-primary)] h-full rounded-none transition-all"
-                        [style.width.%]="(student.memorizedHadithNumbers.length / (state.hadiths().length || 1)) * 100"></div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="(student.memorizedHadithNumbers.length / (state.hadiths().length || 1)) * 100"></div>
                     </div>
                   </div>
 
                   @if (student.notes) {
-                  <p class="text-[11px] text-[var(--color-text-tertiary)] bg-[var(--color-surface)] p-2 rounded-none border border-[var(--color-border-light)] italic mb-3 max-h-12 overflow-y-auto">
+                  <p class="text-[11px] text-[var(--color-text-tertiary)] bg-[var(--color-surface)] p-2 border border-[var(--color-border-light)] italic mb-3 max-h-12 overflow-y-auto">
                     "{{ student.notes }}"
                   </p>
                   }
@@ -108,28 +107,28 @@ import { ApiService } from '../../api.service';
 
                 <div class="flex items-center justify-between pt-2.5 border-t border-[var(--color-border-light)]">
                   <div class="flex gap-1.5">
-                    <button (click)="openEditStudent(student)" class="w-12 h-12 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] cursor-pointer transition-colors" title="تعديل" aria-label="تعديل الطالب">
+                    <button (click)="openEditStudent(student)" class="btn btn-ghost btn-icon" title="تعديل" aria-label="تعديل الطالب">
                       <span class="material-icons text-xs">edit</span>
                     </button>
-                    <button (click)="onDeleteStudent(student.id, student.name)" class="w-12 h-12 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-tertiary)] hover:border-red-500 hover:text-red-500 cursor-pointer transition-colors" title="حذف" aria-label="حذف الطالب">
+                    <button (click)="onDeleteStudent(student.id, student.name)" class="btn btn-ghost btn-icon hover:text-red-500 hover:bg-red-50" title="حذف" aria-label="حذف الطالب">
                       <span class="material-icons text-xs">delete</span>
                     </button>
                   </div>
                   <div class="flex gap-1.5">
-                    <button (click)="cheatUnlockAll(student.id)" class="px-2 py-1 text-[11px] font-bold bg-[var(--color-amber-light)] text-[var(--color-text-primary)] border border-[var(--color-amber)] rounded-none hover:bg-[var(--color-amber)] transition-colors cursor-pointer" title="ختم الأربعين">
+                    <button (click)="cheatUnlockAll(student.id)" class="btn btn-sm bg-[var(--color-amber-light)] text-[var(--color-text-primary)] border border-[var(--color-amber)] hover:bg-[var(--color-amber)]" title="ختم الأربعين">
                       ختم 40
                     </button>
-                    <button (click)="resetStudentProgress(student.id)" class="px-2 py-1 text-[11px] font-bold bg-[var(--color-canvas)] text-[var(--color-text-tertiary)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-border)] transition-colors cursor-pointer" title="تصفير">
+                    <button (click)="resetStudentProgress(student.id)" class="btn btn-sm border border-[var(--color-border)] bg-[var(--color-canvas)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-border)]" title="تصفير">
                       تصفير
                     </button>
                   </div>
                 </div>
               </div>
               } @empty {
-              <div class="col-span-2 text-center py-10 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
-                <span class="material-icons text-4xl text-[var(--color-text-tertiary)]">person_off</span>
-                <p class="text-[var(--color-text-secondary)] mt-2 font-semibold text-sm">لا يوجد طلاب نشطين</p>
-                <button (click)="showAddStudent()" class="sketch-button mt-4 px-5 py-2 text-xs font-semibold cursor-pointer">سجل أول طالب</button>
+              <div class="col-span-2 empty-state">
+                <span class="empty-state-icon">person_off</span>
+                <p class="empty-state-text">لا يوجد طلاب نشطين</p>
+                <button (click)="showAddStudent()" class="btn btn-primary btn-md mt-4">سجل أول طالب</button>
               </div>
               }
             </div>

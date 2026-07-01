@@ -10,7 +10,7 @@ import { TrackerState, Student } from '../../state';
 
     <div class="space-y-4 lg:col-span-1">
       <!-- Stage Card -->
-      <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)] flex flex-col items-center text-center">
+      <div class="panel p-6 flex flex-col items-center text-center">
         <div class="w-16 h-16 rounded-none bg-[var(--color-primary-light)] flex items-center justify-center mb-4 relative">
           <span class="material-icons text-3xl text-[var(--color-primary)]">{{ stage.badgeIcon }}</span>
           @if (student.xp >= 10000) {
@@ -22,7 +22,7 @@ import { TrackerState, Student } from '../../state';
         <h4 class="font-tajawal text-xl font-bold text-[var(--color-text-primary)] mt-1">{{ stage.name }}</h4>
         <p class="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed max-w-[200px]">{{ stage.description }}</p>
 
-        <div class="w-full mt-5 p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
+        <div class="w-full mt-5 p-4 bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
           @if (nextStageInfo) {
           <p class="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">
             يتبقى للوصول إلى <span class="text-[var(--color-primary-dark)] font-bold">{{ nextStageInfo.nextStage.name }}</span>:
