@@ -75,29 +75,6 @@ import { ModalService } from '../services/modal.service';
               class="w-full rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors"></textarea>
           </div>
 
-          <div class="pt-3 border-t border-[var(--color-border-light)]">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label for="addHadithBadgeName" class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">اسم وسام التميز</label>
-                <input id="addHadithBadgeName" type="text" formControlName="badgeName" placeholder="تلقائي"
-                  class="w-full rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
-              </div>
-              <div>
-                <span class="block text-xs font-semibold text-[var(--color-text-secondary)] mb-1.5">أيقونة الوسام</span>
-                <div class="grid grid-cols-4 gap-1.5">
-                  @for (icon of ['stars', 'favorite', 'spa', 'workspace_premium']; track icon) {
-                  <label [class]="form.get('badgeIcon')?.value === icon
-                    ? 'flex items-center justify-center p-2 rounded-none bg-[var(--color-primary-light)] border border-[var(--color-primary)] cursor-pointer'
-                    : 'flex items-center justify-center p-2 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border)] hover:border-[var(--color-primary)] cursor-pointer'">
-                    <input type="radio" formControlName="badgeIcon" [value]="icon" class="sr-only" />
-                    <span class="material-icons text-base text-[var(--color-text-secondary)]">{{ icon }}</span>
-                  </label>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="flex items-center gap-3 pt-2">
             <button type="submit" [disabled]="form.invalid"
               class="flex-1 sketch-button py-2.5 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
@@ -127,8 +104,6 @@ export class AddHadithModalComponent implements OnInit {
     reference: new FormControl('رواه البخاري ومسلم', { nonNullable: true, validators: [Validators.required] }),
     explanation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     category: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    badgeName: new FormControl('', { nonNullable: true }),
-    badgeIcon: new FormControl('stars', { nonNullable: true }),
   });
 
   ngOnInit() {
@@ -156,16 +131,9 @@ export class AddHadithModalComponent implements OnInit {
     if (this.form.invalid) return;
     const val = this.form.value;
     const cat = val.category || 'عام';
-    this.state.addHadith(
-      val.text || '',
-      val.reference || '',
-      val.explanation || '',
-      cat,
-      val.badgeName || undefined,
-      val.badgeIcon || undefined,
-    );
+    this.state.addHadith(val.text || '', val.reference || '', val.explanation || '', cat);
     this.modal.showAddHadith.set(false);
-    this.form.reset({ reference: 'رواه البخاري ومسلم', badgeIcon: 'stars' });
+    this.form.reset({ reference: 'رواه البخاري ومسلم' });
     this.showNewCategoryInput.set(false);
     this.toast.show('تم إضافة الحديث الشريف بنجاح!');
   }

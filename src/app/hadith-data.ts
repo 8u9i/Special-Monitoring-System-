@@ -5,6 +5,4 @@ export interface Hadith {
   explanation: string;
   category: string;
   points: number;
-  badgeName: string;
-  badgeIcon: string;
 }

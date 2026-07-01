@@ -80,13 +80,4 @@ export class ApiService {
     return this.request('POST', '/student-english-progress', { student_id: studentId, unit_number: unitNumber, status });
   }
 
-  // ── Badges ──
-  async getBadges(): Promise<any[]> {
-    return this.request('GET', '/badges');
-  }
-
-  async getAllStudentBadges(): Promise<any[]> {
-    return this.request('GET', '/student-badges');
-  }
-
 }

@@ -9,28 +9,6 @@ import { Hadith } from "./hadith-data";
 import { ApiService } from "./api.service";
 import { ToastService } from "./shared/services/toast.service";
 
-export interface BadgeDefinition {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  trail: string;
-  threshold: number;
-  points: number;
-}
-
-export interface StudentBadge {
-  student_id: string;
-  badge_id: number;
-  earned_at: string;
-  name: string;
-  description: string;
-  icon: string;
-  trail: string;
-  threshold: number;
-  points: number;
-}
-
 export interface Student {
   id: string;
   name: string;
@@ -206,8 +184,6 @@ export class TrackerState {
   categoryFilter = signal<string>("all");
   loading = signal(false);
   loaded = signal(false);
-  badgeDefinitions = signal<BadgeDefinition[]>([]);
-  studentBadges = signal<StudentBadge[]>([]);
   englishUnits = signal<EnglishUnitWithWords[]>([]);
 
   /**
@@ -218,19 +194,14 @@ export class TrackerState {
     if (!force && this.loaded()) return;
     this.loading.set(true);
     try {
-      const [apiStudents, apiHadiths, apiBadges, apiStudentBadges, apiEnglishUnits] = await Promise.all([
+      const [apiStudents, apiHadiths, apiEnglishUnits] = await Promise.all([
         this.api.getStudents(),
         this.api.getHadiths(),
-        this.api.getBadges(),
-        this.api.getAllStudentBadges(),
         this.api.getEnglishUnits(),
       ]);
 
-      // Use real database data only — no auto-seeding of sample data
       this.students.set(apiStudents);
       this.hadiths.set(apiHadiths);
-      this.badgeDefinitions.set(apiBadges);
-      this.studentBadges.set(apiStudentBadges);
       this.englishUnits.set(apiEnglishUnits);
 
       if (this.students().length > 0 && !this.selectedStudentId()) {
@@ -264,21 +235,6 @@ export class TrackerState {
     const nextStage = STAGES.find((s) => s.level === currentStage.level + 1);
     if (!nextStage) return null;
     return { nextStage, remaining: nextStage.minXP - student.xp };
-  }
-
-
-
-  async refreshBadges() {
-    try {
-      const [badges, studentBadges] = await Promise.all([
-        this.api.getBadges(),
-        this.api.getAllStudentBadges(),
-      ]);
-      this.badgeDefinitions.set(badges);
-      this.studentBadges.set(studentBadges);
-    } catch (e) {
-      console.error('refreshBadges', e);
-    }
   }
 
   stats = computed(() => {
@@ -333,19 +289,19 @@ export class TrackerState {
   // ──────────────────────────────
   // Hadith actions
   // ──────────────────────────────
-  addHadith(text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string) {
+  addHadith(text: string, reference: string, explanation: string, category: string) {
     if (!text.trim()) return;
-    const payload = { text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${category.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
+    const payload = { text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100 };
     this.api.saveHadith(payload).then((saved) => {
       this.hadiths.update((prev) => [...prev, saved as Hadith]);
     }).catch((e) => { console.error('saveHadith', e); this.toast.show(`فشل حفظ الحديث: ${e.message || 'خطأ غير معروف'}`, "error"); });
   }
 
-  updateHadith(oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
+  updateHadith(oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string): boolean {
     if (!text.trim() || !newNumber) return false;
     if (oldNumber !== newNumber && this.hadiths().some((h) => h.number === newNumber)) return false;
     this.hadiths.update((list) => list.map((h) =>
-      h.number === oldNumber ? { ...h, number: newNumber, text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim(), badgeName: badgeName?.trim() || h.badgeName, badgeIcon: badgeIcon?.trim() || h.badgeIcon } : h
+      h.number === oldNumber ? { ...h, number: newNumber, text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim() } : h
     ));
     if (oldNumber !== newNumber) {
       this.students.update((list) => list.map((s) => ({

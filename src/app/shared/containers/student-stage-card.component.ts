@@ -55,30 +55,6 @@ import { TrackerState, Student } from '../../state';
         </div>
       </div>
 
-      <!-- Badges -->
-      <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-        <h4 class="font-inter text-sm font-bold mb-3 text-[var(--color-text-secondary)] flex items-center gap-2">
-          <span class="material-icons text-[var(--color-primary)]">workspace_premium</span>
-          أوسمة الحفظ
-        </h4>
-        <div class="grid grid-cols-4 gap-3">
-          @for (badge of getUnlockedBadges(student); track badge.name) {
-          <div class="flex flex-col items-center group relative cursor-help" [title]="badge.name + ': ' + badge.desc">
-            <div [class]="badge.unleased
-              ? 'w-10 h-10 rounded-none bg-[var(--color-primary-light)] text-[var(--color-primary)] flex items-center justify-center transition-all group-hover:scale-105'
-              : 'w-10 h-10 rounded-none bg-[var(--color-canvas)] text-[var(--color-text-tertiary)] flex items-center justify-center grayscale'">
-              <span class="material-icons text-lg">{{ badge.icon }}</span>
-              @if (!badge.unleased) {
-              <span class="material-icons absolute bottom-0 right-0 text-[8px] text-[var(--color-text-tertiary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none p-0.5">lock</span>
-              }
-            </div>
-            <span class="text-[8px] text-center font-semibold mt-1 select-none truncate w-full" [class.text-[var(--color-text-tertiary)]]="!badge.unleased">
-              {{ badge.name.replace('وسام ', '') }}
-            </span>
-          </div>
-          }
-        </div>
-      </div>
     </div>
   `,
 })
@@ -86,28 +62,4 @@ export class StudentStageCardComponent {
   state = inject(TrackerState);
   student = input.required<Student>();
 
-  getUnlockedBadges(student: Student) {
-    const badges: { name: string; desc: string; icon: string; unleased: boolean }[] = [];
-    const memorizedSet = new Set(student.memorizedHadithNumbers);
-
-    badges.push({ name: 'البذرة الأولى', desc: 'حفظ أول حديث نبوي شريف.', icon: 'energy_savings_leaf', unleased: student.memorizedHadithNumbers.length >= 1 });
-    badges.push({ name: 'الخمسة الندية', desc: 'إتمام حفظ 5 أحاديث نبوية.', icon: 'spa', unleased: student.memorizedHadithNumbers.length >= 5 });
-    badges.push({ name: 'العشرة المباركة', desc: 'إتمام حفظ 10 أحاديث نبوية.', icon: 'grade', unleased: student.memorizedHadithNumbers.length >= 10 });
-    badges.push({ name: 'نصف الطريق', desc: 'إتمام حفظ 20 حديثاً شريفاً.', icon: 'explore', unleased: student.memorizedHadithNumbers.length >= 20 });
-    badges.push({ name: 'حافظ الأربعين', desc: 'إتمام حفظ 40 حديثاً نبوياً كاملاً.', icon: 'military_tech', unleased: student.memorizedHadithNumbers.length >= this.state.hadiths().length });
-    badges.push({ name: 'سورة النور', desc: 'حفظ أول سورة من القرآن.', icon: 'auto_stories', unleased: student.memorizedSurahNumbers.length >= 1 });
-    badges.push({ name: 'حامل الجزء', desc: 'حفظ أكثر من 15 سورة.', icon: 'import_contacts', unleased: student.memorizedSurahNumbers.length >= 15 });
-    badges.push({ name: 'الكلمة الأولى', desc: 'حفظ الوحدة الإنجليزية الأولى.', icon: 'translate', unleased: student.memorizedEnglishUnits.length >= 1 });
-    badges.push({ name: 'السفير الماهر', desc: 'إتمام حفظ أكثر من 20 وحدة إنجليزية.', icon: 'public', unleased: student.memorizedEnglishUnits.length >= 20 });
-
-    const specificHadiths = [1, 6, 15, 22, 29];
-    specificHadiths.forEach((num) => {
-      const hadith = this.state.hadiths().find((h) => h.number === num);
-      if (hadith) {
-        badges.push({ name: `وسام ${hadith.badgeName}`, desc: `حفظ الحديث رقم ${num}.`, icon: hadith.badgeIcon, unleased: memorizedSet.has(num) });
-      }
-    });
-
-    return badges;
-  }
 }

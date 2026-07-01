@@ -85,17 +85,19 @@ app.use(cookieParser(COOKIE_SECRET));
 // Production safety checks
 if (isProduction) {
   if (!process.env['DATABASE_URL']) {
-    console.error('FATAL: DATABASE_URL is required in production');
+    console.log('FATAL: DATABASE_URL is required in production');
     process.exit(1);
   }
   if (!process.env['COOKIE_SECRET']) {
-    console.error('WARNING: COOKIE_SECRET not set — sessions will not survive restarts');
+    console.log('WARNING: COOKIE_SECRET not set — sessions will not survive restarts');
   }
 }
 
-// Self-healing schema migration: drop the redundant title column from hadiths
-// (migration 009 may not have been applied to existing databases)
-pool.query('ALTER TABLE hadiths DROP COLUMN IF EXISTS title').catch(() => {});
+// Self-healing schema migration: drop badge columns and tables
+Promise.all([
+  pool.query('ALTER TABLE hadiths DROP COLUMN IF EXISTS badge_name, DROP COLUMN IF EXISTS badge_icon'),
+  pool.query('DROP TABLE IF EXISTS student_badges, badge_definitions CASCADE'),
+]).catch(() => {});
 
 // Global rate limiter (100 requests per 15 min per IP)
 const globalLimiter = rateLimit({
@@ -124,7 +126,7 @@ app.post('/api/login', loginLimiter, (req, res) => {
   const { username, password } = req.body || {};
 
   if (!AUTH_USER || !AUTH_PASS) {
-    console.error('AUTH_USER or AUTH_PASS not configured');
+    console.log('AUTH_USER or AUTH_PASS not configured');
     return res.status(500).json({ error: 'Server auth not configured' });
   }
 
@@ -265,7 +267,7 @@ app.get('/api/students', async (_req, res) => {
       pool.query('UPDATE students SET xp = $1 WHERE id = $2', [s.xp, s.id]).catch(() => {});
     }
   } catch (err) {
-    console.error('GET /api/students error:', err);
+    console.log('GET /api/students error:', err);
     res.status(500).json({ error: 'Failed to fetch students' });
   }
 });
@@ -284,7 +286,7 @@ app.post('/api/students', async (req, res) => {
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, id]);
     res.json({ ...rows[0], xp });
   } catch (err) {
-    console.error('POST /api/students error:', err);
+    console.log('POST /api/students error:', err);
     res.status(500).json({ error: 'Failed to save student' });
   }
 });
@@ -294,7 +296,7 @@ app.delete('/api/students/:id', async (req, res) => {
     await pool.query('DELETE FROM students WHERE id = $1', [req.params.id]);
     res.json({ success: true });
   } catch (err) {
-    console.error('DELETE /api/students error:', err);
+    console.log('DELETE /api/students error:', err);
     res.status(500).json({ error: 'Failed to delete student' });
   }
 });
@@ -303,39 +305,31 @@ app.delete('/api/students/:id', async (req, res) => {
 app.get('/api/hadiths', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM hadiths ORDER BY number');
-    // Map snake_case DB columns to camelCase frontend interface
     const hadiths = rows.map((r: any) => ({
-      number: r.number,
-      text: r.text,
-      reference: r.reference,
-      explanation: r.explanation,
-      category: r.category,
-      points: r.points,
-      badgeName: r.badge_name,
-      badgeIcon: r.badge_icon,
+      number: r.number, text: r.text, reference: r.reference,
+      explanation: r.explanation, category: r.category, points: r.points,
     }));
     res.json(hadiths);
   } catch (err) {
-    console.error('GET /api/hadiths error:', err);
+    console.log('GET /api/hadiths error:', err);
     res.status(500).json({ error: 'Failed to fetch hadiths' });
   }
 });
 
 app.post('/api/hadiths', async (req, res) => {
   try {
-    const { number, text, reference, explanation, category, points, badge_name, badge_icon } = req.body;
-    // When number is provided (existing update): use it; otherwise auto-assign (new insert, concurrency-safe)
+    const { number, text, reference, explanation, category, points } = req.body;
     const finalNumber = number || (await pool.query('SELECT COALESCE(MAX(number) + 1, 1) AS nxt FROM hadiths')).rows[0].nxt;
     const { rows } = await pool.query(
-      `INSERT INTO hadiths (number, text, reference, explanation, category, points, badge_name, badge_icon)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5, points = $6, badge_name = $7, badge_icon = $8
+      `INSERT INTO hadiths (number, text, reference, explanation, category, points)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5, points = $6
        RETURNING *`,
-      [finalNumber, text, reference || '', explanation || '', category || 'عام', points || 100, badge_name || '', badge_icon || 'stars']
+      [finalNumber, text, reference || '', explanation || '', category || 'عام', points || 100]
     );
     res.json(rows[0]);
   } catch (err) {
-    console.error('POST /api/hadiths error:', err);
+    console.log('POST /api/hadiths error:', err);
     res.status(500).json({ error: 'Failed to save hadith' });
   }
 });
@@ -345,7 +339,7 @@ app.delete('/api/hadiths/:number', async (req, res) => {
     await pool.query('DELETE FROM hadiths WHERE number = $1', [parseInt(req.params.number)]);
     res.json({ success: true });
   } catch (err) {
-    console.error('DELETE /api/hadiths error:', err);
+    console.log('DELETE /api/hadiths error:', err);
     res.status(500).json({ error: 'Failed to delete hadith' });
   }
 });
@@ -359,7 +353,7 @@ app.get('/api/student-hadiths/:studentId', async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error('GET /api/student-hadiths error:', err);
+    console.log('GET /api/student-hadiths error:', err);
     res.status(500).json({ error: 'Failed to fetch student hadiths' });
   }
 });
@@ -377,9 +371,8 @@ app.post('/api/student-hadiths', async (req, res) => {
     const xp = await recalculateXP(student_id);
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
     res.json({ ...rows[0], xp });
-    checkAndAwardBadges(student_id);
   } catch (err) {
-    console.error('POST /api/student-hadiths error:', err);
+    console.log('POST /api/student-hadiths error:', err);
     res.status(500).json({ error: 'Failed to update hadith status' });
   }
 });
@@ -412,7 +405,7 @@ app.post('/api/student-surahs', async (req, res) => {
     const xp = await recalculateXP(student_id);
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
     res.json({ ...rows[0], xp });
-    checkAndAwardBadges(student_id);
+
   } catch (err) {
     res.status(500).json({ error: 'Failed to update surah status' });
   }
@@ -429,7 +422,7 @@ app.post('/api/student-surah-pages', async (req, res) => {
     const xp = await recalculateXP(student_id);
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
     res.json({ success: true, xp });
-    checkAndAwardBadges(student_id);
+
   } catch (err) {
     res.status(500).json({ error: 'Failed to save page' });
   }
@@ -466,7 +459,7 @@ app.get('/api/english-units', async (_req, res) => {
     }));
     res.json(result);
   } catch (err) {
-    console.error('GET /api/english-units error:', err);
+    console.log('GET /api/english-units error:', err);
     res.status(500).json({ error: 'Failed to fetch english units' });
   }
 });
@@ -485,9 +478,9 @@ app.post('/api/student-english-progress', async (req, res) => {
     const xp = await recalculateXP(student_id);
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
     res.json({ ...rows[0], xp });
-    checkAndAwardBadges(student_id);
+
   } catch (err) {
-    console.error('POST /api/student-english-progress error:', err);
+    console.log('POST /api/student-english-progress error:', err);
     res.status(500).json({ error: 'Failed to update english progress' });
   }
 });
@@ -502,7 +495,7 @@ app.delete('/api/student-english-progress/:studentId/:unitNumber', async (req, r
     await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, req.params.studentId]);
     res.json({ success: true, xp });
   } catch (err) {
-    console.error('DELETE /api/student-english-progress error:', err);
+    console.log('DELETE /api/student-english-progress error:', err);
     res.status(500).json({ error: 'Failed to delete english progress' });
   }
 });
@@ -537,127 +530,22 @@ app.post('/api/sync', async (req, res) => {
     if (hadiths && Array.isArray(hadiths)) {
       for (const h of hadiths) {
         await pool.query(
-          `INSERT INTO hadiths (number, text, reference, explanation, category, points, badge_name, badge_icon)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          `INSERT INTO hadiths (number, text, reference, explanation, category, points)
+           VALUES ($1, $2, $3, $4, $5, $6)
            ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5`,
-          [h.number, h.text, h.reference || '', h.explanation || '', h.category || 'عام', h.points || 100, h.badgeName || '', h.badgeIcon || 'stars']
+          [h.number, h.text, h.reference || '', h.explanation || '', h.category || 'عام', h.points || 100]
         );
       }
     }
 
     res.json({ success: true });
   } catch (err) {
-    console.error('POST /api/sync error:', err);
+    console.log('POST /api/sync error:', err);
     res.status(500).json({ error: 'Sync failed' });
   }
 });
 
-// Badges
-// ────────────────────────────────────────────
 
-// Get all badge definitions
-app.get('/api/badges', async (_req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM badge_definitions ORDER BY trail, threshold');
-    res.json(rows.map((r: any) => ({
-      id: r.id, name: r.name, description: r.description,
-      icon: r.icon, trail: r.trail, threshold: r.threshold, points: r.points,
-    })));
-  } catch (err) {
-    console.error('GET /api/badges error:', err);
-    res.status(500).json({ error: 'Failed to fetch badges' });
-  }
-});
-
-// Add custom badge definition
-app.post('/api/badges', async (req, res) => {
-  try {
-    const { name, description, icon, trail, threshold, points } = req.body;
-    const { rows } = await pool.query(
-      'INSERT INTO badge_definitions (name, description, icon, trail, threshold, points) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [name, description || '', icon || 'emoji_events', trail, threshold, points || 0]
-    );
-    res.json(rows[0]);
-  } catch (err) {
-    console.error('POST /api/badges error:', err);
-    res.status(500).json({ error: 'Failed to create badge' });
-  }
-});
-
-// Delete badge definition
-app.delete('/api/badges/:id', async (req, res) => {
-  try {
-    await pool.query('DELETE FROM badge_definitions WHERE id = $1', [parseInt(req.params.id)]);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete badge' });
-  }
-});
-
-// Get earned badges for a student
-app.get('/api/student-badges/:studentId', async (req, res) => {
-  try {
-    const { rows } = await pool.query(
-      `SELECT sb.badge_id, sb.earned_at, bd.name, bd.description, bd.icon, bd.trail, bd.threshold, bd.points
-       FROM student_badges sb JOIN badge_definitions bd ON bd.id = sb.badge_id
-       WHERE sb.student_id = $1 ORDER BY sb.earned_at DESC`,
-      [req.params.studentId]
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch student badges' });
-  }
-});
-
-// Get all students badges (bulk)
-app.get('/api/student-badges', async (_req, res) => {
-  try {
-    const { rows } = await pool.query(
-      `SELECT sb.student_id, sb.badge_id, sb.earned_at, bd.name, bd.description, bd.icon, bd.trail, bd.threshold, bd.points
-       FROM student_badges sb JOIN badge_definitions bd ON bd.id = sb.badge_id ORDER BY sb.earned_at DESC`
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch student badges' });
-  }
-});
-
-// Auto-award badges for a student (called after progress changes)
-async function checkAndAwardBadges(studentId: string) {
-  try {
-    const [hadithCount, surahCount, pageCount, englishCount, xpRow] = await Promise.all([
-      pool.query("SELECT COUNT(*)::int FROM student_hadiths WHERE student_id = $1 AND status = 'memorized'", [studentId]),
-      pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
-      pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
-      pool.query("SELECT COUNT(*)::int FROM student_english_progress WHERE student_id = $1 AND status = 'memorized'", [studentId]),
-      pool.query("SELECT COALESCE(xp, 0) as xp FROM students WHERE id = $1", [studentId]),
-    ]);
-
-    const counts: Record<string, number> = {
-      hadith: hadithCount.rows[0].count,
-      quran: surahCount.rows[0].count,
-      pages: pageCount.rows[0].count,
-      english: englishCount.rows[0].count,
-      xp: xpRow.rows[0]?.xp || 0,
-    };
-
-    const { rows: allBadges } = await pool.query('SELECT * FROM badge_definitions');
-    const { rows: earned } = await pool.query('SELECT badge_id FROM student_badges WHERE student_id = $1', [studentId]);
-    const earnedIds = new Set(earned.map((r: any) => r.badge_id));
-
-    for (const badge of allBadges) {
-      if (earnedIds.has(badge.id)) continue;
-      if ((counts[badge.trail] || 0) >= badge.threshold) {
-        await pool.query(
-          'INSERT INTO student_badges (student_id, badge_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-          [studentId, badge.id]
-        );
-      }
-    }
-  } catch (err) {
-    console.error('checkAndAwardBadges error:', err);
-  }
-}
 
 // ────────────────────────────────────────────
 // ────────────────────────────────────────────
@@ -679,8 +567,8 @@ async function recalculateXP(studentId: string): Promise<number> {
 // ────────────────────────────────────────────
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const msg = isProduction ? 'Internal server error' : (err?.message || 'Unknown error');
-  if (!isProduction) console.error('Unhandled error:', err);
-  else console.error('Unhandled error:', err?.message || 'unknown');
+  if (!isProduction) console.log('Unhandled error:', err);
+  else console.log('Unhandled error:', err?.message || 'unknown');
   res.status(500).json({ error: msg });
 });
 
