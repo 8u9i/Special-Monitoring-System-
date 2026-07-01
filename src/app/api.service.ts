@@ -9,11 +9,6 @@ interface ApiResponse<T> {
   error?: string;
 }
 
-interface SyncPayload {
-  students?: Partial<Student>[];
-  hadiths?: Partial<Hadith>[];
-}
-
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private base = '/api';
@@ -49,7 +44,7 @@ export class ApiService {
     return this.request('GET', '/hadiths');
   }
 
-  async saveHadith(hadith: Partial<Hadith> & { number: number }): Promise<Hadith> {
+  async saveHadith(hadith: Partial<Hadith>): Promise<Hadith> {
     return this.request('POST', '/hadiths', hadith);
   }
 
@@ -58,21 +53,21 @@ export class ApiService {
   }
 
   // ── Student Hadith Status ──
-  async setHadithStatus(studentId: string, hadithNumber: number, status: Status): Promise<void> {
-    await this.request('POST', '/student-hadiths', { student_id: studentId, hadith_number: hadithNumber, status });
+  async setHadithStatus(studentId: string, hadithNumber: number, status: Status): Promise<{ xp: number }> {
+    return this.request('POST', '/student-hadiths', { student_id: studentId, hadith_number: hadithNumber, status });
   }
 
   // ── Student Surah Status ──
-  async setSurahStatus(studentId: string, surahNumber: number, status: Status): Promise<void> {
-    await this.request('POST', '/student-surahs', { student_id: studentId, surah_number: surahNumber, status });
+  async setSurahStatus(studentId: string, surahNumber: number, status: Status): Promise<{ xp: number }> {
+    return this.request('POST', '/student-surahs', { student_id: studentId, surah_number: surahNumber, status });
   }
 
-  async markSurahPage(studentId: string, pageId: string): Promise<void> {
-    await this.request('POST', '/student-surah-pages', { student_id: studentId, page_id: pageId });
+  async markSurahPage(studentId: string, pageId: string): Promise<{ xp: number }> {
+    return this.request('POST', '/student-surah-pages', { student_id: studentId, page_id: pageId });
   }
 
-  async unmarkSurahPage(studentId: string, pageId: string): Promise<void> {
-    await this.request('DELETE', `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
+  async unmarkSurahPage(studentId: string, pageId: string): Promise<{ xp: number }> {
+    return this.request('DELETE', `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
   }
 
   // ── English Units ──
@@ -81,12 +76,8 @@ export class ApiService {
   }
 
   // ── Student English Progress ──
-  async setEnglishProgress(studentId: string, unitNumber: number, status: Status): Promise<void> {
-    await this.request('POST', '/student-english-progress', { student_id: studentId, unit_number: unitNumber, status });
-  }
-
-  async deleteEnglishProgress(studentId: string, unitNumber: number): Promise<void> {
-    await this.request('DELETE', `/student-english-progress/${studentId}/${unitNumber}`);
+  async setEnglishProgress(studentId: string, unitNumber: number, status: Status): Promise<{ xp: number }> {
+    return this.request('POST', '/student-english-progress', { student_id: studentId, unit_number: unitNumber, status });
   }
 
   // ── Badges ──
@@ -94,24 +85,8 @@ export class ApiService {
     return this.request('GET', '/badges');
   }
 
-  async getStudentBadges(studentId: string): Promise<any[]> {
-    return this.request('GET', `/student-badges/${studentId}`);
-  }
-
   async getAllStudentBadges(): Promise<any[]> {
     return this.request('GET', '/student-badges');
   }
 
-  async createBadge(badge: { name: string; description?: string; icon: string; trail: string; threshold: number; points?: number }): Promise<any> {
-    return this.request('POST', '/badges', badge);
-  }
-
-  async deleteBadge(id: number): Promise<ApiResponse<void>> {
-    return this.request('DELETE', `/badges/${id}`);
-  }
-
-  // ── Bulk Sync ──
-  async sync(data: SyncPayload): Promise<ApiResponse<void>> {
-    return this.request('POST', '/sync', data);
-  }
 }

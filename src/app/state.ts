@@ -212,10 +212,10 @@ export class TrackerState {
 
   /**
    * Call after authentication to load data from the API.
-   * Does nothing if already loaded.
+   * Does nothing if already loaded unless force=true.
    */
-  async loadAll() {
-    if (this.loaded()) return;
+  async loadAll(force = false) {
+    if (!force && this.loaded()) return;
     this.loading.set(true);
     try {
       const [apiStudents, apiHadiths, apiBadges, apiStudentBadges, apiEnglishUnits] = await Promise.all([
@@ -245,11 +245,8 @@ export class TrackerState {
     }
   }
 
-  public calculateXP(s: Partial<Student>): number {
-    return (s.memorizedHadithNumbers?.length || 0) * 100 +
-      (s.memorizedSurahNumbers?.length || 0) * 150 +
-      (s.memorizedSurahPages?.length || 0) * 20 +
-      (s.memorizedEnglishUnits?.length || 0) * 100;
+  private updateXP(studentId: string, xp: number) {
+    this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, xp } : s));
   }
 
   selectedStudent = computed(() => {
@@ -269,20 +266,7 @@ export class TrackerState {
     return { nextStage, remaining: nextStage.minXP - student.xp };
   }
 
-  private persistStudentXP(student: Student) {
-    this.api.saveStudent(student).catch((e) => {
-      console.error('persistStudentXP', e);
-      this.toast.show("فشل حفظ النقاط", "error");
-    });
-  }
 
-  getStudentBadges(studentId: string): StudentBadge[] {
-    return this.studentBadges().filter((b) => b.student_id === studentId);
-  }
-
-  getStudentBadgesByTrail(studentId: string, trail: string): StudentBadge[] {
-    return this.studentBadges().filter((b) => b.student_id === studentId && b.trail === trail);
-  }
 
   async refreshBadges() {
     try {
@@ -315,12 +299,6 @@ export class TrackerState {
     };
   });
 
-  categories = computed(() => {
-    const cats = new Set<string>();
-    this.hadiths().forEach((h) => cats.add(h.category));
-    return Array.from(cats);
-  });
-
   // ──────────────────────────────
   // Student actions
   // ──────────────────────────────
@@ -341,7 +319,7 @@ export class TrackerState {
       s.id === id ? { ...s, name: name.trim(), age: age ? Number(age) : undefined, avatar: avatar || s.avatar, notes: notes?.trim() || undefined } : s
     ));
     const student = this.students().find((s) => s.id === id);
-    if (student) this.api.saveStudent(student).catch((e) => { console.error('updateStudent', e); this.toast.show("فشل تحديث بيانات الطالب", "error"); });
+    if (student) this.api.saveStudent(student).then((r) => this.updateXP(id, r.xp)).catch((e) => { console.error('updateStudent', e); this.toast.show("فشل تحديث بيانات الطالب", "error"); });
   }
 
   deleteStudent(id: string) {
@@ -357,11 +335,10 @@ export class TrackerState {
   // ──────────────────────────────
   addHadith(text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string) {
     if (!text.trim()) return;
-    const list = this.hadiths();
-    const nextNum = list.length > 0 ? Math.max(...list.map((h) => h.number)) + 1 : 1;
-    const newHadith: Hadith = { number: nextNum, text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${category.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
-    this.hadiths.update((prev) => [...prev, newHadith]);
-    this.api.saveHadith(newHadith).catch((e) => { console.error('saveHadith', e); this.toast.show("فشل حفظ الحديث", "error"); });
+    const payload = { text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100, badgeName: badgeName?.trim() || `وسام ${category.trim()}`, badgeIcon: badgeIcon?.trim() || "stars" };
+    this.api.saveHadith(payload).then((saved) => {
+      this.hadiths.update((prev) => [...prev, saved as Hadith]);
+    }).catch((e) => { console.error('saveHadith', e); this.toast.show(`فشل حفظ الحديث: ${e.message || 'خطأ غير معروف'}`, "error"); });
   }
 
   updateHadith(oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string, badgeName?: string, badgeIcon?: string): boolean {
@@ -382,9 +359,6 @@ export class TrackerState {
 
   deleteHadith(number: number) {
     this.hadiths.update((list) => list.filter((h) => h.number !== number));
-    this.students.update((list) => list.map((s) => ({
-      ...s, memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number), reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number), xp: this.calculateXP({ ...s, memorizedHadithNumbers: s.memorizedHadithNumbers.filter((n) => n !== number), reviewHadithNumbers: s.reviewHadithNumbers.filter((n) => n !== number) }),
-    })));
     this.api.deleteHadith(number).catch((e) => { console.error('deleteHadith', e); this.toast.show("فشل حذف الحديث", "error"); });
   }
 
@@ -394,51 +368,37 @@ export class TrackerState {
   toggleHadithStatus(studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") {
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      let memorized = s.memorizedHadithNumbers.filter((n) => n !== hadithNumber);
-      let review = s.reviewHadithNumbers.filter((n) => n !== hadithNumber);
+      const memorized = s.memorizedHadithNumbers.filter((n) => n !== hadithNumber);
+      const review = s.reviewHadithNumbers.filter((n) => n !== hadithNumber);
       if (newStatus === "memorized") { memorized.push(hadithNumber); memorized.sort((a, b) => a - b); }
       else if (newStatus === "review") { review.push(hadithNumber); review.sort((a, b) => a - b); }
-      return { ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review, xp: this.calculateXP({ ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review }) };
+      return { ...s, memorizedHadithNumbers: memorized, reviewHadithNumbers: review };
     }));
-    this.api.setHadithStatus(studentId, hadithNumber, newStatus).catch((e) => { console.error('setHadithStatus', e); this.toast.show("فشل تحديث حالة الحديث", "error"); });
-    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
-  }
-
-  toggleHadithQuick(studentId: string, hadithNumber: number) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-    this.toggleHadithStatus(studentId, hadithNumber, student.memorizedHadithNumbers.includes(hadithNumber) ? "none" : "memorized");
+    this.api.setHadithStatus(studentId, hadithNumber, newStatus).then((r) => this.updateXP(studentId, r.xp)).catch((e) => { console.error('setHadithStatus', e); this.toast.show("فشل تحديث حالة الحديث", "error"); });
   }
 
   toggleSurahStatus(studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") {
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      let memorized = s.memorizedSurahNumbers.filter((n) => n !== surahNumber);
-      let review = s.reviewSurahNumbers.filter((n) => n !== surahNumber);
+      const memorized = s.memorizedSurahNumbers.filter((n) => n !== surahNumber);
+      const review = s.reviewSurahNumbers.filter((n) => n !== surahNumber);
       if (newStatus === "memorized") { memorized.push(surahNumber); memorized.sort((a, b) => a - b); }
       else if (newStatus === "review") { review.push(surahNumber); review.sort((a, b) => a - b); }
-      return { ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review, xp: this.calculateXP({ ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review }) };
+      return { ...s, memorizedSurahNumbers: memorized, reviewSurahNumbers: review };
     }));
-    this.api.setSurahStatus(studentId, surahNumber, newStatus).catch((e) => { console.error('setSurahStatus', e); this.toast.show("فشل تحديث حالة السورة", "error"); });
-    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
-  }
-
-  toggleSurahQuick(studentId: string, surahNumber: number) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-    this.toggleSurahStatus(studentId, surahNumber, student.memorizedSurahNumbers.includes(surahNumber) ? "none" : "memorized");
+    this.api.setSurahStatus(studentId, surahNumber, newStatus).then((r) => this.updateXP(studentId, r.xp)).catch((e) => { console.error('setSurahStatus', e); this.toast.show("فشل تحديث حالة السورة", "error"); });
   }
 
   toggleSurahPageStatus(studentId: string, surahNumber: number, pageIndex: number, newStatus: "memorized" | "none") {
     const pageId = `${surahNumber}-${pageIndex}`;
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      let memorized = [...(s.memorizedSurahPages || [])].filter((id) => id !== pageId);
+      const memorized = [...(s.memorizedSurahPages || [])].filter((id) => id !== pageId);
       if (newStatus === "memorized") memorized.push(pageId);
-      return { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) };
+      return { ...s, memorizedSurahPages: memorized };
     }));
-    if (newStatus === 'memorized') this.api.markSurahPage(studentId, pageId).catch(() => this.toast.show("فشل تحديث صفحة السورة", "error"));
-    else this.api.unmarkSurahPage(studentId, pageId).catch(() => this.toast.show("فشل تحديث صفحة السورة", "error"));
+    const req = newStatus === 'memorized' ? this.api.markSurahPage(studentId, pageId) : this.api.unmarkSurahPage(studentId, pageId);
+    req.then((r) => this.updateXP(studentId, r.xp)).catch(() => this.toast.show("فشل تحديث صفحة السورة", "error"));
   }
 
   markAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
@@ -448,9 +408,10 @@ export class TrackerState {
     let changed = false;
     for (let i = 1; i <= pageCount; i++) { const id = `${surahNumber}-${i}`; if (!memorized.includes(id)) { memorized.push(id); changed = true; } }
     if (!changed) return;
-    this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) } : s));
-    for (let i = 1; i <= pageCount; i++) this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => this.toast.show("فشل تحديث صفحات السورة", "error"));
-    const _upd2 = this.students().find(s => s.id === studentId); if (_upd2) this.persistStudentXP(_upd2);
+    this.students.update((list) => list.map((s) => s.id === studentId ? { ...s, memorizedSurahPages: memorized } : s));
+    let last: Promise<{ xp: number }> = Promise.resolve({ xp: 0 });
+    for (let i = 1; i <= pageCount; i++) last = this.api.markSurahPage(studentId, `${surahNumber}-${i}`).catch(() => ({ xp: 0 }));
+    last.then((r) => this.updateXP(studentId, r.xp));
   }
 
   clearAllSurahPages(studentId: string, surahNumber: number, pageCount: number) {
@@ -460,28 +421,23 @@ export class TrackerState {
     if (memorized.length === (student.memorizedSurahPages || []).length) return;
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      return { ...s, memorizedSurahPages: memorized, xp: this.calculateXP({ ...s, memorizedSurahPages: memorized }) };
+      return { ...s, memorizedSurahPages: memorized };
     }));
-    for (let i = 1; i <= pageCount; i++) this.api.unmarkSurahPage(studentId, `${surahNumber}-${i}`).catch(() => this.toast.show("فشل تحديث صفحات السورة", "error"));
-    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
+    let last: Promise<{ xp: number }> = Promise.resolve({ xp: 0 });
+    for (let i = 1; i <= pageCount; i++) last = this.api.unmarkSurahPage(studentId, `${surahNumber}-${i}`).catch(() => ({ xp: 0 }));
+    last.then((r) => this.updateXP(studentId, r.xp));
   }
 
   toggleEnglishStatus(studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") {
     this.students.update((list) => list.map((s) => {
       if (s.id !== studentId) return s;
-      let memorized = s.memorizedEnglishUnits.filter((n) => n !== unitNumber);
-      let review = s.reviewEnglishUnits.filter((n) => n !== unitNumber);
+      const memorized = s.memorizedEnglishUnits.filter((n) => n !== unitNumber);
+      const review = s.reviewEnglishUnits.filter((n) => n !== unitNumber);
       if (newStatus === "memorized") { memorized.push(unitNumber); memorized.sort((a, b) => a - b); }
       else if (newStatus === "review") { review.push(unitNumber); review.sort((a, b) => a - b); }
-      return { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review, xp: this.calculateXP({ ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review }) };
+      return { ...s, memorizedEnglishUnits: memorized, reviewEnglishUnits: review };
     }));
-    this.api.setEnglishProgress(studentId, unitNumber, newStatus).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
-    const _upd = this.students().find(s => s.id === studentId); if (_upd) this.persistStudentXP(_upd);
+    this.api.setEnglishProgress(studentId, unitNumber, newStatus).then((r) => this.updateXP(studentId, r.xp)).catch((e) => { console.error('setEnglish', e); this.toast.show("فشل تحديث حالة الوحدة الإنجليزية", "error"); });
   }
 
-  toggleEnglishQuick(studentId: string, unitNumber: number) {
-    const student = this.students().find((s) => s.id === studentId);
-    if (!student) return;
-    this.toggleEnglishStatus(studentId, unitNumber, student.memorizedEnglishUnits.includes(unitNumber) ? "none" : "memorized");
-  }
 }

@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './shared/layout/sidebar.component';
 import { HeaderComponent } from './shared/layout/header.component';
 import { ToastComponent } from './shared/overlays/toast.component';
@@ -9,8 +9,6 @@ import { AddStudentModalComponent } from './shared/modals/add-student-modal.comp
 import { EditStudentModalComponent } from './shared/modals/edit-student-modal.component';
 import { AddHadithModalComponent } from './shared/modals/add-hadith-modal.component';
 import { EditHadithModalComponent } from './shared/modals/edit-hadith-modal.component';
-import { filter, map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { TrackerState } from './state';
 import { AuthService } from './auth.service';
 
@@ -78,18 +76,11 @@ export class App implements OnInit {
 
   async ngOnInit() {
     const ok = await this.auth.checkAuth();
-    if (!ok && !this.router.url.startsWith('/login')) {
+    if (ok) {
+      await this.state.loadAll();
+    } else if (!this.router.url.startsWith('/login')) {
       this.router.navigate(['/login']);
     }
   }
 
-  private currentUrl = toSignal(
-    this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map(() => this.router.url),
-    ),
-    { initialValue: this.router.url },
-  );
-
-  isLoginPage = () => this.currentUrl()?.startsWith('/login') ?? false;
 }

@@ -93,6 +93,10 @@ if (isProduction) {
   }
 }
 
+// Self-healing schema migration: drop the redundant title column from hadiths
+// (migration 009 may not have been applied to existing databases)
+pool.query('ALTER TABLE hadiths DROP COLUMN IF EXISTS title').catch(() => {});
+
 // Global rate limiter (100 requests per 15 min per IP)
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -268,15 +272,17 @@ app.get('/api/students', async (_req, res) => {
 
 app.post('/api/students', async (req, res) => {
   try {
-    const { id, name, age, avatar, notes, joinedAt, xp } = req.body;
+    const { id, name, age, avatar, notes, joinedAt } = req.body;
     const { rows } = await pool.query(
       `INSERT INTO students (id, name, age, avatar, notes, joined_at, xp)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       ON CONFLICT (id) DO UPDATE SET name = $2, age = $3, avatar = $4, notes = $5, xp = $7
+       VALUES ($1, $2, $3, $4, $5, $6, 0)
+       ON CONFLICT (id) DO UPDATE SET name = $2, age = $3, avatar = $4, notes = $5
        RETURNING *`,
-      [id, name, age ?? null, avatar || 'avatar-leaf', notes || null, joinedAt || new Date().toISOString().split('T')[0], xp || 0]
+      [id, name, age ?? null, avatar || 'avatar-leaf', notes || null, joinedAt || new Date().toISOString().split('T')[0]]
     );
-    res.json(rows[0]);
+    const xp = await recalculateXP(id);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, id]);
+    res.json({ ...rows[0], xp });
   } catch (err) {
     console.error('POST /api/students error:', err);
     res.status(500).json({ error: 'Failed to save student' });
@@ -318,12 +324,14 @@ app.get('/api/hadiths', async (_req, res) => {
 app.post('/api/hadiths', async (req, res) => {
   try {
     const { number, text, reference, explanation, category, points, badge_name, badge_icon } = req.body;
+    // When number is provided (existing update): use it; otherwise auto-assign (new insert, concurrency-safe)
+    const finalNumber = number || (await pool.query('SELECT COALESCE(MAX(number) + 1, 1) AS nxt FROM hadiths')).rows[0].nxt;
     const { rows } = await pool.query(
       `INSERT INTO hadiths (number, text, reference, explanation, category, points, badge_name, badge_icon)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5, points = $6, badge_name = $7, badge_icon = $8
        RETURNING *`,
-      [number, text, reference || '', explanation || '', category || 'عام', points || 100, badge_name || '', badge_icon || 'stars']
+      [finalNumber, text, reference || '', explanation || '', category || 'عام', points || 100, badge_name || '', badge_icon || 'stars']
     );
     res.json(rows[0]);
   } catch (err) {
@@ -366,7 +374,9 @@ app.post('/api/student-hadiths', async (req, res) => {
        RETURNING *`,
       [student_id, hadith_number, status]
     );
-    res.json(rows[0]);
+    const xp = await recalculateXP(student_id);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
+    res.json({ ...rows[0], xp });
     checkAndAwardBadges(student_id);
   } catch (err) {
     console.error('POST /api/student-hadiths error:', err);
@@ -380,7 +390,9 @@ app.delete('/api/student-hadiths/:studentId/:hadithNumber', async (req, res) => 
       'DELETE FROM student_hadiths WHERE student_id = $1 AND hadith_number = $2',
       [req.params.studentId, parseInt(req.params.hadithNumber)]
     );
-    res.json({ success: true });
+    const xp = await recalculateXP(req.params.studentId);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, req.params.studentId]);
+    res.json({ success: true, xp });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete' });
   }
@@ -397,7 +409,9 @@ app.post('/api/student-surahs', async (req, res) => {
        RETURNING *`,
       [student_id, surah_number, status]
     );
-    res.json(rows[0]);
+    const xp = await recalculateXP(student_id);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
+    res.json({ ...rows[0], xp });
     checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update surah status' });
@@ -412,7 +426,9 @@ app.post('/api/student-surah-pages', async (req, res) => {
       'INSERT INTO student_surah_pages (student_id, page_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
       [student_id, page_id]
     );
-    res.json({ success: true });
+    const xp = await recalculateXP(student_id);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
+    res.json({ success: true, xp });
     checkAndAwardBadges(student_id);
   } catch (err) {
     res.status(500).json({ error: 'Failed to save page' });
@@ -425,7 +441,9 @@ app.delete('/api/student-surah-pages/:studentId/:pageId', async (req, res) => {
       'DELETE FROM student_surah_pages WHERE student_id = $1 AND page_id = $2',
       [req.params.studentId, req.params.pageId]
     );
-    res.json({ success: true });
+    const xp = await recalculateXP(req.params.studentId);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, req.params.studentId]);
+    res.json({ success: true, xp });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete page' });
   }
@@ -464,7 +482,9 @@ app.post('/api/student-english-progress', async (req, res) => {
        RETURNING *`,
       [student_id, unit_number, status]
     );
-    res.json(rows[0]);
+    const xp = await recalculateXP(student_id);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, student_id]);
+    res.json({ ...rows[0], xp });
     checkAndAwardBadges(student_id);
   } catch (err) {
     console.error('POST /api/student-english-progress error:', err);
@@ -478,7 +498,9 @@ app.delete('/api/student-english-progress/:studentId/:unitNumber', async (req, r
       'DELETE FROM student_english_progress WHERE student_id = $1 AND unit_number = $2',
       [req.params.studentId, parseInt(req.params.unitNumber)]
     );
-    res.json({ success: true });
+    const xp = await recalculateXP(req.params.studentId);
+    await pool.query('UPDATE students SET xp = $1 WHERE id = $2', [xp, req.params.studentId]);
+    res.json({ success: true, xp });
   } catch (err) {
     console.error('DELETE /api/student-english-progress error:', err);
     res.status(500).json({ error: 'Failed to delete english progress' });
@@ -638,7 +660,19 @@ async function checkAndAwardBadges(studentId: string) {
 }
 
 // ────────────────────────────────────────────
-// Global error handler
+// ────────────────────────────────────────────
+// XP recalculation helper (server-authoritative)
+// ────────────────────────────────────────────
+
+async function recalculateXP(studentId: string): Promise<number> {
+  const [hadithRes, surahRes, pageRes, englishRes] = await Promise.all([
+    pool.query("SELECT COUNT(*)::int FROM student_hadiths WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+    pool.query("SELECT COUNT(*)::int FROM student_surahs WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+    pool.query("SELECT COUNT(*)::int FROM student_surah_pages WHERE student_id = $1", [studentId]),
+    pool.query("SELECT COUNT(*)::int FROM student_english_progress WHERE student_id = $1 AND status = 'memorized'", [studentId]),
+  ]);
+  return hadithRes.rows[0].count * 100 + surahRes.rows[0].count * 150 + pageRes.rows[0].count * 20 + englishRes.rows[0].count * 100;
+}
 
 // ────────────────────────────────────────────
 // Global error handler
