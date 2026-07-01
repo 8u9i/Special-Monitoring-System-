@@ -14,7 +14,7 @@ import { ModalService } from '../services/modal.service';
     <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="editHadithTitle" (click)="close()">
       <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 id="editHadithTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="editHadithTitle" class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">edit_note</span>
             تعديل الحديث رقم {{ form.get('number')?.value }}
           </h3>
@@ -44,7 +44,7 @@ import { ModalService } from '../services/modal.service';
                 <input id="editHadithCategory" type="text" formControlName="category" placeholder="اسم التصنيف الجديد"
                   class="flex-1 rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
                 <button type="button" (click)="showNewCategory.set(false)"
-                  class="px-2 py-2 text-[10px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
+                  class="px-2 py-2 text-[11px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
                   اختر من القائمة
                 </button>
               </div>
@@ -57,7 +57,7 @@ import { ModalService } from '../services/modal.service';
                   }
                 </select>
                 <button type="button" (click)="startNewCategory()"
-                  class="px-2 py-2 text-[10px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
+                  class="px-2 py-2 text-[11px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
                   جديد
                 </button>
               </div>

@@ -34,7 +34,7 @@ interface SurahInfo {
             </div>
           </div>
           <div class="flex-1 text-center sm:text-right">
-            <h3 class="font-inter text-base font-bold text-[var(--color-text-primary)] mb-1">تقدم {{ qStudent.name }} في حفظ القرآن</h3>
+            <h3 class="font-tajawal text-base font-bold text-[var(--color-text-primary)] mb-1">تقدم {{ qStudent.name }} في حفظ القرآن</h3>
             <p class="text-sm text-[var(--color-text-secondary)] mb-3">
               حفظ <span class="font-bold text-[var(--color-primary)]">{{ state.quranProgress().totalMemorized }}</span> من 114 سورة
             </p>
@@ -60,7 +60,7 @@ interface SurahInfo {
         <div class="space-y-6 lg:col-span-2">
           <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <span class="material-icons text-[var(--color-primary)]">mosque</span>
                 مسار حفظ السور
               </h3>
@@ -78,7 +78,7 @@ interface SurahInfo {
                   class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                   [class.bg-[var(--color-primary-light)]]="isExpanded"
                   [class.hover:bg-[var(--color-canvas)]]="!isExpanded">
-                  <span class="w-7 h-7 rounded-none flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-all"
+                  <span class="w-7 h-7 rounded-none flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all"
                     [ngClass]="{
                       'bg-[var(--color-primary)] text-white': surahStatus === 'memorized',
                       'bg-[var(--color-amber)] text-[var(--color-text-primary)]': surahStatus === 'review',
@@ -93,7 +93,7 @@ interface SurahInfo {
                   </span>
                   @if (surah.pagesCount) {
                   @let memorizedPagesCount = countMemorizedPages(student, surah);
-                  <span class="text-[10px] font-semibold flex-shrink-0"
+                  <span class="text-[11px] font-semibold flex-shrink-0"
                     [class.text-[var(--color-primary)]]="memorizedPagesCount > 0 && memorizedPagesCount < surah.pagesCount"
                     [class.text-[var(--color-green)]]="memorizedPagesCount === surah.pagesCount"
                     [class.text-[var(--color-text-tertiary)]]="memorizedPagesCount === 0">
@@ -110,7 +110,7 @@ interface SurahInfo {
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
                       <button (click)="onMarkAllPages(student.id, surah)"
-                        class="px-3 py-1.5 text-[10px] font-semibold rounded-none border transition-all cursor-pointer"
+                        class="px-3 py-1.5 text-[11px] font-semibold rounded-none border transition-all cursor-pointer"
                         [class]="countMemorizedPages(student, surah) === surah.pagesCount
                           ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
                           : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)]'">
@@ -119,13 +119,13 @@ interface SurahInfo {
                       </button>
                       @if (countMemorizedPages(student, surah) > 0) {
                       <button (click)="onClearAllPages(student.id, surah)"
-                        class="px-3 py-1.5 text-[10px] font-semibold rounded-none border border-gray-200 bg-[var(--color-surface)] text-red-500 hover:bg-red-50 transition-all cursor-pointer">
+                        class="px-3 py-1.5 text-[11px] font-semibold rounded-none border border-gray-200 bg-[var(--color-surface)] text-red-500 hover:bg-red-50 transition-all cursor-pointer">
                         <span class="material-icons text-xs align-middle">restart_alt</span>
                         مسح
                       </button>
                       }
                     </div>
-                    <span class="text-[10px] font-semibold text-[var(--color-text-secondary)]">
+                    <span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">
                       {{ countMemorizedPages(student, surah) }} / {{ surah.pagesCount }} صفحة
                     </span>
                   </div>
@@ -134,7 +134,7 @@ interface SurahInfo {
                     @let pageId = surah.number + '-' + ($index + 1);
                     @let isMemorized = (student.memorizedSurahPages || []).includes(pageId);
                     <button (click)="state.toggleSurahPageStatus(student.id, surah.number, $index + 1, isMemorized ? 'none' : 'memorized')"
-                      class="w-9 h-9 rounded-none border flex items-center justify-center font-bold text-[10px] transition-all cursor-pointer"
+                        class="w-9 h-9 rounded-none border flex items-center justify-center font-bold text-[11px] transition-all cursor-pointer"
                       [ngClass]="{
                         'bg-[var(--color-primary)] text-white border-[var(--color-primary)]': isMemorized,
                         'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-primary)]': !isMemorized

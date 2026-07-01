@@ -29,7 +29,7 @@ import { ModalService } from '../../shared/services/modal.service';
       <!-- Header -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] rounded-none border border-[var(--color-primary)]/10">
         <div>
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">library_books</span>
             دليل الأحاديث الشريفة
           </h3>
@@ -72,7 +72,7 @@ import { ModalService } from '../../shared/services/modal.service';
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-[var(--color-border-light)]">
               <div class="flex items-center gap-2">
                 <span class="w-12 h-12 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border)] flex items-center justify-center font-bold text-xs text-[var(--color-text-primary)] font-inter">{{ hadith.number }}</span>
-                <span class="text-[10px] font-bold text-[var(--color-primary-dark)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded-none">{{ hadith.category }}</span>
+                <span class="text-[11px] font-bold text-[var(--color-primary-dark)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded-none">{{ hadith.category }}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button (click)="openEditHadith(hadith)" class="w-12 h-12 rounded-none text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-light)] cursor-pointer transition-all flex items-center justify-center" title="تعديل" aria-label="تعديل الحديث">
@@ -83,12 +83,12 @@ import { ModalService } from '../../shared/services/modal.service';
                 </button>
               </div>
             </div>
-            <h4 class="font-inter text-sm font-bold text-[var(--color-text-primary)] mb-2">باب: {{ hadith.category }}</h4>
+            <h4 class="font-tajawal text-sm font-bold text-[var(--color-text-primary)] mb-2">باب: {{ hadith.category }}</h4>
             <p class="font-amiri text-[var(--color-primary-dark)] text-base leading-relaxed bg-[var(--color-primary-light)]/50 p-3 rounded-none text-center mb-3">"{{ hadith.text }}"</p>
             <p class="text-xs text-[var(--color-text-secondary)] mb-3 leading-relaxed">{{ hadith.explanation }}</p>
           </div>
           <div class="border-t border-[var(--color-border-light)] pt-3 flex items-center justify-between">
-            <span class="text-[10px] text-[var(--color-text-tertiary)] font-medium">الراوي: {{ hadith.reference }}</span>
+            <span class="text-[11px] text-[var(--color-text-tertiary)] font-medium">الراوي: {{ hadith.reference }}</span>
             <button (click)="viewInTrail()" class="text-xs font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] flex items-center gap-1 cursor-pointer transition-colors">
               <span class="material-icons text-sm material-icons-arrow-rtl">arrow_back</span>
               عرض في المسار
@@ -106,7 +106,7 @@ import { ModalService } from '../../shared/services/modal.service';
 
       @if (activeReferenceSubject() === 'quran') {
       <div class="p-5 bg-[var(--color-primary-light)] rounded-none border border-[var(--color-primary)]/10">
-        <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+        <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
           <span class="material-icons text-[var(--color-primary)]">auto_stories</span>
           دليل القرآن الكريم
         </h3>
@@ -116,9 +116,9 @@ import { ModalService } from '../../shared/services/modal.service';
         @for (surah of allSurahs; track surah.number) {
         <div class="bg-[var(--color-surface)] rounded-none p-4 text-center border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors cursor-pointer">
           <div class="w-10 h-10 mx-auto rounded-none bg-[var(--color-primary-light)] flex items-center justify-center font-bold text-[var(--color-primary)] text-sm mb-2 font-inter">{{ surah.number }}</div>
-          <h4 class="font-inter font-bold text-sm text-[var(--color-text-primary)] mb-1">سورة {{ surah.name }}</h4>
+          <h4 class="font-tajawal font-bold text-sm text-[var(--color-text-primary)] mb-1">سورة {{ surah.name }}</h4>
           @if (surah.pagesCount) {
-          <span class="text-[10px] bg-[var(--color-green-light)] text-green-700 px-2 py-0.5 rounded-none font-semibold">{{ surah.pagesCount }} صفحة</span>
+          <span class="text-[11px] bg-[var(--color-green-light)] text-green-700 px-2 py-0.5 rounded-none font-semibold">{{ surah.pagesCount }} صفحة</span>
           }
         </div>
         }
@@ -128,7 +128,7 @@ import { ModalService } from '../../shared/services/modal.service';
       @if (activeReferenceSubject() === 'english') {
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] rounded-none border border-[var(--color-primary)]/10">
         <div>
-          <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">translate</span>
             دليل المفردات الإنجليزية
           </h3>
@@ -139,7 +139,7 @@ import { ModalService } from '../../shared/services/modal.service';
         @for (unit of state.englishUnits(); track unit.unitNumber) {
         <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
           <div class="flex justify-between items-start mb-3 pb-3 border-b border-[var(--color-border-light)]">
-            <h4 class="font-inter font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+            <h4 class="font-tajawal font-bold text-[var(--color-text-primary)] flex items-center gap-2">
               <span class="material-icons text-[var(--color-primary)]">list_alt</span>
               الوحدة {{ unit.unitNumber }}
             </h4>

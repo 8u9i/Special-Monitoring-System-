@@ -90,7 +90,7 @@ import { ModalService } from '../../shared/services/modal.service';
           <div class="flex-1 text-center sm:text-right">
             <div class="flex items-center gap-2 mb-2">
               <span class="material-icons text-[var(--color-green)]">auto_stories</span>
-              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">تقدم حفظ القرآن الكريم</h3>
+              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">تقدم حفظ القرآن الكريم</h3>
             @if (state.selectedStudent(); as s) {
               <p class="text-xs text-[var(--color-primary-dark)] font-semibold">{{ s.name }}</p>
             }
@@ -120,7 +120,7 @@ import { ModalService } from '../../shared/services/modal.service';
         <!-- Leaderboard -->
         <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)] lg:col-span-2">
           <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-            <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+            <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
               <span class="material-icons text-[var(--color-primary)]">emoji_events</span>
               قائمة الصدارة
             </h3>
@@ -200,7 +200,7 @@ import { ModalService } from '../../shared/services/modal.service';
         <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)] flex flex-col">
           <div class="flex items-center gap-2 mb-5 pb-4 border-b border-[var(--color-border-light)]">
             <span class="material-icons text-[var(--color-primary)]">wb_sunny</span>
-            <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">الحديث لليوم</h3>
+            <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">الحديث لليوم</h3>
           </div>
 
           @if (hadithOfTheDay(); as hadith) {
@@ -223,7 +223,7 @@ import { ModalService } from '../../shared/services/modal.service';
           </div>
 
           <div class="mt-6 pt-4 border-t border-[var(--color-border-light)] text-center">
-            <p class="text-[10px] text-[var(--color-text-tertiary)]">الأحاديث مأخوذة من كتاب إتحاف الأخيار للشيخ سعيد بن مبروك القنوبي</p>
+            <p class="text-[11px] text-[var(--color-text-tertiary)]">الأحاديث مأخوذة من كتاب إتحاف الأخيار للشيخ سعيد بن مبروك القنوبي</p>
           </div>
           } @else {
           <div class="flex-1 flex items-center justify-center">

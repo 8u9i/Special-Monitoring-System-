@@ -17,7 +17,7 @@ import { ApiService } from '../../api.service';
         <div class="space-y-4 lg:col-span-1">
           <!-- Stats Card -->
           <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-            <h3 class="font-inter text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
+            <h3 class="font-tajawal text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
               <span class="material-icons text-[var(--color-primary)]">dashboard</span>
               إحصائيات الإدارة
             </h3>
@@ -39,7 +39,7 @@ import { ApiService } from '../../api.service';
 
           <!-- Batch Actions -->
           <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-            <h3 class="font-inter text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
+            <h3 class="font-tajawal text-sm font-bold mb-4 text-[var(--color-text-secondary)] flex items-center gap-2">
               <span class="material-icons text-[var(--color-primary)]">build</span>
               أدوات الإدارة
             </h3>
@@ -49,7 +49,7 @@ import { ApiService } from '../../api.service';
                 <span class="material-icons text-sm">person_add</span>
                 إضافة طالب جديد
               </button>
-              <p class="text-[10px] text-[var(--color-text-tertiary)] leading-relaxed mt-2 p-2 bg-[var(--color-amber-light)] border border-[var(--color-amber)]/30">
+              <p class="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed mt-2 p-2 bg-[var(--color-amber-light)] border border-[var(--color-amber)]/30">
                 <span class="font-semibold">ختم 40:</span> يوسم جميع الأحاديث الأربعين كمحفوظة دفعة واحدة.
                 <br><span class="font-semibold">تصفير:</span> يعيد تعيين سجل حفظ الطالب بالكامل.
               </p>
@@ -61,7 +61,7 @@ import { ApiService } from '../../api.service';
         <div class="space-y-4 lg:col-span-2">
           <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <span class="material-icons text-[var(--color-primary)]">people</span>
                 الطلاب النشطون
               </h3>
@@ -82,14 +82,14 @@ import { ApiService } from '../../api.service';
                       </div>
                       <div>
                         <h4 class="font-bold text-sm text-[var(--color-text-primary)]">{{ student.name }}</h4>
-                        <p class="text-[10px] text-[var(--color-text-tertiary)] font-medium">{{ student.age ? student.age + ' سنة' : 'غير محدد' }}</p>
+                        <p class="text-[11px] text-[var(--color-text-tertiary)] font-medium">{{ student.age ? student.age + ' سنة' : 'غير محدد' }}</p>
                       </div>
                     </div>
-                    <span class="text-[9px] font-bold bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] px-2 py-0.5 rounded-none">{{ stage.name }}</span>
+                    <span class="text-[11px] font-bold bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] px-2 py-0.5 rounded-none">{{ stage.name }}</span>
                   </div>
 
                   <div class="my-3">
-                    <div class="flex justify-between text-[10px] font-semibold text-[var(--color-text-secondary)] mb-1">
+                    <div class="flex justify-between text-[11px] font-semibold text-[var(--color-text-secondary)] mb-1">
                       <span>الأحاديث:</span>
                       <span class="text-[var(--color-primary-dark)]">{{ student.memorizedHadithNumbers.length }} / {{ state.hadiths().length }}</span>
                     </div>
@@ -100,7 +100,7 @@ import { ApiService } from '../../api.service';
                   </div>
 
                   @if (student.notes) {
-                  <p class="text-[10px] text-[var(--color-text-tertiary)] bg-[var(--color-surface)] p-2 rounded-none border border-[var(--color-border-light)] italic mb-3 max-h-12 overflow-y-auto">
+                  <p class="text-[11px] text-[var(--color-text-tertiary)] bg-[var(--color-surface)] p-2 rounded-none border border-[var(--color-border-light)] italic mb-3 max-h-12 overflow-y-auto">
                     "{{ student.notes }}"
                   </p>
                   }
@@ -116,10 +116,10 @@ import { ApiService } from '../../api.service';
                     </button>
                   </div>
                   <div class="flex gap-1.5">
-                    <button (click)="cheatUnlockAll(student.id)" class="px-2 py-1 text-[9px] font-bold bg-[var(--color-amber-light)] text-[var(--color-text-primary)] border border-[var(--color-amber)] rounded-none hover:bg-[var(--color-amber)] transition-colors cursor-pointer" title="ختم الأربعين">
+                    <button (click)="cheatUnlockAll(student.id)" class="px-2 py-1 text-[11px] font-bold bg-[var(--color-amber-light)] text-[var(--color-text-primary)] border border-[var(--color-amber)] rounded-none hover:bg-[var(--color-amber)] transition-colors cursor-pointer" title="ختم الأربعين">
                       ختم 40
                     </button>
-                    <button (click)="resetStudentProgress(student.id)" class="px-2 py-1 text-[9px] font-bold bg-[var(--color-canvas)] text-[var(--color-text-tertiary)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-border)] transition-colors cursor-pointer" title="تصفير">
+                    <button (click)="resetStudentProgress(student.id)" class="px-2 py-1 text-[11px] font-bold bg-[var(--color-canvas)] text-[var(--color-text-tertiary)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-border)] transition-colors cursor-pointer" title="تصفير">
                       تصفير
                     </button>
                   </div>

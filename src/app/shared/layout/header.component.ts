@@ -14,7 +14,7 @@ import { ModalService } from '../services/modal.service';
           <span class="material-icons text-lg">yard</span>
           <span class="text-[11px] font-bold tracking-widest uppercase">مسيرة التمكين النبوي</span>
         </div>
-        <h2 class="font-inter text-2xl font-bold text-[var(--color-text-primary)]">
+        <h2 class="font-tajawal text-2xl font-bold text-[var(--color-text-primary)]">
           {{ title() }}
         </h2>
         <p class="text-sm text-[var(--color-text-secondary)] mt-1">

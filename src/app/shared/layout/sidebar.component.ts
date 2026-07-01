@@ -16,7 +16,7 @@ import { ThemeService } from '../services/theme.service';
             <span class="material-icons text-white text-xl">eco</span>
           </div>
           <div>
-            <h1 class="font-inter text-lg font-bold text-white tracking-tight">يا إخوتي</h1>
+            <h1 class="font-tajawal text-lg font-bold text-white tracking-tight">يا إخوتي</h1>
             <p class="text-xs text-[var(--color-text-inverse-muted)] font-medium">متابع الحفظ التفاعلي</p>
           </div>
         </div>
@@ -52,7 +52,7 @@ import { ThemeService } from '../services/theme.service';
           </a>
 
           <div class="pt-2 pb-1">
-            <p class="px-4 text-[10px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">مسارات التعلم</p>
+            <p class="px-4 text-[11px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">مسارات التعلم</p>
           </div>
           <a routerLink="/hadith" routerLinkActive="bg-white/10 text-white"
             class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
@@ -71,7 +71,7 @@ import { ThemeService } from '../services/theme.service';
           </a>
 
           <div class="pt-4 pb-1">
-            <p class="px-4 text-[10px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">أدوات</p>
+            <p class="px-4 text-[11px] font-bold text-[var(--color-text-inverse-muted)]/50 uppercase tracking-widest mb-1">أدوات</p>
           </div>
           <a routerLink="/reference" routerLinkActive="bg-white/10 text-white"
             class="flex items-center gap-3 px-4 py-2.5 rounded-none text-[var(--color-text-inverse-muted)] hover:bg-white/5 hover:text-white transition-all text-sm font-medium">

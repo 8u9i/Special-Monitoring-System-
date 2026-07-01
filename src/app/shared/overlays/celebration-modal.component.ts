@@ -14,8 +14,8 @@ import { CelebrationService } from '../services/celebration.service';
           <span class="absolute -top-2 -right-2 text-2xl animate-bounce">👑</span>
         </div>
 
-        <p class="text-[10px] text-[var(--color-primary-dark)] font-bold tracking-widest uppercase">ارتقاء مبارك!</p>
-        <h3 id="celebrationTitle" class="font-inter text-2xl font-bold text-[var(--color-text-primary)] mt-2 mb-4">مبارك الارتقاء!</h3>
+        <p class="text-[11px] text-[var(--color-primary-dark)] font-bold tracking-widest uppercase">ارتقاء مبارك!</p>
+        <h3 id="celebrationTitle" class="font-tajawal text-2xl font-bold text-[var(--color-text-primary)] mt-2 mb-4">مبارك الارتقاء!</h3>
 
         @if (student && stage) {
         <div class="my-4 p-5 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">
@@ -25,8 +25,8 @@ import { CelebrationService } from '../services/celebration.service';
             <span>{{ student.name }}</span>
           </p>
           <div class="w-1/2 h-px border-t border-dashed border-[var(--color-border)] mx-auto my-3"></div>
-          <p class="text-[10px] text-[var(--color-text-tertiary)] font-bold uppercase">إلى مستوى</p>
-          <p class="font-inter text-lg font-bold text-[var(--color-primary-dark)] mt-1">{{ stage.name }}</p>
+          <p class="text-[11px] text-[var(--color-text-tertiary)] font-bold uppercase">إلى مستوى</p>
+          <p class="font-tajawal text-lg font-bold text-[var(--color-primary-dark)] mt-1">{{ stage.name }}</p>
           <p class="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed px-4">{{ stage.description }}</p>
         </div>
 

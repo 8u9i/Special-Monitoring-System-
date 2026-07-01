@@ -18,8 +18,8 @@ import { TrackerState, Student } from '../../state';
           }
         </div>
 
-        <span class="text-[10px] font-bold text-[var(--color-text-tertiary)] tracking-widest uppercase">المرحلة الحالية</span>
-        <h4 class="font-inter text-xl font-bold text-[var(--color-text-primary)] mt-1">{{ stage.name }}</h4>
+        <span class="text-[11px] font-bold text-[var(--color-text-tertiary)] tracking-widest uppercase">المرحلة الحالية</span>
+        <h4 class="font-tajawal text-xl font-bold text-[var(--color-text-primary)] mt-1">{{ stage.name }}</h4>
         <p class="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed max-w-[200px]">{{ stage.description }}</p>
 
         <div class="w-full mt-5 p-4 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border-light)]">

@@ -19,7 +19,7 @@ import { ToastService } from '../../shared/services/toast.service';
         <div class="space-y-6 lg:col-span-2">
           <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <span class="material-icons text-[var(--color-primary)]">language</span>
                 الوحدات الإنجليزية
               </h3>
@@ -47,7 +47,7 @@ import { ToastService } from '../../shared/services/toast.service';
                 <span class="material-icons text-xl"
                   [class.text-[var(--color-primary)]]="unitStatus !== 'review'"
                   [class.text-[var(--color-amber)]]="unitStatus === 'review'">translate</span>
-                <span class="text-[9px] font-semibold mt-1 leading-tight px-1 text-center line-clamp-2"
+                <span class="text-[11px] font-semibold mt-1 leading-tight px-1 text-center line-clamp-2"
                   [class.text-[var(--color-text-secondary)]]="unitStatus === 'none'"
                   [class.text-[var(--color-primary-dark)]]="unitStatus === 'memorized'"
                   [class.text-[var(--color-text-primary)]]="unitStatus === 'review'">{{ unit.unitNumber }}</span>
@@ -70,7 +70,7 @@ import { ToastService } from '../../shared/services/toast.service';
           <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border-light)]">
               <div class="flex-1">
-                <h4 class="font-inter text-lg font-bold text-[var(--color-text-primary)]">الوحدة {{ unit.unitNumber }}</h4>
+                <h4 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">الوحدة {{ unit.unitNumber }}</h4>
                 <p class="text-xs text-[var(--color-text-secondary)] mt-1">{{ unit.words.length }} كلمة</p>
               </div>
               <div class="flex items-center gap-2 mr-4">
@@ -108,7 +108,7 @@ import { ToastService } from '../../shared/services/toast.service';
               <div class="flex items-center gap-2 p-2.5 rounded-none border border-[var(--color-border-light)]">
                 <div class="min-w-0 flex-1">
                   <p class="font-bold text-[var(--color-text-primary)] text-sm leading-tight">{{ word.word }}</p>
-                  <p class="text-[10px] leading-tight text-[var(--color-text-secondary)]">{{ word.definition }}</p>
+                  <p class="text-[11px] leading-tight text-[var(--color-text-secondary)]">{{ word.definition }}</p>
                 </div>
               </div>
               }

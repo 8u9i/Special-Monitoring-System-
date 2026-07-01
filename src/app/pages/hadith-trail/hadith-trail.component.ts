@@ -21,7 +21,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
         <div class="space-y-6 lg:col-span-2">
           <div class="bg-[var(--color-surface)] rounded-none p-6 border border-[var(--color-border)]">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-              <h3 class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <span class="material-icons text-[var(--color-primary)]">alt_route</span>
                 مسار الأحاديث
               </h3>
@@ -42,7 +42,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                   <span class="font-bold text-sm flex-1 text-right text-[var(--color-text-primary)]">
                     {{ group.category }}
                   </span>
-                  <span class="text-[10px] font-semibold text-[var(--color-primary-dark)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded-none">
+                  <span class="text-[11px] font-semibold text-[var(--color-primary-dark)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded-none">
                     {{ group.hadiths.length }}
                   </span>
                   <span class="material-icons text-sm text-[var(--color-text-tertiary)] transition-transform flex-shrink-0"
@@ -59,7 +59,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                       class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                       [class.bg-[var(--color-surface)]]="isExpanded"
                       [class.hover:bg-[var(--color-surface)]]="!isExpanded">
-                      <span class="w-7 h-7 rounded-none flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-all"
+                      <span class="w-7 h-7 rounded-none flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all"
                         [ngClass]="{
                           'bg-[var(--color-primary)] text-white': hadithStatus === 'memorized',
                           'bg-[var(--color-amber)] text-[var(--color-text-primary)]': hadithStatus === 'review',

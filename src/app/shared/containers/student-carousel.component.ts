@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   selector: 'app-student-carousel',
   template: `
     <div class="bg-[var(--color-surface)] rounded-none p-5 border border-[var(--color-border)]">
-      <h3 class="font-inter text-sm font-bold mb-3 text-[var(--color-text-secondary)] flex items-center gap-2">
+      <h3 class="font-tajawal text-sm font-bold mb-3 text-[var(--color-text-secondary)] flex items-center gap-2">
         <span class="material-icons text-[var(--color-primary)] text-lg">psychology</span>
         اختر الطالب
       </h3>
@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
           <span class="text-lg leading-none select-none">{{ getAvatarEmoji(student.avatar) }}</span>
           <div class="text-right">
             <p class="font-bold text-sm">{{ student.name }}</p>
-            <p class="text-[10px] opacity-70 font-medium">
+            <p class="text-[11px] opacity-70 font-medium">
               {{ progress.done }} / {{ progress.total }}
             </p>
           </div>

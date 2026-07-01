@@ -47,10 +47,14 @@ import { AuthService } from './auth.service';
       </div>
     } @else {
       <!-- FULLY AUTHENTICATED + DATA LOADED -->
+      <!-- Skip-to-content link for keyboard users -->
+      <a href="#main-content" class="fixed top-0 left-0 z-[999] -translate-y-full focus:translate-y-0 bg-[var(--color-primary)] text-white px-4 py-2 text-sm font-bold transition-transform outline-none">
+        تخطى إلى المحتوى
+      </a>
       <!-- Main layout with sidebar + header -->
       <div class="min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] font-sans antialiased flex flex-col md:flex-row">
         <app-sidebar />
-        <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+        <main id="main-content" class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
           <app-header />
           <div style="animation: fadeSlideIn 0.3s ease-out both">
             <router-outlet />

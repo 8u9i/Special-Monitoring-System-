@@ -4,10 +4,24 @@
 @import "tailwindcss";
 
 @theme {
+  /* Font Family */
   --font-amiri: "Amiri", serif;
   --font-cause: "Cause", cursive;
   --font-inter: "Inter", sans-serif;
   --font-tajawal: "Tajawal", "Inter", sans-serif;
+  --font-body: "Tajawal", "Inter", sans-serif;
+  --font-ui: "Inter", "Tajawal", sans-serif;
+
+  /* Type Scale — product */
+  --text-2xs: 0.6875rem;    /* 11px — minimum label */
+  --text-xs: 0.75rem;        /* 12px — metadata */
+  --text-sm: 0.875rem;       /* 14px — body small */
+  --text-base: 1rem;         /* 16px — body */
+  --text-lg: 1.125rem;       /* 18px — heading small */
+  --text-xl: 1.25rem;        /* 20px — heading */
+  --text-2xl: 1.5rem;        /* 24px — heading large */
+  --text-3xl: 1.875rem;      /* 30px — display */
+  --text-4xl: 2.25rem;       /* 36px — hero */
 
   /* Canvas & Surface */
   --color-canvas: #F8F7F4;
@@ -127,7 +141,7 @@ body.dark .sketch-card-inset { border-color: var(--color-border-light); backgrou
 }
 
 body {
-  font-family: var(--font-tajawal);
+  font-family: var(--font-body);
   background-color: var(--color-canvas);
   color: var(--color-text-primary);
   direction: rtl;
@@ -246,13 +260,7 @@ input, select, textarea {
 button, a, label {
   min-height: 44px;
 }
-/* Small inline buttons (e.g. page numbers, badge buttons) */
-button.text-\[10px\], button.text-\[9px\],
-a.text-\[10px\], a.text-\[9px\],
-[class*="text-\[10px\]"], [class*="text-\[9px\]"] {
-  min-height: auto;
-}
-
+/* Minimum type size: 11px floor applied across all text labels */
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

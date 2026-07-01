@@ -13,7 +13,7 @@ import { ModalService } from '../services/modal.service';
     <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="addHadithTitle" (click)="close()">
       <div class="w-full max-w-lg p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 id="addHadithTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="addHadithTitle" class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">add_box</span>
             إضافة حديث شريف جديد
           </h3>
@@ -28,7 +28,7 @@ import { ModalService } from '../services/modal.service';
             <textarea id="addHadithText" formControlName="text" rows="3" placeholder="نص الحديث..."
               class="w-full font-amiri text-lg text-center rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 focus:outline-none focus:border-[var(--color-primary)] transition-colors"></textarea>
             @if (form.get('text')?.invalid && form.get('text')?.touched) {
-            <p class="text-[10px] text-red-500 mt-1">النص مطلوب (5 أحرف على الأقل).</p>
+            <p class="text-[11px] text-red-500 mt-1">النص مطلوب (5 أحرف على الأقل).</p>
             }
           </div>
 
@@ -40,7 +40,7 @@ import { ModalService } from '../services/modal.service';
                 <input id="addHadithCategory" type="text" formControlName="category" placeholder="اسم التصنيف الجديد"
                   class="flex-1 rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
                 <button type="button" (click)="useExistingCategory()"
-                  class="px-2 py-2 text-[10px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
+                  class="px-2 py-2 text-[11px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
                   اختر من القائمة
                 </button>
               </div>
@@ -53,7 +53,7 @@ import { ModalService } from '../services/modal.service';
                   }
                 </select>
                 <button type="button" (click)="showNewCategoryInput.set(true)"
-                  class="px-2 py-2 text-[10px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
+                  class="px-2 py-2 text-[11px] font-semibold bg-[var(--color-surface)] border border-[var(--color-border)] rounded-none hover:bg-[var(--color-canvas)] cursor-pointer whitespace-nowrap">
                   جديد
                 </button>
               </div>

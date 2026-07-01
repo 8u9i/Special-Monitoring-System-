@@ -10,7 +10,7 @@ import { ModalService } from '../services/modal.service';
         <div class="w-14 h-14 rounded-none bg-red-50 text-red-500 mx-auto flex items-center justify-center mb-4">
           <span class="material-icons text-2xl">warning</span>
         </div>
-        <h3 id="confirmTitle" class="font-inter font-bold text-lg text-[var(--color-text-primary)] mb-2">تأكيد الإجراء</h3>
+        <h3 id="confirmTitle" class="font-tajawal font-bold text-lg text-[var(--color-text-primary)] mb-2">تأكيد الإجراء</h3>
         <p class="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
           {{ modal.confirmState()!.message }}
         </p>

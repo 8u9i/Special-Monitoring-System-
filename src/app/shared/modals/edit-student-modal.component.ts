@@ -12,7 +12,7 @@ import { ModalService } from '../services/modal.service';
     <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="editStudentTitle" (click)="close()">
       <div class="w-full max-w-md p-6 bg-[var(--color-surface)] rounded-none border border-[var(--color-border)] max-h-[90vh] overflow-y-auto shadow-xl" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
-          <h3 id="editStudentTitle" class="font-inter text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+          <h3 id="editStudentTitle" class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span class="material-icons text-[var(--color-primary)]">edit</span>
             تعديل بيانات الطالب
           </h3>
@@ -29,7 +29,7 @@ import { ModalService } from '../services/modal.service';
             <input id="input-edit-name" type="text" formControlName="name" placeholder="مثال: يوسف محمد العلي"
               class="w-full rounded-none border border-[var(--color-border)] bg-[var(--color-canvas)] px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors" />
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
-            <p class="text-[10px] text-red-500 mt-1">الاسم مطلوب (حرفان على الأقل).</p>
+            <p class="text-[11px] text-red-500 mt-1">الاسم مطلوب (حرفان على الأقل).</p>
             }
           </div>
 
@@ -48,7 +48,7 @@ import { ModalService } from '../services/modal.service';
                 : 'flex flex-col items-center p-3 rounded-none bg-[var(--color-canvas)] border border-[var(--color-border)] hover:border-[var(--color-primary)] cursor-pointer transition-all'">
                 <input type="radio" formControlName="avatar" [value]="opt.key" class="sr-only" />
                 <span class="text-2xl mb-1 select-none">{{ opt.emoji }}</span>
-                <span class="text-[10px] font-semibold text-[var(--color-text-secondary)]">{{ opt.label }}</span>
+                <span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{{ opt.label }}</span>
               </label>
               }
             </div>

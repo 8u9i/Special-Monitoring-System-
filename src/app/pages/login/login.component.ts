@@ -118,7 +118,7 @@ import { TrackerState } from '../../state';
     }
 
     .login-title {
-      font-family: var(--font-inter);
+      font-family: var(--font-tajawal);
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--color-text-primary);
