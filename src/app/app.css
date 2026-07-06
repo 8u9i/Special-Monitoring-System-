@@ -9,16 +9,7 @@
   }
 }
 
-/* Animations classes */
-.animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
-}
-
 /* Custom styles for gamified elements */
 .backdrop-blur-md {
   backdrop-filter: blur(12px);
-}
-
-.z-55 {
-  z-index: 55;
 }

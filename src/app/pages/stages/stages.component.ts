@@ -6,13 +6,14 @@ import { ToastService } from '../../shared/services/toast.service';
 import { ModalService } from '../../shared/services/modal.service';
 import { CelebrationService } from '../../shared/services/celebration.service';
 import { ApiService } from '../../api.service';
+import { getAvatarEmoji } from '../../shared/constants/avatars';
 
 @Component({
   selector: 'app-stages',
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="space-y-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Admin Tools Column -->
         <div class="space-y-4 lg:col-span-1">
           <!-- Stats Card -->
@@ -110,7 +111,7 @@ import { ApiService } from '../../api.service';
                     <button (click)="openEditStudent(student)" class="btn btn-ghost btn-icon" title="تعديل" aria-label="تعديل الطالب">
                       <span class="material-icons text-xs">edit</span>
                     </button>
-                    <button (click)="onDeleteStudent(student.id, student.name)" class="btn btn-ghost btn-icon hover:text-red-500 hover:bg-red-50" title="حذف" aria-label="حذف الطالب">
+                    <button (click)="onDeleteStudent(student.id, student.name)" class="btn btn-ghost btn-icon hover:text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]" title="حذف" aria-label="حذف الطالب">
                       <span class="material-icons text-xs">delete</span>
                     </button>
                   </div>
@@ -145,10 +146,7 @@ export class StagesComponent {
   celebration = inject(CelebrationService);
   api = inject(ApiService);
 
-  private avatarMap: Record<string, string> = {
-    'avatar-leaf': '🌿', 'avatar-mountain': '🏔️', 'avatar-sun': '☀️',
-    'avatar-flower': '🌸', 'avatar-water': '💧', 'avatar-shield': '🛡️',
-  };
+  getAvatarEmoji = getAvatarEmoji;
 
   get totalXP(): number {
     return this.state.students().reduce((sum, s) => sum + s.xp, 0);
@@ -158,10 +156,6 @@ export class StagesComponent {
     const students = this.state.students();
     if (students.length === 0) return '—';
     return students.reduce((a, b) => (a.xp > b.xp ? a : b)).name;
-  }
-
-  getAvatarEmoji(key: string): string {
-    return this.avatarMap[key] || '🌿';
   }
 
   showAddStudent() {
@@ -194,7 +188,7 @@ export class StagesComponent {
       });
       this.state.students.set(updated);
       const saved = updated.find((s) => s.id === studentId);
-      if (saved) this.api.saveStudent(saved).catch(() => {});
+      if (saved) this.api.saveStudent(saved).catch(() => this.toast.show('فشل حفظ بيانات الطالب', 'error'));
       const updatedStudent = updated.find((s) => s.id === studentId)!;
       this.celebration.trigger(updatedStudent, STAGES[4]);
       this.toast.show(`هنيئاً! تم إتمام حفظ الأربعين لـ ${updatedStudent.name}!`);
@@ -214,7 +208,7 @@ export class StagesComponent {
       });
       this.state.students.set(updated);
       const savedStudent = updated.find((s) => s.id === studentId);
-      if (savedStudent) this.api.saveStudent(savedStudent).catch(() => {});
+      if (savedStudent) this.api.saveStudent(savedStudent).catch(() => this.toast.show('فشل حفظ بيانات الطالب', 'error'));
       this.toast.show('تم تصفير سجل الحفظ.');
       this.modal.confirmState.set(null);
     });

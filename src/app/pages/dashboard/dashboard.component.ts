@@ -2,12 +2,13 @@ import { Component, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { TrackerState } from '../../state';
 import { ModalService } from '../../shared/services/modal.service';
+import { getAvatarEmoji } from '../../shared/constants/avatars';
 
 @Component({
   selector: 'app-dashboard',
   template: `
     <div class="space-y-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div class="panel p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 bg-[var(--color-primary-light)] flex items-center justify-center">
@@ -126,8 +127,9 @@ import { ModalService } from '../../shared/services/modal.service';
             @let isTop = idx === 0 && student.xp > 0;
             @let stage = state.getStudentStage(student);
             <div [class]="isTop
-              ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20 transition-all duration-300'
-              : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[var(--color-canvas)] border border-[var(--color-border-light)] transition-all duration-300 hover:border-[var(--color-primary)]/30'">
+              ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[var(--color-primary-light)] border transition-all duration-300'
+              : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[var(--color-canvas)] border border-[var(--color-border-light)] transition-all duration-300'"
+              [style.border-color]="isTop ? 'color-mix(in srgb, var(--color-primary) 20%, transparent)' : null">
               <div class="flex items-center gap-3 w-full sm:w-auto">
                 <div class="w-12 h-12 flex items-center justify-center font-bold text-sm shrink-0"
                   [class]="isTop ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--color-border)] text-[var(--color-text-secondary)]'">
@@ -181,7 +183,7 @@ import { ModalService } from '../../shared/services/modal.service';
           </div>
 
           @if (state.students().length > 0) {
-          <div class="mt-4 p-4 bg-[var(--color-green-light)] border border-[var(--color-green)]/20 text-[var(--color-text-primary)] text-xs leading-relaxed flex items-start gap-2">
+          <div class="mt-4 p-4 bg-[var(--color-green-light)] border text-[var(--color-text-primary)] text-xs leading-relaxed flex items-start gap-2" [style.border-color]="'color-mix(in srgb, var(--color-green) 20%, transparent)'">
             <span class="material-icons text-[var(--color-green)] shrink-0 mt-0.5">lightbulb</span>
             <p>
               <strong>فكرة تربوية:</strong> لتشجيع الحفاظ الصغار، يمكن إعطاء جائزة عينية لمرتقي كل مرحلة!
@@ -235,10 +237,7 @@ export class DashboardComponent {
   private router = inject(Router);
   private modal = inject(ModalService);
 
-  private avatarMap: Record<string, string> = {
-    'avatar-leaf': '🌿', 'avatar-mountain': '🏔️', 'avatar-sun': '☀️',
-    'avatar-flower': '🌸', 'avatar-water': '💧', 'avatar-shield': '🛡️',
-  };
+  getAvatarEmoji = getAvatarEmoji;
 
   /** Picks a deterministic random hadith based on today's date */
   hadithOfTheDay = computed(() => {
@@ -256,10 +255,6 @@ export class DashboardComponent {
 
   get sortedStudents() {
     return [...this.state.students()].sort((a, b) => b.xp - a.xp);
-  }
-
-  getAvatarEmoji(key: string): string {
-    return this.avatarMap[key] || '🌿';
   }
 
   goToStudent(studentId: string) {

@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { TrackerState } from '../../state';
 import { Router } from '@angular/router';
+import { getAvatarEmoji } from '../constants/avatars';
 
 @Component({
   selector: 'app-student-carousel',
@@ -17,7 +18,8 @@ import { Router } from '@angular/router';
         <button (click)="state.selectedStudentId.set(student.id)"
           [class]="isSelected
             ? 'flex items-center gap-2.5 px-4 py-2.5 bg-[var(--color-primary)] text-white font-semibold transition-all cursor-pointer text-sm'
-            : 'flex items-center gap-2.5 px-4 py-2.5 bg-[var(--color-canvas)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all cursor-pointer text-sm'">
+            : 'flex items-center gap-2.5 px-4 py-2.5 bg-[var(--color-canvas)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all cursor-pointer text-sm'"
+          [attr.aria-pressed]="isSelected">
           <span class="text-lg leading-none select-none">{{ getAvatarEmoji(student.avatar) }}</span>
           <div class="text-right">
             <p class="font-bold text-sm">{{ student.name }}</p>
@@ -40,14 +42,7 @@ export class StudentCarouselComponent {
   state = inject(TrackerState);
   private router = inject(Router);
 
-  private avatarMap: Record<string, string> = {
-    'avatar-leaf': '🌿', 'avatar-mountain': '🏔️', 'avatar-sun': '☀️',
-    'avatar-flower': '🌸', 'avatar-water': '💧', 'avatar-shield': '🛡️',
-  };
-
-  getAvatarEmoji(key: string): string {
-    return this.avatarMap[key] || '🌿';
-  }
+  getAvatarEmoji = getAvatarEmoji;
 
   getRouteProgress(student: { memorizedHadithNumbers: number[]; memorizedSurahNumbers: number[]; memorizedEnglishUnits: number[] }) {
     const url = this.router.url;

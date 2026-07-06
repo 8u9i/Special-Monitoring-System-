@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { TrackerState, Student } from '../../state';
 import { ToastService } from '../services/toast.service';
 import { ModalService } from '../services/modal.service';
+import { AVATAR_OPTIONS } from '../constants/avatars';
 
 @Component({
   selector: 'app-edit-student-modal',
@@ -29,7 +30,7 @@ import { ModalService } from '../services/modal.service';
             <input id="input-edit-name" type="text" formControlName="name" placeholder="مثال: يوسف محمد العلي"
               class="input-field" />
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
-            <p class="text-[11px] text-red-500 mt-1">الاسم مطلوب (حرفان على الأقل).</p>
+            <p class="text-[11px] text-[var(--color-rose)] mt-1">الاسم مطلوب (حرفان على الأقل).</p>
             }
           </div>
 
@@ -104,14 +105,7 @@ export class EditStudentModalComponent implements OnInit, OnDestroy {
     notes: new FormControl(''),
   });
 
-  avatarOptions = [
-    { key: 'avatar-leaf', emoji: '🌿', label: 'غصن أخضر' },
-    { key: 'avatar-mountain', emoji: '🏔️', label: 'جبل الحكمة' },
-    { key: 'avatar-sun', emoji: '☀️', label: 'شمس الهداية' },
-    { key: 'avatar-flower', emoji: '🌸', label: 'زهرة الأخلاق' },
-    { key: 'avatar-water', emoji: '💧', label: 'غيث المعرفة' },
-    { key: 'avatar-shield', emoji: '🛡️', label: 'درع العقيدة' },
-  ];
+  avatarOptions = AVATAR_OPTIONS;
 
   open(student: Student) {
     this.form.setValue({

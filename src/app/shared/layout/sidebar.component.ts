@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TrackerState } from '../../state';
 import { AuthService } from '../../auth.service';
 import { ThemeService } from '../services/theme.service';
+import { getAvatarEmoji } from '../constants/avatars';
 
 @Component({
   selector: 'app-sidebar',
@@ -68,15 +69,15 @@ import { ThemeService } from '../services/theme.service';
             <span class="font-semibold text-[var(--color-primary)]">{{ getProgressValue(student) }}</span>
           </div>
           <div class="flex items-center justify-between text-xs mt-2">
-            <span class="text-white/40">المرحلة:</span>
+            <span class="text-[var(--color-nav-text-muted)]">المرحلة:</span>
             <span class="font-semibold text-[var(--color-amber)]">{{ getStudentStageName(student) }}</span>
           </div>
         </div>
         }
 
         <nav class="space-y-0.5">
-          <a (click)="closeMenu()" routerLink="/dashboard" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]" [routerLinkActiveOptions]="{ exact: true }"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/dashboard" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]" [routerLinkActiveOptions]="{ exact: true }"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">home</span>
             <span>الرئيسية</span>
           </a>
@@ -84,18 +85,18 @@ import { ThemeService } from '../services/theme.service';
           <div class="pt-3 pb-1">
             <p class="px-4 text-[11px] font-bold text-white/20 tracking-widest mb-1">مسارات التعلم</p>
           </div>
-          <a (click)="closeMenu()" routerLink="/hadith" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/hadith" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">menu_book</span>
             <span>مسار الأحاديث</span>
           </a>
-          <a (click)="closeMenu()" routerLink="/quran" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/quran" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">auto_stories</span>
             <span>مسار القرآن</span>
           </a>
-          <a (click)="closeMenu()" routerLink="/english" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/english" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">translate</span>
             <span>مسار الإنجليزية</span>
           </a>
@@ -103,13 +104,13 @@ import { ThemeService } from '../services/theme.service';
           <div class="pt-4 pb-1">
             <p class="px-4 text-[11px] font-bold text-white/20 tracking-widest mb-1">أدوات</p>
           </div>
-          <a (click)="closeMenu()" routerLink="/reference" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/reference" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">library_books</span>
             <span>المناهج التعليمية</span>
           </a>
-          <a (click)="closeMenu()" routerLink="/stages" routerLinkActive="bg-white/[0.08] text-white border-r-2 border-[var(--color-primary)]"
-            class="flex items-center gap-3 px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium border-r-2 border-transparent">
+          <a (click)="closeMenu()" routerLink="/stages" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
+            class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
             <span class="material-icons text-xl">manage_accounts</span>
             <span>لوحة الإدارة</span>
           </a>
@@ -119,17 +120,17 @@ import { ThemeService } from '../services/theme.service';
       <div class="p-5 border-t border-white/[0.06]">
         <button
           (click)="theme.toggle()"
-          class="flex items-center gap-3 w-full px-4 py-2.5 text-white/40 hover:bg-white/[0.04] hover:text-white/80 transition-all text-sm font-medium cursor-pointer mb-1 border-none">
+          class="flex items-center gap-3 w-full px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium cursor-pointer mb-1 border-none">
           <span class="material-icons text-xl">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
           <span>{{ theme.isDark() ? 'الوضع الفاتح' : 'الوضع الداكن' }}</span>
         </button>
         <button
           (click)="logout()"
-          class="flex items-center gap-3 w-full px-4 py-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium cursor-pointer mb-2 border-none">
+          class="flex items-center gap-3 w-full px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-rose-light)] hover:text-[var(--color-rose)] transition-all text-sm font-medium cursor-pointer mb-2 border-none">
           <span class="material-icons text-xl">logout</span>
           <span>تسجيل الخروج</span>
         </button>
-        <div class="flex items-center gap-3 px-3 py-2 bg-white/[0.03] text-white/30 text-xs">
+        <div class="flex items-center gap-3 px-3 py-2 text-[var(--color-nav-text-muted)] text-xs">
           <span class="material-icons text-sm">verified</span>
           <span class="font-medium">v1.0 — متابع الحفظ</span>
         </div>
@@ -157,18 +158,7 @@ export class SidebarComponent {
     this.closeMenu();
   }
 
-  avatarMap: Record<string, string> = {
-    'avatar-leaf': '🌿',
-    'avatar-mountain': '🏔️',
-    'avatar-sun': '☀️',
-    'avatar-flower': '🌸',
-    'avatar-water': '💧',
-    'avatar-shield': '🛡️',
-  };
-
-  getAvatarEmoji(key: string): string {
-    return this.avatarMap[key] || '🌿';
-  }
+  getAvatarEmoji = getAvatarEmoji;
 
   getStudentStageName(student: { id: string; name: string; xp: number }): string {
     const stage = this.state.getStudentStage({ xp: student.xp } as import('../../state').Student);
@@ -203,3 +193,4 @@ export class SidebarComponent {
     this.auth.logout();
   }
 }
+

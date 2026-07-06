@@ -25,7 +25,7 @@ import { ModalService } from '../../shared/services/modal.service';
       </div>
 
       @if (activeReferenceSubject() === 'hadith') {
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] border border-[var(--color-primary)]/10">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] border" [style.border-color]="'color-mix(in srgb, var(--color-primary) 10%, transparent)'">
         <div>
           <h3 class="panel-title">
             <span class="panel-title-icon">library_books</span>
@@ -74,13 +74,13 @@ import { ModalService } from '../../shared/services/modal.service';
                 <button (click)="openEditHadith(hadith)" class="btn btn-ghost btn-icon" title="تعديل" aria-label="تعديل الحديث">
                   <span class="material-icons text-xs">edit</span>
                 </button>
-                <button (click)="onDeleteHadith(hadith.number, hadith.category)" class="btn btn-ghost btn-icon hover:text-red-500 hover:bg-red-50" title="حذف" aria-label="حذف الحديث">
+                <button (click)="onDeleteHadith(hadith.number, hadith.category)" class="btn btn-ghost btn-icon hover:text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]" title="حذف" aria-label="حذف الحديث">
                   <span class="material-icons text-xs">delete</span>
                 </button>
               </div>
             </div>
             <h4 class="font-tajawal text-sm font-bold text-[var(--color-text-primary)] mb-2">باب: {{ hadith.category }}</h4>
-            <p class="font-amiri text-[var(--color-primary-dark)] text-base leading-relaxed bg-[var(--color-primary-light)]/50 p-3 text-center mb-3">"{{ hadith.text }}"</p>
+            <p class="font-amiri text-[var(--color-primary-dark)] text-base leading-relaxed p-3 text-center mb-3" [style.background-color]="'color-mix(in srgb, var(--color-primary-light) 50%, transparent)'">"{{ hadith.text }}"</p>
             <p class="text-xs text-[var(--color-text-secondary)] mb-3 leading-relaxed">{{ hadith.explanation }}</p>
           </div>
           <div class="border-t border-[var(--color-border-light)] pt-3 flex items-center justify-between">
@@ -101,7 +101,7 @@ import { ModalService } from '../../shared/services/modal.service';
       }
 
       @if (activeReferenceSubject() === 'quran') {
-      <div class="p-5 bg-[var(--color-primary-light)] border border-[var(--color-primary)]/10">
+      <div class="p-5 bg-[var(--color-primary-light)] border" [style.border-color]="'color-mix(in srgb, var(--color-primary) 10%, transparent)'">
         <h3 class="panel-title">
           <span class="panel-title-icon">auto_stories</span>
           دليل القرآن الكريم
@@ -122,7 +122,8 @@ import { ModalService } from '../../shared/services/modal.service';
       }
 
       @if (activeReferenceSubject() === 'english') {
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] border border-[var(--color-primary)]/10">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[var(--color-primary-light)] border"
+        [style.border-color]="'color-mix(in srgb, var(--color-primary) 10%, transparent)'">
         <div>
           <h3 class="panel-title">
             <span class="panel-title-icon">translate</span>

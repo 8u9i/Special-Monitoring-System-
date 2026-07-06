@@ -28,7 +28,7 @@ import { ModalService } from '../services/modal.service';
             <textarea id="addHadithText" formControlName="text" rows="3" placeholder="نص الحديث..."
               class="input-field font-amiri text-lg text-center"></textarea>
             @if (form.get('text')?.invalid && form.get('text')?.touched) {
-            <p class="text-[11px] text-red-500 mt-1">النص مطلوب (5 أحرف على الأقل).</p>
+            <p class="text-[11px] text-[var(--color-rose)] mt-1">النص مطلوب (5 أحرف على الأقل).</p>
             }
           </div>
 

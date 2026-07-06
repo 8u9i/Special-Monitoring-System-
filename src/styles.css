@@ -15,11 +15,11 @@
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: clamp(1.5rem, 3vw, 2.441rem);
+  --text-4xl: clamp(1.75rem, 4vw, 3.052rem);
 
   --color-canvas: #F5F0EB;
   --color-surface: #FCFAF7;
@@ -39,9 +39,17 @@
   --color-green-light: #EAF5EA;
   --color-rose: #D49A9A;
   --color-rose-light: #F8ECEC;
+  --color-rose-hover: #C08080;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-tag-amber-text: #7A6510;
+  --color-tag-green-text: #3D6B3D;
+  --color-tag-blue-text: #3D6A80;
+  --color-nav-text: #E8E4DE;
+  --color-nav-text-muted: #7A7268;
+  --color-nav-text-subtle: #5A5248;
   --color-text-primary: #1C1814;
   --color-text-secondary: #6B635C;
-  --color-text-tertiary: #9C948C;
+  --color-text-tertiary: #7A7268;
   --color-text-inverse: #FFFFFF;
   --color-text-inverse-muted: #9C948C;
   --color-border: #DCD4CC;
@@ -68,9 +76,16 @@ body.dark {
   --color-green-light: #142014;
   --color-rose: #D49A9A;
   --color-rose-light: #281414;
+  --color-rose-hover: #E0B0B0;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-tag-amber-text: #E0C050;
+  --color-tag-green-text: #8CC08C;
+  --color-tag-blue-text: #8CC0C0;
+  --color-nav-text-muted: #9C948C;
+  --color-nav-text-subtle: #6B635C;
   --color-text-primary: #E8E4DE;
   --color-text-secondary: #9C948C;
-  --color-text-tertiary: #6B635C;
+  --color-text-tertiary: #8A8278;
   --color-text-inverse: #1C1814;
   --color-text-inverse-muted: #6B635C;
   --color-border: #2D2926;
@@ -98,9 +113,17 @@ body.dark {
     --color-green-light: #142014;
     --color-rose: #D49A9A;
     --color-rose-light: #281414;
+    --color-rose-hover: #E0B0B0;
+    --color-overlay: rgba(0, 0, 0, 0.6);
+    --color-tag-amber-text: #E0C050;
+    --color-tag-green-text: #8CC08C;
+    --color-tag-blue-text: #8CC0C0;
+    --color-nav-text: #E8E4DE;
+    --color-nav-text-muted: #9C948C;
+    --color-nav-text-subtle: #6B635C;
     --color-text-primary: #E8E4DE;
     --color-text-secondary: #9C948C;
-    --color-text-tertiary: #6B635C;
+    --color-text-tertiary: #8A8278;
     --color-text-inverse: #1C1814;
     --color-text-inverse-muted: #6B635C;
     --color-border: #2D2926;
@@ -117,6 +140,13 @@ body {
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --z-sidebar: 40;
+  --z-overlay: 45;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
 .panel {
@@ -201,6 +231,15 @@ body {
   background: var(--color-primary-light);
 }
 
+.btn-ghost:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-sm {
   padding: 0.5rem 0.75rem;
   font-size: 0.8125rem;
@@ -238,17 +277,17 @@ body {
 
 .tag-amber {
   background: var(--color-amber-light);
-  color: #7A6510;
+  color: var(--color-tag-amber-text);
 }
 
 .tag-green {
   background: var(--color-green-light);
-  color: #3D6B3D;
+  color: var(--color-tag-green-text);
 }
 
 .tag-blue {
   background: var(--color-blue-light);
-  color: #3D6A80;
+  color: var(--color-tag-blue-text);
 }
 
 .badge-number {
@@ -463,6 +502,13 @@ button, a, label {
 
 .input-field::placeholder {
   color: var(--color-text-tertiary);
+}
+
+.input-field:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Avatar option card */

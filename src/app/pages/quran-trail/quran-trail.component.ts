@@ -75,7 +75,10 @@ interface SurahInfo {
                 <button (click)="toggleSurah(surah)"
                   class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                   [class.bg-[var(--color-primary-light)]]="isExpanded"
-                  [class.hover:bg-[var(--color-canvas)]]="!isExpanded">
+                  [class.hover:bg-[var(--color-canvas)]]="!isExpanded"
+                  [attr.aria-expanded]="isExpanded"
+                  [attr.aria-controls]="'surah-content-' + surah.number"
+                  [attr.id]="'surah-btn-' + surah.number">
                   <span class="badge-number transition-all"
                     [ngClass]="{
                       'badge-number-memorized': surahStatus === 'memorized',
@@ -103,7 +106,7 @@ interface SurahInfo {
                 </button>
 
                 @if (isExpanded) {
-                <div class="border-t border-[var(--color-border-light)] p-4 bg-[var(--color-canvas)]">
+                <div class="border-t border-[var(--color-border-light)] p-4 bg-[var(--color-canvas)]" [attr.id]="'surah-content-' + surah.number" role="region" [attr.aria-labelledby]="'surah-btn-' + surah.number">
                   @if (surah.pagesCount) {
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
@@ -117,7 +120,7 @@ interface SurahInfo {
                       </button>
                       @if (countMemorizedPages(student, surah) > 0) {
                       <button (click)="onClearAllPages(student.id, surah)"
-                        class="btn btn-sm border border-red-200 bg-[var(--color-surface)] text-red-500 hover:bg-red-50">
+                        class="btn btn-sm border-[var(--color-rose-light)] bg-[var(--color-surface)] text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]">
                         <span class="material-icons text-xs">restart_alt</span>
                         مسح
                       </button>

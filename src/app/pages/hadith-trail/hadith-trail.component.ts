@@ -37,7 +37,10 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                 <button (click)="toggleCategory(group.category)"
                   class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                   [class.bg-[var(--color-primary-light)]]="isCategoryExpanded"
-                  [class.hover:bg-[var(--color-canvas)]]="!isCategoryExpanded">
+                  [class.hover:bg-[var(--color-canvas)]]="!isCategoryExpanded"
+                  [attr.aria-expanded]="isCategoryExpanded"
+                  [attr.aria-controls]="'cat-content-' + group.category"
+                  [attr.id]="'cat-btn-' + group.category">
                   <span class="material-icons text-[var(--color-primary)] text-sm">folder</span>
                   <span class="font-bold text-sm flex-1 text-right text-[var(--color-text-primary)]">
                     {{ group.category }}
@@ -48,7 +51,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                 </button>
 
                 @if (isCategoryExpanded) {
-                <div class="border-t border-[var(--color-border-light)] bg-[var(--color-canvas)]">
+                <div class="border-t border-[var(--color-border-light)] bg-[var(--color-canvas)]" [attr.id]="'cat-content-' + group.category" role="region" [attr.aria-labelledby]="'cat-btn-' + group.category">
                   @for (hadith of group.hadiths; track hadith.number; let idx = $index) {
                   @let isExpanded = expandedHadithNumber() === hadith.number;
                   @let hadithStatus = getHadithStatus(student, hadith.number);
@@ -56,7 +59,9 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                     <button (click)="toggleHadith(hadith.number)"
                       class="w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors border-none"
                       [class.bg-[var(--color-surface)]]="isExpanded"
-                      [class.hover:bg-[var(--color-surface)]]="!isExpanded">
+                      [class.hover:bg-[var(--color-surface)]]="!isExpanded"
+                      [attr.aria-expanded]="isExpanded"
+                      [attr.aria-controls]="'hadith-content-' + hadith.number">
                       <span class="badge-number transition-all"
                         [ngClass]="{
                           'badge-number-memorized': hadithStatus === 'memorized',
@@ -75,8 +80,8 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                     </button>
 
                     @if (isExpanded) {
-                    <div class="border-t border-[var(--color-border-light)] p-4 bg-[var(--color-surface)]">
-                      <div class="p-4 bg-[var(--color-amber-light)] border border-[var(--color-amber)]/20 text-center mb-4">
+                    <div class="border-t border-[var(--color-border-light)] p-4 bg-[var(--color-surface)]" [attr.id]="'hadith-content-' + hadith.number" role="region">
+                      <div class="p-4 bg-[var(--color-amber-light)] border text-center mb-4" [style.border-color]="'color-mix(in srgb, var(--color-amber) 20%, transparent)'">
                         <p class="font-amiri text-base font-bold text-[var(--color-text-primary)] leading-relaxed select-all">
                           "{{ hadith.text }}"
                         </p>

@@ -206,7 +206,7 @@ import { TrackerState } from '../../state';
       padding: 0.75rem 1rem;
       background: var(--color-rose-light);
       border: 1px solid var(--color-rose);
-      color: #DC2626;
+      color: var(--color-rose);
       font-size: 0.85rem;
       font-weight: 500;
     }

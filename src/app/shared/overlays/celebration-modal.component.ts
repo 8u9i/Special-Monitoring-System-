@@ -1,5 +1,6 @@
 import { Component, inject, HostListener } from '@angular/core';
 import { CelebrationService } from '../services/celebration.service';
+import { getAvatarEmoji } from '../constants/avatars';
 
 @Component({
   selector: 'app-celebration-modal',
@@ -51,18 +52,7 @@ import { CelebrationService } from '../services/celebration.service';
 export class CelebrationModalComponent {
   celeb = inject(CelebrationService);
 
-  private avatarMap: Record<string, string> = {
-    'avatar-leaf': '🌿',
-    'avatar-mountain': '🏔️',
-    'avatar-sun': '☀️',
-    'avatar-flower': '🌸',
-    'avatar-water': '💧',
-    'avatar-shield': '🛡️',
-  };
-
-  getAvatarEmoji(key: string): string {
-    return this.avatarMap[key] || '🌿';
-  }
+  getAvatarEmoji = getAvatarEmoji;
 
   close() {
     this.celeb.dismiss();

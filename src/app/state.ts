@@ -158,17 +158,15 @@ export interface Stage {
   minXP: number;
   maxXP: number;
   description: string;
-  colorClass: string;
   badgeIcon: string;
-  bgHex: string;
 }
 
 export const STAGES: Stage[] = [
-  { level: 1, name: "مرحلة البذرة", minXP: 0, maxXP: 1000, description: "بداية مباركة ونبتة صالحة في رياض المعرفة.", colorClass: "text-amber-700 bg-amber-50 border-amber-300", badgeIcon: "eco", bgHex: "#FAF7F2" },
-  { level: 2, name: "مرحلة الشتلة", minXP: 1001, maxXP: 3000, description: "تنمو المعرفة وتترسخ خطى الحفظ في القلوب.", colorClass: "text-[#6B8F6B] bg-emerald-50/50 border-[#A3B18A]", badgeIcon: "yard", bgHex: "#F5F8F5" },
-  { level: 3, name: "مرحلة الغصن", minXP: 3001, maxXP: 6000, description: "غصن يافع يرتوي بالقرآن والسنة واللغة النافعة.", colorClass: "text-[#41644A] bg-green-50 border-green-300", badgeIcon: "nature", bgHex: "#EFF5EF" },
-  { level: 4, name: "مرحلة الشجرة المثمرة", minXP: 6001, maxXP: 10000, description: "أثمر السعي والجد، وبدأت الحكمة تظهر.", colorClass: "text-emerald-800 bg-emerald-100/50 border-emerald-400", badgeIcon: "local_florist", bgHex: "#EBF5EB" },
-  { level: 5, name: "مرحلة الظل الممتد", minXP: 10001, maxXP: 999999, description: "تاج الحافظين، يظلل من حوله بنور وسكينة وعلم واسع.", colorClass: "text-indigo-900 bg-indigo-50 border-indigo-300", badgeIcon: "park", bgHex: "#F2F4FA" },
+  { level: 1, name: "مرحلة البذرة", minXP: 0, maxXP: 1000, description: "بداية مباركة ونبتة صالحة في رياض المعرفة.", badgeIcon: "eco" },
+  { level: 2, name: "مرحلة الشتلة", minXP: 1001, maxXP: 3000, description: "تنمو المعرفة وتترسخ خطى الحفظ في القلوب.", badgeIcon: "yard" },
+  { level: 3, name: "مرحلة الغصن", minXP: 3001, maxXP: 6000, description: "غصن يافع يرتوي بالقرآن والسنة واللغة النافعة.", badgeIcon: "nature" },
+  { level: 4, name: "مرحلة الشجرة المثمرة", minXP: 6001, maxXP: 10000, description: "أثمر السعي والجد، وبدأت الحكمة تظهر.", badgeIcon: "local_florist" },
+  { level: 5, name: "مرحلة الظل الممتد", minXP: 10001, maxXP: 999999, description: "تاج الحافظين، يظلل من حوله بنور وسكينة وعلم واسع.", badgeIcon: "park" },
 ];
 
 @Injectable({ providedIn: "root" })

@@ -35,6 +35,8 @@ import { ToastService } from '../../shared/services/toast.service';
               @let unitStatus = getUnitStatus(student, unit.unitNumber);
               <button (click)="onUnitClick(unit)"
                 class="aspect-square border flex flex-col items-center justify-center transition-all hover:scale-105 cursor-pointer"
+                [attr.aria-expanded]="selectedUnit()?.unitNumber === unit.unitNumber"
+                [attr.aria-controls]="'unit-detail-panel'"
                 [class.bg-[var(--color-surface)]]="unitStatus === 'none'"
                 [class.bg-[var(--color-green-light)]]="unitStatus === 'memorized'"
                 [class.bg-[var(--color-amber-light)]]="unitStatus === 'review'"
@@ -65,7 +67,7 @@ import { ToastService } from '../../shared/services/toast.service';
           </div>
 
           @if (selectedUnit(); as unit) {
-          <div class="panel p-6">
+          <div id="unit-detail-panel" role="region" class="panel p-6">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border-light)]">
               <div class="flex-1">
                 <h4 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">الوحدة {{ unit.unitNumber }}</h4>
@@ -92,7 +94,7 @@ import { ToastService } from '../../shared/services/toast.service';
                 </button>
                 @if (getUnitStatus(student, unit.unitNumber) !== 'none') {
                 <button (click)="onClearUnit(student.id, unit.unitNumber)"
-                  class="btn btn-sm border border-red-200 bg-[var(--color-surface)] text-red-500 hover:bg-red-50"
+                  class="btn btn-sm border-[var(--color-rose-light)] bg-[var(--color-surface)] text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]"
                   aria-label="مسح التحديد">
                   <span class="material-icons text-sm">restart_alt</span>
                   مسح
