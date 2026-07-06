@@ -366,10 +366,22 @@ body {
   margin: 1rem 0;
 }
 
-.mat-icon {
+.mat-icon,
+.material-icons {
   font-family: 'Material Icons' !important;
-  vertical-align: middle;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
   line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar — minimal */
