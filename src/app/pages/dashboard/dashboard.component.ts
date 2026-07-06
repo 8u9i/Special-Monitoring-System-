@@ -4,21 +4,24 @@ import { TrackerState } from '../../state';
 import { ModalService } from '../../shared/services/modal.service';
 import { getAvatarEmoji } from '../../shared/constants/avatars';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-dashboard',
+    imports: [AppIconComponent],
   template: `
     <div class="space-y-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div class="panel p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 bg-[var(--color-primary-light)] flex items-center justify-center">
-              <span class="material-icons text-[var(--color-primary)]">groups</span>
+              <app-icon name="groups" [size]="18"></app-icon>
             </div>
             <span class="text-xs text-[var(--color-text-secondary)] font-semibold">الحفاظ الصغار</span>
           </div>
           <p class="text-3xl font-bold text-[var(--color-text-primary)]">{{ state.stats().totalStudents }}</p>
           <p class="text-xs text-[var(--color-green)] mt-2 font-medium flex items-center gap-1">
-            <span class="material-icons text-sm">check_circle</span>
+            <app-icon name="check_circle" [size]="18"></app-icon>
             طلاب نشطون
           </p>
         </div>
@@ -26,13 +29,13 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
         <div class="panel p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 bg-[var(--color-primary-light)] flex items-center justify-center">
-              <span class="material-icons text-[var(--color-primary)]">emoji_events</span>
+              <app-icon name="emoji_events" [size]="18"></app-icon>
             </div>
             <span class="text-xs text-[var(--color-text-secondary)] font-semibold">مجموع النقاط</span>
           </div>
           <p class="text-3xl font-bold text-[var(--color-primary-dark)]">{{ state.stats().totalXP }}</p>
           <p class="text-xs text-[var(--color-text-secondary)] mt-2 font-medium flex items-center gap-1">
-            <span class="material-icons text-sm">done_all</span>
+            <app-icon name="done_all" [size]="18"></app-icon>
             حصيلة الحفظ
           </p>
         </div>
@@ -40,13 +43,13 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
         <div class="panel p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 bg-[var(--color-amber-light)] flex items-center justify-center">
-              <span class="material-icons text-[var(--color-amber)]">query_stats</span>
+              <app-icon name="query_stats" [size]="18"></app-icon>
             </div>
             <span class="text-xs text-[var(--color-text-secondary)] font-semibold">متوسط الطالب</span>
           </div>
           <p class="text-3xl font-bold text-[var(--color-text-primary)]">{{ state.stats().averageXP }} <span class="text-sm font-medium text-[var(--color-text-secondary)]">XP</span></p>
           <p class="text-xs text-[var(--color-text-secondary)] mt-2 font-medium flex items-center gap-1">
-            <span class="material-icons text-sm">trending_up</span>
+            <app-icon name="trending_up" [size]="18"></app-icon>
             معدل مستمر
           </p>
         </div>
@@ -54,7 +57,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
         <div class="panel p-5 border-[var(--color-primary)]">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 bg-[var(--color-amber-light)] flex items-center justify-center">
-              <span class="material-icons text-[var(--color-amber)]">stars</span>
+              <app-icon name="stars" [size]="18"></app-icon>
             </div>
             <span class="text-xs text-[var(--color-primary-dark)] font-semibold">صاحب الصدارة</span>
           </div>
@@ -87,7 +90,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
 
           <div class="flex-1 text-center sm:text-right">
             <div class="flex items-center gap-2 mb-2">
-              <span class="material-icons text-[var(--color-green)]">auto_stories</span>
+              <app-icon name="auto_stories" [size]="18"></app-icon>
               <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)]">تقدم حفظ القرآن الكريم</h3>
             @if (state.selectedStudent(); as s) {
               <p class="text-xs text-[var(--color-primary-dark)] font-semibold">{{ s.name }}</p>
@@ -142,7 +145,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
                   <p class="font-bold text-sm text-[var(--color-text-primary)] flex items-center gap-1.5">
                     <span>{{ student.name }}</span>
                     @if (isTop) {
-                    <span class="material-icons text-[var(--color-primary)] text-sm">military_tech</span>
+                    <app-icon name="military_tech" [size]="18"></app-icon>
                     }
                   </p>
                   <div class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mt-0.5">
@@ -155,21 +158,21 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
               <div class="flex items-center gap-2 mt-3 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
                 <div class="flex gap-1.5 text-xs font-semibold flex-wrap">
                   <span class="tag tag-primary">
-                    <span class="material-icons text-[10px]">menu_book</span>
+                    <app-icon name="menu_book" [size]="18"></app-icon>
                     {{ student.memorizedHadithNumbers.length }}
                   </span>
                   <span class="tag tag-blue">
-                    <span class="material-icons text-[10px]">auto_stories</span>
+                    <app-icon name="auto_stories" [size]="18"></app-icon>
                     {{ student.memorizedSurahNumbers.length }}
                   </span>
                   <span class="tag tag-green">
-                    <span class="material-icons text-[10px]">translate</span>
+                    <app-icon name="translate" [size]="18"></app-icon>
                     {{ student.memorizedEnglishUnits.length }}
                   </span>
                 </div>
                 <button (click)="goToStudent(student.id)"
                   class="btn btn-ghost btn-icon" title="انتقل لمسار الحفظ" aria-label="انتقل لمسار الحفظ">
-                  <span class="material-icons text-sm material-icons-arrow-rtl">arrow_back</span>
+                  <app-icon name="arrow_back" [size]="18"></app-icon>
                 </button>
               </div>
             </div>
@@ -184,7 +187,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
 
           @if (state.students().length > 0) {
           <div class="mt-4 p-4 bg-[var(--color-green-light)] border text-[var(--color-text-primary)] text-xs leading-relaxed flex items-start gap-2" [style.border-color]="'color-mix(in srgb, var(--color-green) 20%, transparent)'">
-            <span class="material-icons text-[var(--color-green)] shrink-0 mt-0.5">lightbulb</span>
+            <span class="shrink-0 mt-0.5"><app-icon name="lightbulb" [size]="18"></app-icon></span>
             <p>
               <strong>فكرة تربوية:</strong> لتشجيع الحفاظ الصغار، يمكن إعطاء جائزة عينية لمرتقي كل مرحلة!
             </p>
@@ -212,7 +215,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
             </p>
             <div class="w-full p-4 bg-[var(--color-canvas)] border border-[var(--color-border-light)] text-right">
               <span class="text-xs text-[var(--color-primary)] font-bold block mb-1.5 flex items-center gap-1">
-                <span class="material-icons text-sm">spa</span>
+                <app-icon name="spa" [size]="18"></app-icon>
                 الدرس والعمل:
               </span>
               <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">{{ hadith.explanation }}</p>

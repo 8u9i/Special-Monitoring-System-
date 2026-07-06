@@ -5,9 +5,11 @@ import { StudentCarouselComponent } from '../../shared/containers/student-carous
 import { StudentStageCardComponent } from '../../shared/containers/student-stage-card.component';
 import { ToastService } from '../../shared/services/toast.service';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-english-trail',
-  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
+  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent, AppIconComponent],
   template: `
     <div class="space-y-6" style="font-family: 'Cause', sans-serif;">
       <app-student-carousel />
@@ -89,14 +91,14 @@ import { ToastService } from '../../shared/services/toast.service';
                     ? 'bg-[var(--color-amber)] text-[var(--color-text-primary)]'
                     : 'btn-outline'"
                   aria-label="مراجعة">
-                  <span class="material-icons text-sm">sync</span>
+                  <app-icon name="sync" [size]="18"></app-icon>
                   مراجعة
                 </button>
                 @if (getUnitStatus(student, unit.unitNumber) !== 'none') {
                 <button (click)="onClearUnit(student.id, unit.unitNumber)"
                   class="btn btn-sm border-[var(--color-rose-light)] bg-[var(--color-surface)] text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]"
                   aria-label="مسح التحديد">
-                  <span class="material-icons text-sm">restart_alt</span>
+                  <app-icon name="restart_alt" [size]="18"></app-icon>
                   مسح
                 </button>
                 }

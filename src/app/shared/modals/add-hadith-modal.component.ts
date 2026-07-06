@@ -5,20 +5,22 @@ import { TrackerState } from '../../state';
 import { ToastService } from '../services/toast.service';
 import { ModalService } from '../services/modal.service';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-add-hadith-modal',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppIconComponent],
   template: `
     @if (modal.showAddHadith()) {
     <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="addHadithTitle" (click)="close()">
       <div class="modal-panel max-w-lg" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
           <h3 id="addHadithTitle" class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-            <span class="material-icons text-[var(--color-primary)]">add_box</span>
+            <app-icon name="add_box" [size]="18"></app-icon>
             إضافة حديث شريف جديد
           </h3>
           <button (click)="modal.showAddHadith.set(false)" class="btn btn-ghost btn-icon" aria-label="إغلاق">
-            <span class="material-icons text-sm">close</span>
+            <app-icon name="close" [size]="18"></app-icon>
           </button>
         </div>
 
@@ -78,7 +80,7 @@ import { ModalService } from '../services/modal.service';
           <div class="flex items-center gap-3 pt-2">
             <button type="submit" [disabled]="form.invalid"
               class="btn btn-primary btn-md flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
-              <span class="material-icons text-sm">check</span>
+              <app-icon name="check" [size]="18"></app-icon>
               إضافة الحديث
             </button>
             <button type="button" (click)="modal.showAddHadith.set(false)"

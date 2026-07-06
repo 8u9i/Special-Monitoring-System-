@@ -1,0 +1,19 @@
+feat: replace Material Icons font with Flaticon PNG icons via <app-icon>
+
+The Material Icons font was rendering as raw text in production (CORS, network
+flakiness, font-feature-settings on Safari). Replaced with a single
+AppIconComponent that renders 31 icons as PNGs from cdn-icons-png.flaticon.com.
+
+- Scoped search via CloakBrowser (Playwright-compatible stealth Chromium) to
+  bypass Flaticon's bot protection.
+- For each Material Icons name, picked the best-matching free Flaticon icon
+  (verified all 31 URLs return HTTP 200).
+- Created AppIconComponent (`<app-icon name="..." [size]="..."></app-icon>`)
+  with OnPush change detection, lazy loading, and async decoding.
+- Mapped 72 <span class="material-icons">name</span> usages across 18 components
+  to the new component, preserving size (text-xs..text-3xl) and wrapper utility
+  classes (shrink-0, mt-0.5, input-icon, etc).
+- Removed Material Icons font from index.html and styles.css.
+- Removed now-unused .mat-icon, .material-icons, .material-icons-arrow-rtl CSS.
+
+Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

@@ -8,9 +8,11 @@ import { CelebrationService } from '../../shared/services/celebration.service';
 import { ApiService } from '../../api.service';
 import { getAvatarEmoji } from '../../shared/constants/avatars';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-stages',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AppIconComponent],
   template: `
     <div class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -47,7 +49,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
             <div class="space-y-2">
               <button (click)="showAddStudent()"
                 class="btn btn-primary btn-md w-full">
-                <span class="material-icons text-sm">person_add</span>
+                <app-icon name="person_add" [size]="18"></app-icon>
                 إضافة طالب جديد
               </button>
               <p class="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed mt-2 p-2 bg-[var(--color-amber-light)] border border-[var(--color-amber)]/30">
@@ -63,7 +65,7 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
           <div class="panel p-5">
             <div class="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-border-light)]">
               <h3 class="font-tajawal text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-                <span class="material-icons text-[var(--color-primary)]">people</span>
+                <app-icon name="people" [size]="18"></app-icon>
                 الطلاب النشطون
               </h3>
               <span class="tag tag-primary">
@@ -109,10 +111,10 @@ import { getAvatarEmoji } from '../../shared/constants/avatars';
                 <div class="flex items-center justify-between pt-2.5 border-t border-[var(--color-border-light)]">
                   <div class="flex gap-1.5">
                     <button (click)="openEditStudent(student)" class="btn btn-ghost btn-icon" title="تعديل" aria-label="تعديل الطالب">
-                      <span class="material-icons text-xs">edit</span>
+                      <app-icon name="edit" [size]="18"></app-icon>
                     </button>
                     <button (click)="onDeleteStudent(student.id, student.name)" class="btn btn-ghost btn-icon hover:text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]" title="حذف" aria-label="حذف الطالب">
-                      <span class="material-icons text-xs">delete</span>
+                      <app-icon name="delete" [size]="18"></app-icon>
                     </button>
                   </div>
                   <div class="flex gap-1.5">

@@ -1,8 +1,11 @@
 import { Component, inject, input } from '@angular/core';
 import { TrackerState, Student } from '../../state';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-student-stage-card',
+    imports: [AppIconComponent],
   template: `
     @let student = this.student();
     @let stage = state.getStudentStage(student);
@@ -41,7 +44,7 @@ import { TrackerState, Student } from '../../state';
           </div>
           } @else {
           <p class="text-xs font-bold text-[var(--color-green)] flex items-center justify-center gap-1">
-            <span class="material-icons text-sm">emoji_events</span>
+            <app-icon name="emoji_events" [size]="18"></app-icon>
             ما شاء الله! وصل لأعلى المراحل
           </p>
           }

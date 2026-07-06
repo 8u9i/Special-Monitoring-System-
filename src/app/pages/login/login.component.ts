@@ -4,16 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
 import { TrackerState } from '../../state';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, AppIconComponent],
   template: `
     <div class="login-wrapper">
       <div class="login-card">
         <!-- Logo / Brand -->
         <div class="login-brand">
           <div class="login-icon">
-            <span class="material-icons text-white text-3xl">eco</span>
+            <app-icon name="eco" [size]="20"></app-icon>
           </div>
           <h1 class="login-title">يا إخوتي</h1>
           <p class="login-subtitle">متابع الحفظ التفاعلي</p>
@@ -24,7 +26,7 @@ import { TrackerState } from '../../state';
           <div class="input-group">
             <label for="username">اسم المستخدم</label>
             <div class="input-wrapper">
-              <span class="material-icons input-icon">person</span>
+              <span class="input-icon"><app-icon name="person" [size]="18"></app-icon></span>
               <input
                 id="username"
                 type="text"
@@ -41,7 +43,7 @@ import { TrackerState } from '../../state';
           <div class="input-group">
             <label for="password">كلمة المرور</label>
             <div class="input-wrapper">
-              <span class="material-icons input-icon">lock</span>
+              <span class="input-icon"><app-icon name="lock" [size]="18"></app-icon></span>
               <input
                 id="password"
                 [type]="showPassword() ? 'text' : 'password'"
@@ -64,7 +66,7 @@ import { TrackerState } from '../../state';
 
           @if (error()) {
             <div class="error-msg">
-              <span class="material-icons">error_outline</span>
+              <app-icon name="error_outline" [size]="18"></app-icon>
               <span>{{ error() }}</span>
             </div>
           }
@@ -74,7 +76,7 @@ import { TrackerState } from '../../state';
               <span class="spinner"></span>
               <span>جاري الدخول...</span>
             } @else {
-              <span class="material-icons">login</span>
+              <app-icon name="login" [size]="18"></app-icon>
               <span>تسجيل الدخول</span>
             }
           </button>
@@ -211,7 +213,7 @@ import { TrackerState } from '../../state';
       font-weight: 500;
     }
 
-    .error-msg .material-icons {
+    .error-msg app-icon {
       font-size: 1.1rem;
     }
 

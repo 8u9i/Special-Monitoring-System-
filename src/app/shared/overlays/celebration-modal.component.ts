@@ -2,8 +2,11 @@ import { Component, inject, HostListener } from '@angular/core';
 import { CelebrationService } from '../services/celebration.service';
 import { getAvatarEmoji } from '../constants/avatars';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-celebration-modal',
+    imports: [AppIconComponent],
   template: `
     @if (celeb.show()) { @let student = celeb.student(); @let stage = celeb.stage();
     <div class="fixed inset-0 bg-black/60 z-55 flex items-center justify-center p-4 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle" (click)="close()">
@@ -40,7 +43,7 @@ import { getAvatarEmoji } from '../constants/avatars';
         <div class="mt-6 w-full">
           <button (click)="celeb.dismiss()"
             class="btn btn-primary btn-md w-full">
-            <span class="material-icons">spa</span>
+            <app-icon name="spa" [size]="18"></app-icon>
             مواصلة رحلة الحفظ
           </button>
         </div>

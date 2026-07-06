@@ -6,9 +6,11 @@ import { Hadith } from '../../hadith-data';
 import { ToastService } from '../../shared/services/toast.service';
 import { ModalService } from '../../shared/services/modal.service';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-reference',
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent],
   template: `
     <div class="space-y-5">
       <div class="panel p-5 flex items-center gap-4">
@@ -20,7 +22,7 @@ import { ModalService } from '../../shared/services/modal.service';
             <option value="quran">سور القرآن الكريم</option>
             <option value="english">المفردات الإنجليزية</option>
           </select>
-          <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] text-lg pointer-events-none icon-expand-more">expand_more</span>
+          <span class="absolute left-3 top-1/2 pointer-events-none icon-expand-more"><app-icon name="expand_more" [size]="18"></app-icon></span>
         </div>
       </div>
 
@@ -35,14 +37,14 @@ import { ModalService } from '../../shared/services/modal.service';
         </div>
         <button (click)="modal.showAddHadith.set(true)"
           class="btn btn-primary btn-md">
-          <span class="material-icons text-sm">add_circle</span>
+          <app-icon name="add_circle" [size]="18"></app-icon>
           إضافة حديث جديد
         </button>
       </div>
 
       <div class="panel p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
         <div class="w-full md:max-w-md relative">
-          <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] text-lg select-none">search</span>
+          <span class="absolute right-3 top-1/2 select-none"><app-icon name="search" [size]="18"></app-icon></span>
           <input type="text" [value]="state.searchQuery()" (input)="onSearchChange($event)"
             placeholder="ابحث برقم الحديث أو الباب أو النص..."
             class="w-full border border-[var(--color-border)] bg-[var(--color-canvas)] pr-10 pl-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] placeholder-[var(--color-text-tertiary)] transition-colors" />
@@ -72,10 +74,10 @@ import { ModalService } from '../../shared/services/modal.service';
               </div>
               <div class="flex items-center gap-1">
                 <button (click)="openEditHadith(hadith)" class="btn btn-ghost btn-icon" title="تعديل" aria-label="تعديل الحديث">
-                  <span class="material-icons text-xs">edit</span>
+                  <app-icon name="edit" [size]="18"></app-icon>
                 </button>
                 <button (click)="onDeleteHadith(hadith.number, hadith.category)" class="btn btn-ghost btn-icon hover:text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]" title="حذف" aria-label="حذف الحديث">
-                  <span class="material-icons text-xs">delete</span>
+                  <app-icon name="delete" [size]="18"></app-icon>
                 </button>
               </div>
             </div>
@@ -86,7 +88,7 @@ import { ModalService } from '../../shared/services/modal.service';
           <div class="border-t border-[var(--color-border-light)] pt-3 flex items-center justify-between">
             <span class="text-[11px] text-[var(--color-text-tertiary)] font-medium">الراوي: {{ hadith.reference }}</span>
             <button (click)="viewInTrail()" class="text-xs font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] flex items-center gap-1 cursor-pointer transition-colors">
-              <span class="material-icons text-sm material-icons-arrow-rtl">arrow_back</span>
+              <app-icon name="arrow_back" [size]="18"></app-icon>
               عرض في المسار
             </button>
           </div>
@@ -137,7 +139,7 @@ import { ModalService } from '../../shared/services/modal.service';
         <div class="panel p-5">
           <div class="flex justify-between items-start mb-3 pb-3 border-b border-[var(--color-border-light)]">
             <h4 class="font-tajawal font-bold text-[var(--color-text-primary)] flex items-center gap-2">
-              <span class="material-icons text-[var(--color-primary)]">list_alt</span>
+              <app-icon name="list_alt" [size]="18"></app-icon>
               الوحدة {{ unit.unitNumber }}
             </h4>
             <span class="text-xs text-[var(--color-text-secondary)]">{{ unit.words.length }} كلمة</span>

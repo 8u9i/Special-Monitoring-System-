@@ -3,12 +3,15 @@ import { TrackerState } from '../../state';
 import { Router } from '@angular/router';
 import { getAvatarEmoji } from '../constants/avatars';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-student-carousel',
+    imports: [AppIconComponent],
   template: `
     <div class="panel p-5">
       <h3 class="font-tajawal text-sm font-bold mb-3 text-[var(--color-text-secondary)] flex items-center gap-2">
-        <span class="material-icons text-[var(--color-primary)] text-lg">psychology</span>
+        <app-icon name="psychology" [size]="18"></app-icon>
         اختر الطالب
       </h3>
       <div class="flex flex-wrap gap-2">

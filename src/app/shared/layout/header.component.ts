@@ -4,14 +4,16 @@ import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ModalService } from '../services/modal.service';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-header',
-  imports: [],
+  imports: [AppIconComponent],
   template: `
     <header class="mb-6 panel p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div class="relative z-10">
         <div class="flex items-center gap-2 mb-2 text-[var(--color-primary)]">
-          <span class="material-icons text-lg">yard</span>
+          <app-icon name="yard" [size]="18"></app-icon>
           <span class="text-[11px] font-bold tracking-widest uppercase">مسيرة التمكين النبوي</span>
         </div>
         <h2 class="font-tajawal text-2xl font-bold text-[var(--color-text-primary)]">
@@ -27,7 +29,7 @@ import { ModalService } from '../services/modal.service';
           (click)="modalService.showAddStudent.set(true)"
           class="btn btn-primary btn-md"
         >
-          <span class="material-icons text-lg">person_add</span>
+          <app-icon name="person_add" [size]="18"></app-icon>
           <span>إضافة طالب</span>
         </button>
       </div>

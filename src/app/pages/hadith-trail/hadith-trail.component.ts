@@ -7,9 +7,11 @@ import { CelebrationService } from '../../shared/services/celebration.service';
 import { StudentCarouselComponent } from '../../shared/containers/student-carousel.component';
 import { StudentStageCardComponent } from '../../shared/containers/student-stage-card.component';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-hadith-trail',
-  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
+  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent, AppIconComponent],
   template: `
     <div class="space-y-6">
       <app-student-carousel />
@@ -41,7 +43,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                   [attr.aria-expanded]="isCategoryExpanded"
                   [attr.aria-controls]="'cat-content-' + group.category"
                   [attr.id]="'cat-btn-' + group.category">
-                  <span class="material-icons text-[var(--color-primary)] text-sm">folder</span>
+                  <app-icon name="folder" [size]="18"></app-icon>
                   <span class="font-bold text-sm flex-1 text-right text-[var(--color-text-primary)]">
                     {{ group.category }}
                   </span>
@@ -93,7 +95,7 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
 
                       <div class="p-3 bg-[var(--color-canvas)] border border-[var(--color-border-light)] mb-4">
                         <span class="text-xs text-[var(--color-primary)] font-bold flex items-center gap-1 mb-1">
-                          <span class="material-icons text-sm">spa</span>
+                          <app-icon name="spa" [size]="18"></app-icon>
                           المعنى المبسط:
                         </span>
                         <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">{{ hadith.explanation }}</p>
@@ -108,21 +110,21 @@ import { StudentStageCardComponent } from '../../shared/containers/student-stage
                             [class]="hadithStatus === 'memorized'
                               ? 'btn btn-primary btn-sm flex items-center justify-center gap-1.5'
                               : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
-                            <span class="material-icons text-sm">check_circle</span>
+                            <app-icon name="check_circle" [size]="18"></app-icon>
                             تم الحفظ
                           </button>
                           <button (click)="setHadithStatus(student.id, hadith.number, 'review')"
                             [class]="hadithStatus === 'review'
                               ? 'btn btn-sm flex items-center justify-center gap-1.5 bg-[var(--color-amber)] text-[var(--color-text-primary)]'
                               : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
-                            <span class="material-icons text-sm">menu_book</span>
+                            <app-icon name="menu_book" [size]="18"></app-icon>
                             قيد المراجعة
                           </button>
                           <button (click)="setHadithStatus(student.id, hadith.number, 'none')"
                             [class]="hadithStatus === 'none'
                               ? 'btn btn-sm flex items-center justify-center gap-1.5 bg-[var(--color-border)] text-[var(--color-text-secondary)]'
                               : 'btn btn-outline btn-sm flex items-center justify-center gap-1.5'">
-                            <span class="material-icons text-sm">restart_alt</span>
+                            <app-icon name="restart_alt" [size]="18"></app-icon>
                             إعادة ضبط
                           </button>
                         </div>

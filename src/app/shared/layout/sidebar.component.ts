@@ -5,18 +5,20 @@ import { AuthService } from '../../auth.service';
 import { ThemeService } from '../services/theme.service';
 import { getAvatarEmoji } from '../constants/avatars';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, AppIconComponent],
   template: `
     <!-- Mobile hamburger bar (visible only on small screens) -->
     <div class="md:hidden flex items-center justify-between p-4 bg-[var(--color-nav)] border-b border-white/[0.04]">
       <button (click)="toggleMenu()" class="text-white/60 hover:text-white transition-colors cursor-pointer border-none" aria-label="فتح القائمة">
-        <span class="material-icons text-2xl">menu</span>
+        <app-icon name="menu" [size]="20"></app-icon>
       </button>
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-[var(--color-primary)] flex items-center justify-center">
-          <span class="material-icons text-white text-sm">eco</span>
+          <app-icon name="eco" [size]="18"></app-icon>
         </div>
         <span class="font-tajawal text-sm font-bold text-white">يا إخوتي</span>
       </div>
@@ -43,14 +45,14 @@ import { getAvatarEmoji } from '../constants/avatars';
       <div class="p-5">
         <div class="flex items-center gap-3 mb-8 pb-6 border-b border-white/[0.06]">
           <div class="w-10 h-10 bg-[var(--color-primary)] flex items-center justify-center">
-            <span class="material-icons text-white text-xl">eco</span>
+            <app-icon name="eco" [size]="18"></app-icon>
           </div>
           <div class="flex-1">
             <h1 class="font-tajawal text-lg font-bold text-white tracking-tight">يا إخوتي</h1>
             <p class="text-xs text-white/40 font-medium">متابع الحفظ التفاعلي</p>
           </div>
           <button (click)="closeMenu()" class="md:hidden text-white/40 hover:text-white transition-colors cursor-pointer border-none" aria-label="إغلاق القائمة">
-            <span class="material-icons">close</span>
+            <app-icon name="close" [size]="18"></app-icon>
           </button>
         </div>
 
@@ -78,7 +80,7 @@ import { getAvatarEmoji } from '../constants/avatars';
         <nav class="space-y-0.5">
           <a (click)="closeMenu()" routerLink="/dashboard" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]" [routerLinkActiveOptions]="{ exact: true }"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">home</span>
+            <app-icon name="home" [size]="18"></app-icon>
             <span>الرئيسية</span>
           </a>
 
@@ -87,17 +89,17 @@ import { getAvatarEmoji } from '../constants/avatars';
           </div>
           <a (click)="closeMenu()" routerLink="/hadith" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">menu_book</span>
+            <app-icon name="menu_book" [size]="18"></app-icon>
             <span>مسار الأحاديث</span>
           </a>
           <a (click)="closeMenu()" routerLink="/quran" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">auto_stories</span>
+            <app-icon name="auto_stories" [size]="18"></app-icon>
             <span>مسار القرآن</span>
           </a>
           <a (click)="closeMenu()" routerLink="/english" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">translate</span>
+            <app-icon name="translate" [size]="18"></app-icon>
             <span>مسار الإنجليزية</span>
           </a>
 
@@ -106,12 +108,12 @@ import { getAvatarEmoji } from '../constants/avatars';
           </div>
           <a (click)="closeMenu()" routerLink="/reference" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">library_books</span>
+            <app-icon name="library_books" [size]="18"></app-icon>
             <span>المناهج التعليمية</span>
           </a>
           <a (click)="closeMenu()" routerLink="/stages" routerLinkActive="bg-[var(--color-nav-active)] text-[var(--color-nav-text)] border-r-2 border-[var(--color-primary)]"
             class="flex items-center gap-3 px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-nav-hover)] hover:text-[var(--color-nav-text)] transition-all text-sm font-medium border-r-2 border-transparent">
-            <span class="material-icons text-xl">manage_accounts</span>
+            <app-icon name="manage_accounts" [size]="18"></app-icon>
             <span>لوحة الإدارة</span>
           </a>
         </nav>
@@ -127,11 +129,11 @@ import { getAvatarEmoji } from '../constants/avatars';
         <button
           (click)="logout()"
           class="flex items-center gap-3 w-full px-4 py-2.5 text-[var(--color-nav-text-muted)] hover:bg-[var(--color-rose-light)] hover:text-[var(--color-rose)] transition-all text-sm font-medium cursor-pointer mb-2 border-none">
-          <span class="material-icons text-xl">logout</span>
+          <app-icon name="logout" [size]="18"></app-icon>
           <span>تسجيل الخروج</span>
         </button>
         <div class="flex items-center gap-3 px-3 py-2 text-[var(--color-nav-text-muted)] text-xs">
-          <span class="material-icons text-sm">verified</span>
+          <app-icon name="verified" [size]="18"></app-icon>
           <span class="font-medium">v1.0 — متابع الحفظ</span>
         </div>
       </div>

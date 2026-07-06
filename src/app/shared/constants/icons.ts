@@ -1,0 +1,37 @@
+export const ICONS: Record<string, string> = {
+  add: 'https://cdn-icons-png.flaticon.com/128/992/992651.png',
+  arrow_back: 'https://cdn-icons-png.flaticon.com/128/3114/3114883.png',
+  auto_stories: 'https://cdn-icons-png.flaticon.com/128/9960/9960119.png',
+  cancel: 'https://cdn-icons-png.flaticon.com/128/490/490880.png',
+  check: 'https://cdn-icons-png.flaticon.com/128/14090/14090503.png',
+  check_circle: 'https://cdn-icons-png.flaticon.com/128/14090/14090503.png',
+  check_circle_outline: 'https://cdn-icons-png.flaticon.com/128/1442/1442912.png',
+  delete: 'https://cdn-icons-png.flaticon.com/128/1214/1214428.png',
+  done_all: 'https://cdn-icons-png.flaticon.com/128/14090/14090371.png',
+  eco: 'https://cdn-icons-png.flaticon.com/128/8909/8909186.png',
+  edit: 'https://cdn-icons-png.flaticon.com/128/1827/1827933.png',
+  emoji_events: 'https://cdn-icons-png.flaticon.com/128/1152/1152912.png',
+  error_outline: 'https://cdn-icons-png.flaticon.com/128/15785/15785504.png',
+  expand_more: 'https://cdn-icons-png.flaticon.com/128/318/318159.png',
+  folder: 'https://cdn-icons-png.flaticon.com/128/3735/3735057.png',
+  groups: 'https://cdn-icons-png.flaticon.com/128/7349/7349821.png',
+  lightbulb: 'https://cdn-icons-png.flaticon.com/128/702/702814.png',
+  lock: 'https://cdn-icons-png.flaticon.com/128/483/483408.png',
+  login: 'https://cdn-icons-png.flaticon.com/128/5264/5264565.png',
+  menu_book: 'https://cdn-icons-png.flaticon.com/128/171/171322.png',
+  military_tech: 'https://cdn-icons-png.flaticon.com/128/2583/2583344.png',
+  park: 'https://cdn-icons-png.flaticon.com/128/829/829180.png',
+  person: 'https://cdn-icons-png.flaticon.com/128/1077/1077114.png',
+  query_stats: 'https://cdn-icons-png.flaticon.com/128/2567/2567943.png',
+  restart_alt: 'https://cdn-icons-png.flaticon.com/128/545/545682.png',
+  spa: 'https://cdn-icons-png.flaticon.com/128/887/887350.png',
+  stars: 'https://cdn-icons-png.flaticon.com/128/1828/1828884.png',
+  sync: 'https://cdn-icons-png.flaticon.com/128/14386/14386943.png',
+  translate: 'https://cdn-icons-png.flaticon.com/128/1375/1375510.png',
+  trending_up: 'https://cdn-icons-png.flaticon.com/128/9345/9345270.png',
+  wb_sunny: 'https://cdn-icons-png.flaticon.com/128/11653/11653452.png',
+};
+
+export function getIconUrl(name: string): string | null {
+  return ICONS[name] ?? null;
+}

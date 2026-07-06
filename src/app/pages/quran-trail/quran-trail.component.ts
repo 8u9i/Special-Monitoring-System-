@@ -4,6 +4,8 @@ import { TrackerState, QURAN_SURAHS, Student } from '../../state';
 import { StudentCarouselComponent } from '../../shared/containers/student-carousel.component';
 import { StudentStageCardComponent } from '../../shared/containers/student-stage-card.component';
 
+import { AppIconComponent } from '../../shared/components/app-icon/app-icon.component';
+
 interface SurahInfo {
   number: number;
   name: string;
@@ -12,7 +14,7 @@ interface SurahInfo {
 
 @Component({
   selector: 'app-quran-trail',
-  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent],
+  imports: [CommonModule, StudentCarouselComponent, StudentStageCardComponent, AppIconComponent],
   template: `
     <div class="space-y-6">
       <app-student-carousel />
@@ -115,13 +117,13 @@ interface SurahInfo {
                         [class]="countMemorizedPages(student, surah) === surah.pagesCount
                           ? 'btn-primary'
                           : 'btn-outline'">
-                        <span class="material-icons text-xs">check_circle_outline</span>
+                        <app-icon name="check_circle_outline" [size]="18"></app-icon>
                         حفظ الكل
                       </button>
                       @if (countMemorizedPages(student, surah) > 0) {
                       <button (click)="onClearAllPages(student.id, surah)"
                         class="btn btn-sm border-[var(--color-rose-light)] bg-[var(--color-surface)] text-[var(--color-rose)] hover:bg-[var(--color-rose-light)]">
-                        <span class="material-icons text-xs">restart_alt</span>
+                        <app-icon name="restart_alt" [size]="18"></app-icon>
                         مسح
                       </button>
                       }
