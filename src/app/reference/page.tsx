@@ -6,6 +6,7 @@ import { useTracker } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { QURAN_SURAHS } from "@/lib/constants";
 import EditHadithModal from "@/components/modals/edit-hadith-modal";
+import AddHadithModal from "@/components/modals/add-hadith-modal";
 import type { Hadith } from "@/lib/types";
 
 type ReferenceSubject = "hadith" | "quran" | "english";
@@ -17,6 +18,7 @@ export default function ReferencePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [editHadith, setEditHadith] = useState<Hadith | null>(null);
+  const [addHadithOpen, setAddHadithOpen] = useState(false);
 
   const uniqueCategories = useMemo(
     () => [...new Set(state.hadiths.map((h) => h.category).filter(Boolean))].sort(),
@@ -65,6 +67,10 @@ export default function ReferencePage() {
                 <option value="all">كل التصنيفات</option>
                 {uniqueCategories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
+              <button className="btn btn-primary btn-sm" onClick={() => setAddHadithOpen(true)}>
+                <AppIcon name="add_box" size={16} />
+                إضافة حديث
+              </button>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -135,6 +141,7 @@ export default function ReferencePage() {
       )}
 
       <EditHadithModal hadith={editHadith} open={!!editHadith} onClose={() => setEditHadith(null)} />
+      <AddHadithModal open={addHadithOpen} onClose={() => setAddHadithOpen(false)} />
     </div>
   );
 }
