@@ -1,15 +1,14 @@
-fix: critical auth bugs causing login-to-401 freeze loop
+fix: populate student progress arrays from DB on load
 
-Three root causes:
-1. Middleware called async validateSession() without await — Promise always
-   truthy, but route-level requireAuth() DID check. Net: pass middleware, fail
-   at route, data load fails, re-renders, infinite loop.
-2. HMAC signature corrupted: String.fromCharCode(...spread Uint8Array) can
-   hit stack limits or silently corrupt bytes. Signature in cookie never
-   matched verifyToken output. Switched to hex encoding.
-3. doLoadAll not wrapped in useCallback — recreated every render. When API
-   calls fail, loaded stays false, effect re-triggers with new identity,
-   causing browser-freezing infinite render loop. Added useCallback +
-   loadedRef guard.
+GET /api/students had every progress array hardcoded to [] — only xp
+was loaded from the students table. This meant all memorization detail
+(which hadiths, surahs, pages, english units) was lost on page reload.
+
+Now queries all four progress tables (student_hadiths, student_surahs,
+student_surah_pages, student_english_progress) in parallel via ANY($1)
+and populates memorized/review arrays correctly per student.
+
+Icons verified: all 49 unique icon names resolve to valid Lucide v0.547.0
+icons. No changes needed.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
