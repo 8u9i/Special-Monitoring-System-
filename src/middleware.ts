@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { validateSession } from "@/lib/auth";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public routes
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
 
   const token = request.cookies.get("__session")?.value || "";
 
-  if (!validateSession(token)) {
+  if (!await validateSession(token)) {
     // API routes return 401
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

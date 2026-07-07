@@ -18,6 +18,18 @@ function getSecret(): string {
   return process.env.COOKIE_SECRET || "dev-secret-change-in-prod";
 }
 
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
 async function createSignedToken(payload: string): Promise<SessionData> {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -30,7 +42,7 @@ async function createSignedToken(payload: string): Promise<SessionData> {
   const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
   return {
     payload: btoa(payload),
-    sig: btoa(String.fromCharCode(...new Uint8Array(sig))),
+    sig: bytesToHex(new Uint8Array(sig)),
   };
 }
 
@@ -43,8 +55,8 @@ async function verifyToken({ payload, sig }: SessionData): Promise<boolean> {
     false,
     ["verify"]
   );
-  const sigBytes = Uint8Array.from(atob(sig), (c) => c.charCodeAt(0));
-  return crypto.subtle.verify("HMAC", key, sigBytes, encoder.encode(atob(payload)));
+  const sigBytes = hexToBytes(sig);
+  return crypto.subtle.verify("HMAC", key, new Uint8Array(sigBytes), encoder.encode(atob(payload)));
 }
 
 export async function createSession(): Promise<string> {

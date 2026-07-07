@@ -103,8 +103,12 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, loaded: false, students: [], hadiths: [], englishUnits: [] }));
   };
 
-  const doLoadAll = async (force = false) => {
-    if (!force && state.loaded) return;
+  const loadedRef = useRef(false);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const doLoadAll = useCallback(async (force = false) => {
+    if (!force && loadedRef.current) return;
     setState((s) => ({ ...s, loading: true }));
     try {
       const [apiStudents, apiHadiths, apiEnglishUnits] = await Promise.all([
@@ -117,12 +121,13 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         students: apiStudents, hadiths: apiHadiths, englishUnits: apiEnglishUnits,
         selectedStudentId: s.selectedStudentId || (apiStudents.length > 0 ? apiStudents[0].id : null),
       }));
+      loadedRef.current = true;
     } catch (err) {
       setState((s) => ({ ...s, loading: false }));
       console.error("doLoadAll error:", err);
       showToast("فشل تحميل البيانات من قاعدة البيانات", "error");
     }
-  };
+  }, [showToast]);
 
   const doSelectStudent = (id: string) => setState((s) => ({ ...s, selectedStudentId: id }));
 
