@@ -83,7 +83,7 @@ export default function LoginPage() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <AppIcon name="lock" size={16} /> : <AppIcon name="lock" size={16} />}
+                {showPassword ? <AppIcon name="visibility_off" size={16} /> : <AppIcon name="visibility" size={16} />}
               </button>
             </div>
           </div>

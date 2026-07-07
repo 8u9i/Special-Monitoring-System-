@@ -194,6 +194,8 @@ export const ICON_MAP: Record<string, string> = {
   translate: "languages",
   trending_up: "trending-up",
   verified: "badge-check",
+  visibility: "eye",
+  visibility_off: "eye-off",
   warning: "circle-alert",
   wb_sunny: "sun",
   yard: "trees",

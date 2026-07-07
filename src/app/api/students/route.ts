@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   if (!process.env.DATABASE_URL) return NextResponse.json([]);
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { rows: students } = await pool.query("SELECT * FROM students ORDER BY name");
     const full = students.map((s: Record<string, unknown>) => ({
@@ -14,11 +17,13 @@ export async function GET() {
     return NextResponse.json(full);
   } catch (err) {
     console.error("GET /api/students error:", err);
-    return NextResponse.json([]);
+    return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { id, name, age, avatar, notes, joinedAt } = await req.json();
     const { rows } = await pool.query(

@@ -120,6 +120,7 @@ export default function Sidebar() {
                       <button
                         className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-none transition-colors ${active ? "bg-nav-active text-primary" : "text-nav-text-muted hover:bg-nav-hover hover:text-nav-text"}`}
                         onClick={() => navTo(item.path)}
+                        aria-current={active ? "page" : undefined}
                       >
                         <AppIcon name={item.icon} size={18} />
                         {item.label}

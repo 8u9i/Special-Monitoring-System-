@@ -91,13 +91,14 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       await api("POST", "/login", { username, password });
       setAuth({ checked: true, authenticated: true, user: username });
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error("doLogin error:", err);
       return { success: false, error: "بيانات الدخول غير صحيحة" };
     }
   };
 
   const doLogout = async () => {
-    await api("POST", "/logout").catch(() => {});
+    await api("POST", "/logout").catch((err) => console.error("doLogout error:", err));
     setAuth({ checked: true, authenticated: false, user: null });
     setState((s) => ({ ...s, loaded: false, students: [], hadiths: [], englishUnits: [] }));
   };
@@ -116,8 +117,9 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         students: apiStudents, hadiths: apiHadiths, englishUnits: apiEnglishUnits,
         selectedStudentId: s.selectedStudentId || (apiStudents.length > 0 ? apiStudents[0].id : null),
       }));
-    } catch {
+    } catch (err) {
       setState((s) => ({ ...s, loading: false }));
+      console.error("doLoadAll error:", err);
       showToast("فشل تحميل البيانات من قاعدة البيانات", "error");
     }
   };
@@ -136,21 +138,33 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
     };
     setState((s) => ({ ...s, students: [...s.students, newStudent], selectedStudentId: newStudent.id }));
-    api("POST", "/students", newStudent).catch(() => showToast("فشل حفظ بيانات الطالب", "error"));
+    api("POST", "/students", newStudent).catch((err) => {
+      console.error("doAddStudent error:", err);
+      showToast("فشل حفظ بيانات الطالب", "error");
+    });
   };
 
   const doUpdateStudent = async (id: string, name: string, age?: number, avatar?: string, notes?: string) => {
+    // Construct payload from function parameters to avoid stale closure state
+    const payload = {
+      id,
+      name: name.trim(),
+      age,
+      avatar: avatar || "avatar-leaf",
+      notes: notes?.trim(),
+      joinedAt: new Date().toISOString().split("T")[0],
+    };
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === id ? { ...st, name: name.trim(), age, avatar: avatar || st.avatar, notes: notes?.trim() } : st) }));
-    const found = state.students.find((st) => st.id === id);
-    if (!found) return;
-    const student = { ...found, name: name.trim(), age, avatar: avatar || found.avatar, notes: notes?.trim() } as Student;
     try {
-      await api("POST", "/students", student);
+      await api("POST", "/students", payload);
       // Recalculate by re-fetching
       const fresh = await api<Student[]>("GET", "/students");
       const updated = fresh.find((s) => s.id === id);
       if (updated) updateXP(id, updated.xp);
-    } catch { showToast("فشل تحديث بيانات الطالب", "error"); }
+    } catch (err) {
+      console.error("doUpdateStudent error:", err);
+      showToast("فشل تحديث بيانات الطالب", "error");
+    }
   };
 
   const doDeleteStudent = async (id: string) => {
@@ -159,7 +173,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       students: s.students.filter((st) => st.id !== id),
       selectedStudentId: s.selectedStudentId === id ? (s.students.length > 1 ? s.students.find((st) => st.id !== id)!.id : null) : s.selectedStudentId,
     }));
-    api("DELETE", `/students/${id}`).catch(() => showToast("فشل حذف الطالب", "error"));
+    api("DELETE", `/students/${id}`).catch((err) => {
+      console.error("doDeleteStudent error:", err);
+      showToast("فشل حذف الطالب", "error");
+    });
   };
 
   const doAddHadith = async (text: string, reference: string, explanation: string, category: string) => {
@@ -179,13 +196,19 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, memorizedHadithNumbers: st.memorizedHadithNumbers.map((n) => n === oldNumber ? newNumber : n), reviewHadithNumbers: st.reviewHadithNumbers.map((n) => n === oldNumber ? newNumber : n) })) }));
     }
     const hadith = state.hadiths.find((h) => h.number === newNumber);
-    if (hadith) api("POST", "/hadiths", hadith).catch(() => showToast("فشل تحديث الحديث", "error"));
+    if (hadith) api("POST", "/hadiths", hadith).catch((err) => {
+      console.error("doUpdateHadith error:", err);
+      showToast("فشل تحديث الحديث", "error");
+    });
     return true;
   };
 
   const doDeleteHadith = async (number: number) => {
     setState((s) => ({ ...s, hadiths: s.hadiths.filter((h) => h.number !== number) }));
-    api("DELETE", `/hadiths/${number}`).catch(() => showToast("فشل حذف الحديث", "error"));
+    api("DELETE", `/hadiths/${number}`).catch((err) => {
+      console.error("doDeleteHadith error:", err);
+      showToast("فشل حذف الحديث", "error");
+    });
   };
 
   const doToggleHadithStatus = async (studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") => {
@@ -207,7 +230,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         const newStage = STAGES.find((s) => computeXP(newSt) >= s.minXP && computeXP(newSt) <= s.maxXP) || STAGES[0];
         if (newStage.level > oldStage.level) setCelebrationState({ show: true, student, stage: newStage });
       }
-    } catch { showToast("فشل تحديث حالة الحديث", "error"); }
+    } catch (err) {
+      console.error("doToggleHadithStatus error:", err);
+      showToast("فشل تحديث حالة الحديث", "error");
+    }
   };
 
   const doToggleSurahStatus = async (studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") => {
@@ -222,7 +248,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     try {
       const r = await api<{ xp: number }>("POST", "/student-surahs", { studentId, surahNumber, status: newStatus });
       updateXP(studentId, r.xp);
-    } catch { showToast("فشل تحديث حالة السورة", "error"); }
+    } catch (err) {
+      console.error("doToggleSurahStatus error:", err);
+      showToast("فشل تحديث حالة السورة", "error");
+    }
   };
 
   const doToggleSurahPageStatus = async (studentId: string, surahNumber: number, pageIndex: number, newStatus: "memorized" | "none") => {
@@ -238,7 +267,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         ? await api<{ xp: number }>("POST", "/student-surah-pages", { studentId, pageId })
         : await api<{ xp: number }>("DELETE", `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
       updateXP(studentId, r.xp);
-    } catch { showToast("فشل تحديث صفحة السورة", "error"); }
+    } catch (err) {
+      console.error("doToggleSurahPageStatus error:", err);
+      showToast("فشل تحديث صفحة السورة", "error");
+    }
   };
 
   const doMarkAllSurahPages = async (studentId: string, surahNumber: number, pageCount: number) => {
@@ -252,10 +284,28 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     }
     if (!changed) return;
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, memorizedSurahPages: memorized } : st) }));
-    let last: Promise<{ xp: number }> = Promise.resolve({ xp: 0 });
-    for (let i = 1; i <= pageCount; i++) last = api<{ xp: number }>("POST", "/student-surah-pages", { studentId, pageId: `${surahNumber}-${i}` }).catch(() => ({ xp: 0 }));
-    const r = await last;
-    updateXP(studentId, r.xp);
+    const results = await Promise.allSettled(
+      Array.from({ length: pageCount }, (_, i) =>
+        api<{ xp: number }>("POST", "/student-surah-pages", { studentId, pageId: `${surahNumber}-${i + 1}` })
+      )
+    );
+    const failures = results.filter((r) => r.status === "rejected").length;
+    if (failures > 0) {
+      console.error(`doMarkAllSurahPages: ${failures}/${pageCount} requests failed`);
+    }
+    // Use the last successful result's XP, or refetch
+    const lastSuccess = results.filter((r) => r.status === "fulfilled").pop();
+    if (lastSuccess && lastSuccess.status === "fulfilled") {
+      updateXP(studentId, lastSuccess.value.xp);
+    } else {
+      try {
+        const fresh = await api<Student[]>("GET", "/students");
+        const updated = fresh.find((s) => s.id === studentId);
+        if (updated) updateXP(studentId, updated.xp);
+      } catch (err) {
+        console.error("doMarkAllSurahPages XP refetch error:", err);
+      }
+    }
   };
 
   const doClearAllSurahPages = async (studentId: string, surahNumber: number, pageCount: number) => {
@@ -264,10 +314,27 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     const memorized = (student.memorizedSurahPages || []).filter((id) => !id.startsWith(surahNumber + "-"));
     if (memorized.length === (student.memorizedSurahPages || []).length) return;
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, memorizedSurahPages: memorized } : st) }));
-    let last: Promise<{ xp: number }> = Promise.resolve({ xp: 0 });
-    for (let i = 1; i <= pageCount; i++) last = api<{ xp: number }>("DELETE", `/student-surah-pages/${studentId}/${surahNumber}-${i}`).catch(() => ({ xp: 0 }));
-    const r = await last;
-    updateXP(studentId, r.xp);
+    const results = await Promise.allSettled(
+      Array.from({ length: pageCount }, (_, i) =>
+        api<{ xp: number }>("DELETE", `/student-surah-pages/${studentId}/${surahNumber}-${i + 1}`)
+      )
+    );
+    const failures = results.filter((r) => r.status === "rejected").length;
+    if (failures > 0) {
+      console.error(`doClearAllSurahPages: ${failures}/${pageCount} requests failed`);
+    }
+    const lastSuccess = results.filter((r) => r.status === "fulfilled").pop();
+    if (lastSuccess && lastSuccess.status === "fulfilled") {
+      updateXP(studentId, lastSuccess.value.xp);
+    } else {
+      try {
+        const fresh = await api<Student[]>("GET", "/students");
+        const updated = fresh.find((s) => s.id === studentId);
+        if (updated) updateXP(studentId, updated.xp);
+      } catch (err) {
+        console.error("doClearAllSurahPages XP refetch error:", err);
+      }
+    }
   };
 
   const doToggleEnglishStatus = async (studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") => {
@@ -282,7 +349,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     try {
       const r = await api<{ xp: number }>("POST", "/student-english-progress", { studentId, unitNumber, status: newStatus });
       updateXP(studentId, r.xp);
-    } catch { showToast("فشل تحديث حالة الوحدة الإنجليزية", "error"); }
+    } catch (err) {
+      console.error("doToggleEnglishStatus error:", err);
+      showToast("فشل تحديث حالة الوحدة الإنجليزية", "error");
+    }
   };
 
   const doCheatUnlockAll = async (studentId: string) => {
@@ -291,14 +361,25 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       if (st.id !== studentId) return st;
       return { ...st, memorizedHadithNumbers: hadiths.map((h) => h.number) };
     }) }));
-    for (const h of hadiths) {
-      await api("POST", "/student-hadiths", { studentId, hadithNumber: h.number, status: "memorized" }).catch(() => {});
+    const results = await Promise.allSettled(
+      hadiths.map((h) =>
+        api("POST", "/student-hadiths", { studentId, hadithNumber: h.number, status: "memorized" })
+      )
+    );
+    const failures = results.filter((r) => r.status === "rejected").length;
+    if (failures > 0) {
+      console.error(`doCheatUnlockAll: ${failures}/${hadiths.length} requests failed`);
+      showToast(`تم فتح ${hadiths.length - failures} من أصل ${hadiths.length} حديث`, "success");
+    } else {
+      showToast("تم فتح كل الأحاديث!", "success");
     }
     try {
-      const r = await api<{ xp: number }>("POST", "/student-hadiths", { studentId, hadithNumber: hadiths[hadiths.length - 1]?.number || 0, status: "memorized" });
-      updateXP(studentId, r.xp);
-    } catch {}
-    showToast("تم فتح كل الأحاديث!", "success");
+      const fresh = await api<Student[]>("GET", "/students");
+      const updated = fresh.find((s) => s.id === studentId);
+      if (updated) updateXP(studentId, updated.xp);
+    } catch (err) {
+      console.error("doCheatUnlockAll XP refetch error:", err);
+    }
   };
 
   const doResetStudentProgress = async (studentId: string) => {
@@ -306,9 +387,14 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       if (st.id !== studentId) return st;
       return { ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 };
     }) }));
-    // We'd need to DELETE all junction rows for this student — batch them
-    for (const h of state.hadiths) {
-      api("DELETE", `/student-hadiths/${studentId}/${h.number}`).catch(() => {});
+    const results = await Promise.allSettled(
+      state.hadiths.map((h) =>
+        api("DELETE", `/student-hadiths/${studentId}/${h.number}`)
+      )
+    );
+    const failures = results.filter((r) => r.status === "rejected").length;
+    if (failures > 0) {
+      console.error(`doResetStudentProgress: ${failures}/${state.hadiths.length} DELETE requests failed`);
     }
     showToast("تم تصفير تقدم الطالب", "success");
   };

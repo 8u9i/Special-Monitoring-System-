@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { validateSession } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   if (!process.env.DATABASE_URL) return NextResponse.json([]);
-  if (!validateSession("")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { rows } = await pool.query("SELECT * FROM hadiths ORDER BY number");
     return NextResponse.json(rows.map((r: Record<string, unknown>) => ({
       number: r.number, text: r.text, reference: r.reference,
       explanation: r.explanation, category: r.category, points: r.points,
     })));
-  } catch { return NextResponse.json([]); }
+  } catch (err) {
+    console.error("GET /api/hadiths error:", err);
+    return NextResponse.json({ error: "Failed to fetch hadiths" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { number, text, reference, explanation, category, points } = await req.json();
     const finalNumber = number || (await pool.query("SELECT COALESCE(MAX(number) + 1, 1) AS nxt FROM hadiths")).rows[0].nxt;

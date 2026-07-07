@@ -1,4 +1,4 @@
-# متابع الحفظ — Hadith Memorization Tracker
+# متابع الحفظ — Special Monitoring System
 
 An interactive, gamified system for tracking the memorization of Prophetic Hadiths, Quran surahs, and English vocabulary. Designed for teachers and halaqa supervisors to monitor student progress with a nature-inspired, hand-drawn aesthetic.
 
@@ -13,19 +13,30 @@ An interactive, gamified system for tracking the memorization of Prophetic Hadit
 
 ## Tech Stack
 
-- Angular 21 (standalone components, signals, SSR)
+- Next.js 16 (App Router, React 19, TypeScript 5)
+- PostgreSQL (via `pg` driver)
 - Tailwind CSS v4
-- Express 5 (SSR server)
-- TypeScript 5.9 (strict mode)
-- Vitest (testing)
-- ESLint + angular-eslint
+- Lucide React (icons)
+- ESLint + TypeScript strict mode
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm
+- PostgreSQL database
+- npm or pnpm
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and configure:
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_USER` | Admin username |
+| `AUTH_PASS` | Admin password |
+| `COOKIE_SECRET` | HMAC-SHA256 signing secret for session tokens |
 
 ### Install & Run
 
@@ -33,24 +44,23 @@ An interactive, gamified system for tracking the memorization of Prophetic Hadit
 # Install dependencies
 npm install
 
-# Start development server (port 3000)
+# Start development server (port 4000)
 npm run dev
 ```
 
 ### Build
 
 ```bash
-# Production build (browser + SSR bundles)
+# Production build
 npm run build
 
-# Serve production SSR
-npm run serve:ssr:app
+# Start production server (port 4000)
+npm start
 ```
 
-### Test & Lint
+### Lint
 
 ```bash
-npm test
 npm run lint
 ```
 
@@ -58,27 +68,36 @@ npm run lint
 
 ```
 src/
-  index.html              # SPA shell
-  main.ts                 # Browser bootstrap
-  main.server.ts          # SSR bootstrap
-  server.ts               # Express SSR server
-  styles.css              # Global styles, Tailwind, theme
   app/
-    app.ts                # Root component (all business logic)
-    app.html              # UI template (~2500 lines)
-    app.css               # Component animations
-    app.routes.ts         # Client routes (empty — tab-based nav)
-    state.ts              # Global state service (Angular Signals)
-    hadith-data.ts        # 40 hardcoded Hadiths + data model
+    api/                   # Next.js API routes (REST endpoints)
+    login/                 # Login page
+    dashboard/             # Main dashboard
+    hadith/                # Hadith tracking
+    quran/                 # Quran tracking
+    english/               # English vocabulary tracking
+    reference/             # Reference materials
+    stages/                # Stage management
+  components/
+    layout/                # Sidebar, layout components
+    app-icon.tsx           # Lucide icon wrapper
+  lib/
+    auth.ts                # HMAC-signed session tokens
+    constants.ts           # Quran surahs, stages, icons, avatars
+    db.ts                  # PostgreSQL connection pool + XP calc
+    tracker-context.tsx     # Global state (React Context)
+    types.ts               # TypeScript interfaces
 ```
 
 ## Data Persistence
 
-All data is stored in the browser's `localStorage`. No backend database is used. Seed data (4 sample students, 40 hadiths) loads on first visit.
+All data is stored in a PostgreSQL database. Session tokens are HMAC-SHA256 signed and validated on every protected API request.
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `GEMINI_API_KEY` | Gemini AI API key (declared but not currently used) |
-| `APP_URL` | Application URL (for self-referential links) |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_USER` | Admin username for login |
+| `AUTH_PASS` | Admin password for login |
+| `COOKIE_SECRET` | Secret key for session token signing (HMAC-SHA256) |
+| `NODE_ENV` | `production` enables Secure cookies |

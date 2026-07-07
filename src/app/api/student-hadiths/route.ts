@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool, { recalculateXP } from "@/lib/db";
-import { validateSession } from "@/lib/auth";
-
-function requireAuth(req: NextRequest): boolean {
-  return validateSession(req.cookies.get("__session")?.value || "");
-}
+import { requireAuth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
-  if (!requireAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { studentId, hadithNumber, status } = await req.json();
     const { rows } = await pool.query(
@@ -18,6 +15,7 @@ export async function POST(req: NextRequest) {
     await pool.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
     return NextResponse.json({ ...rows[0], xp });
   } catch (err) {
+    console.error("POST /api/student-hadiths error:", err);
     return NextResponse.json({ error: "Failed to update hadith status" }, { status: 500 });
   }
 }

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Checkup — نظام المتابعة الخاص</title>
+<style>
+  :root {
+    --bg: #F5F0EB;
+    --surface: #FCFAF7;
+    --border: #DCD4CC;
+    --text: #1C1814;
+    --text-secondary: #6B635C;
+    --text-tertiary: #7A7268;
+    --primary: #D4A23A;
+    --primary-dark: #8B702C;
+    --green: #7DAB7D;
+    --green-bg: #EAF5EA;
+    --amber: #E8C96A;
+    --amber-bg: #FCF5E0;
+    --rose: #D49A9A;
+    --rose-bg: #F8ECEC;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .report {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.75rem;
+    color: var(--primary-dark);
+  }
+  .meta {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+  .score-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  .score-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid var(--border);
+  }
+  .score-label { font-weight: 600; font-size: 0.875rem; }
+  .score-value {
+    font-weight: 800;
+    font-size: 1.125rem;
+    padding: 0.25rem 0.625rem;
+  }
+  .score-green { background: var(--green-bg); color: #3D6B3D; }
+  .score-amber { background: var(--amber-bg); color: #7A6510; }
+  .overall {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    margin: 1.5rem 0;
+  }
+  .overall-score {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #3D6B3D;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  th, td {
+    text-align: right;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  th {
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  td:first-child { font-weight: 600; }
+  .tag {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 2px;
+  }
+  .tag-high { background: var(--rose-bg); color: #C08080; }
+  .tag-med { background: var(--amber-bg); color: #7A6510; }
+  .tag-low { background: var(--green-bg); color: #3D6B3D; }
+  ul, ol { margin: 0.5rem 0 0.5rem 1.25rem; }
+  li { margin-bottom: 0.375rem; font-size: 0.9rem; }
+  p { font-size: 0.9rem; margin-bottom: 0.75rem; }
+  strong { color: var(--text); }
+  code {
+    background: var(--bg);
+    padding: 0.125rem 0.375rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="report">
+
+<h1>Design Checkup Report</h1>
+<p class="meta">
+  <strong>نظام المتابعة الخاص</strong> — يا إخوتي · مسيرة التمكين النبوي<br>
+  Generated: 2026-07-07 &nbsp;|&nbsp; Surface: Product &nbsp;|&nbsp; Register: Product
+</p>
+
+<div class="overall">
+  <div class="overall-score">6.8<span style="font-size:1.25rem;font-weight:600">/10</span></div>
+  <div>
+    <strong>Solid foundation.</strong> Distinctive amber-on-warm-cream palette with strong identity. Motion is the weakest category.<br>
+    <span style="font-size:0.8rem;color:var(--text-secondary)">10 prescriptions — all enhancements, no blockers.</span>
+  </div>
+</div>
+
+<h2>Vitals</h2>
+<div class="score-card">
+  <div class="score-item"><span class="score-label">Color System</span><span class="score-value score-green">8/10</span></div>
+  <div class="score-item"><span class="score-label">Typography</span><span class="score-value score-green">7/10</span></div>
+  <div class="score-item"><span class="score-label">Layout</span><span class="score-value score-green">7/10</span></div>
+  <div class="score-item"><span class="score-label">Motion</span><span class="score-value score-amber">4/10</span></div>
+  <div class="score-item"><span class="score-label">Interaction</span><span class="score-value score-green">6/10</span></div>
+  <div class="score-item"><span class="score-label">Responsive</span><span class="score-value score-green">7/10</span></div>
+  <div class="score-item"><span class="score-label">Accessibility</span><span class="score-value score-green">6/10</span></div>
+  <div class="score-item"><span class="score-label">Surface Quality</span><span class="score-value score-green">7/10</span></div>
+  <div class="score-item"><span class="score-label">Voice / Identity</span><span class="score-value score-green">8/10</span></div>
+  <div class="score-item"><span class="score-label">Dark Mode</span><span class="score-value score-green">8/10</span></div>
+</div>
+
+<h2>Priority Prescriptions</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>Area</th><th>Prescription</th><th>Impact</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Motion</td><td>Add accordion expand/collapse animation (200ms ease-out)</td><td><span class="tag tag-high">High</span></td></tr>
+    <tr><td>2</td><td>Motion</td><td>Add page content fade-in on route change (200ms)</td><td><span class="tag tag-high">High</span></td></tr>
+    <tr><td>3</td><td>Accessibility</td><td>Add <code>aria-current="page"</code> to active nav items</td><td><span class="tag tag-high">High</span></td></tr>
+    <tr><td>4</td><td>Accessibility</td><td>Bump <code>--text-2xs</code> from 0.6875rem to 0.75rem</td><td><span class="tag tag-med">Medium</span></td></tr>
+    <tr><td>5</td><td>Interaction</td><td>Fix password toggle icon (show different icon per state)</td><td><span class="tag tag-med">Medium</span></td></tr>
+    <tr><td>6</td><td>Responsive</td><td>Add scroll-snapping to student carousel</td><td><span class="tag tag-med">Medium</span></td></tr>
+    <tr><td>7</td><td>Responsive</td><td>Bump login input font-size to 1rem on mobile</td><td><span class="tag tag-med">Medium</span></td></tr>
+    <tr><td>8</td><td>Layout</td><td>Make top-student dashboard card visually dominant (span 2 cols)</td><td><span class="tag tag-med">Medium</span></td></tr>
+    <tr><td>9</td><td>Color</td><td>Slightly deepen canvas from <code>#F5F0EB</code> to <code>#F0EAE4</code></td><td><span class="tag tag-low">Low</span></td></tr>
+    <tr><td>10</td><td>Typography</td><td>Differentiate prose line-height (1.8) from UI label line-height (1.5)</td><td><span class="tag tag-low">Low</span></td></tr>
+  </tbody>
+</table>
+
+<h2>Section-by-Section</h2>
+
+<h3>🎨 Color System — 8/10</h3>
+<p>The amber/saffron primary (<code>#D4A23A</code>) on warm cream canvas is a distinctive, intentional choice that avoids the generic blue-purple SaaS reflex. Semantic roles are well-assigned, tag colors have proper text variants, and dark mode is a complete token swap — not a lazy inversion.</p>
+<ul>
+  <li><strong>Consider:</strong> Push amber-secondary slightly toward yellow-gold to distinguish it from amber-primary</li>
+  <li><strong>Consider:</strong> Deepen canvas from <code>#F5F0EB</code> to <code>#F0EAE4</code> for 5% surface distinction</li>
+</ul>
+
+<h3>🔤 Typography — 7/10</h3>
+<p>Tajawal + Amiri + Cause + Inter is a thoughtful domain-appropriate pairing. <code>clamp()</code> on headings is a good responsive choice.</p>
+<ul>
+  <li><strong>Fix:</strong> <code>--text-2xs</code> at 0.6875rem is below the accessibility floor — bump to 0.75rem</li>
+  <li><strong>Consider:</strong> Differentiate prose line-height (1.8) from UI label line-height (1.4-1.5) for scanning efficiency</li>
+  <li><strong>Consider:</strong> Use font-weight 800 for the largest heading level for clearer hierarchy</li>
+</ul>
+
+<h3>📐 Layout — 7/10</h3>
+<p>Composition correctly identifies the dominant work pattern as Monitor. Sidebar + header shell is predictable and efficient. The three learning trails share a consistent accordion + student card pattern.</p>
+<ul>
+  <li><strong>Consider:</strong> Make the top-student card on the dashboard span 2 columns — it's the most emotionally meaningful metric</li>
+  <li><strong>Consider:</strong> Give each learning trail a distinctive entry element (progress ring for quran, daily hadith pull for hadith)</li>
+</ul>
+
+<h3>✨ Motion — 4/10 ⚠️</h3>
+<p><strong>Weakest category.</strong> <code>prefers-reduced-motion</code> is respected and buttons have tactile press feedback, but the motion system is nearly absent.</p>
+<ul>
+  <li><strong>Add:</strong> Accordion expand/collapse animation — 200ms ease-out height transition</li>
+  <li><strong>Add:</strong> Page content fade-in on route change — 200ms, 50ms delay</li>
+  <li><strong>Add:</strong> List entrance stagger — 20ms per-item delay on first render</li>
+</ul>
+
+<h3>🖱️ Interaction — 6/10</h3>
+<p>Hover, focus, active, disabled, loading, and empty states are all handled. Escape key and backdrop-click dismiss modals.</p>
+<ul>
+  <li><strong>Fix:</strong> Password toggle shows the same <code>lock</code> icon for both states — use visibility/visibility_off</li>
+  <li><strong>Add:</strong> Skeleton/placeholder states during loading</li>
+  <li><strong>Add:</strong> Brief pulse animation on status toggle confirmation (300ms scale)</li>
+</ul>
+
+<h3>📱 Responsive — 7/10</h3>
+<p>Grid breakpoints well-chosen, mobile sidebar with RTL-aware slide-in, touch targets ≥44px, <code>viewport-fit=cover</code> set.</p>
+<ul>
+  <li><strong>Add:</strong> Scroll-snapping to student carousel for mobile polish</li>
+  <li><strong>Fix:</strong> Login input font-size (14px) triggers iOS zoom — bump to 1rem on mobile</li>
+</ul>
+
+<h3>♿ Accessibility — 6/10</h3>
+<p>RTL layout, <code>focus-visible</code> outlines, <code>aria-expanded</code>, <code>aria-modal</code>, and Escape handlers are all present.</p>
+<ul>
+  <li><strong>Add:</strong> <code>aria-current="page"</code> to active sidebar navigation items</li>
+  <li><strong>Add:</strong> <code>role="listbox"</code> + <code>aria-selected</code> to student carousel</li>
+  <li><strong>Add:</strong> Skip-to-content link</li>
+  <li><strong>Verify:</strong> Tag amber text contrast at 0.6875rem size</li>
+</ul>
+
+<h3>🧩 Surface Quality — 7/10</h3>
+<p>Well-structured component hierarchy: panel, button, tag, badge, progress, empty-state, modal, input — all using design tokens, no hardcoded colors.</p>
+<ul>
+  <li><strong>Consider:</strong> A 2px border-radius on buttons and inputs to soften the zero-radius aesthetic</li>
+  <li><strong>Consider:</strong> Abstract the hadith/quran accordion into a reusable <code>&lt;AccordionList&gt;</code></li>
+</ul>
+
+<h3>🎙️ Voice / Identity — 8/10</h3>
+<p>Strong authentic identity. "يا إخوتي" carries warmth, the leaf/sprout icon symbolizes growth, the بسملة grounds the app in its context, educational nudges are phrased warmly.</p>
+<ul>
+  <li><strong>Consider:</strong> Remove "v1.0 — متابع الحفظ" from sidebar footer — feels like dev cruft</li>
+</ul>
+
+<h3>🌙 Dark Mode — 8/10</h3>
+<p>Complete token swap, <code>prefers-color-scheme</code> + manual override, dark canvas is genuinely dark, text contrast well-considered. No issues.</p>
+
+</div>
+</body>
+</html>

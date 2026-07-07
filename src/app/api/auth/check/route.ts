@@ -5,7 +5,7 @@ import { validateSession } from "@/lib/auth";
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("__session")?.value || "";
-    return NextResponse.json({ authenticated: validateSession(token) });
+    return NextResponse.json({ authenticated: await validateSession(token) });
   } catch {
     return NextResponse.json({ authenticated: false });
   }
