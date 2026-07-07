@@ -1,5 +1,6 @@
 "use client";
 
+import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import AppIcon from "@/components/app-icon";
 
@@ -12,22 +13,39 @@ const ROUTE_DATA: Record<string, { title: string; subtitle: string }> = {
   stages: { title: "لوحة الإدارة", subtitle: "إدارة الطلاب ومتابعة التقدم" },
 };
 
-export default function Header({ onAddStudent }: { onAddStudent: () => void }) {
+interface Props {
+  onAddStudent: () => void;
+  onToggleMobileMenu?: () => void;
+  mobileMenuOpen?: boolean;
+  mobileMenu?: ReactNode;
+}
+
+export default function Header({ onAddStudent, onToggleMobileMenu, mobileMenuOpen, mobileMenu }: Props) {
   const pathname = usePathname();
   const route = ROUTE_DATA[pathname.split("/")[1] || "dashboard"] || ROUTE_DATA.dashboard;
 
   return (
-    <header className="sticky top-0 z-30 bg-surface-elevated border-b border-border p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-text-primary font-tajawal">{route.title}</h1>
-          <p className="text-sm text-text-secondary">{route.subtitle}</p>
-        </div>
-        <button className="btn btn-primary btn-md" onClick={onAddStudent} title="إضافة طالب" aria-label="إضافة طالب">
-          <AppIcon name="person_add" size={18} />
-          <span className="hidden sm:inline">إضافة طالب</span>
+    <header className="sticky top-0 z-30 bg-surface-elevated border-b border-border p-4 flex items-center gap-3 relative">
+      {onToggleMobileMenu && (
+        <button
+          className="btn btn-icon btn-ghost lg:hidden"
+          onClick={onToggleMobileMenu}
+          aria-label="القائمة"
+          aria-expanded={mobileMenuOpen}
+          aria-haspopup="menu"
+        >
+          <AppIcon name={mobileMenuOpen ? "close" : "menu"} size={24} />
         </button>
+      )}
+      <div className="flex-1 min-w-0">
+        <h1 className="text-lg font-bold text-text-primary font-tajawal">{route.title}</h1>
+        <p className="text-sm text-text-secondary">{route.subtitle}</p>
       </div>
+      <button className="btn btn-primary btn-md" onClick={onAddStudent} title="إضافة طالب" aria-label="إضافة طالب">
+        <AppIcon name="person_add" size={18} />
+        <span className="hidden sm:inline">إضافة طالب</span>
+      </button>
+      {mobileMenu}
     </header>
   );
 }
