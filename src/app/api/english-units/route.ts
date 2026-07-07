@@ -19,3 +19,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch english units" }, { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  if (!(await requireAuth(req)))
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const client = await pool.connect();
+  try {
+    const { unitNumber, words } = await req.json();
+    if (!Array.isArray(words) || words.length === 0) {
+      return NextResponse.json({ error: "Unit must contain at least one word" }, { status: 400 });
+    }
+    const finalUnitNumber = unitNumber || (
+      await client.query("SELECT COALESCE(MAX(unit_number) + 1, 1) AS nxt FROM english_unit_words")
+    ).rows[0].nxt;
+    await client.query("BEGIN");
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      await client.query(
+        "INSERT INTO english_unit_words (unit_number, word_index, word, definition) VALUES ($1, $2, $3, $4)",
+        [finalUnitNumber, i + 1, w.word, w.definition]
+      );
+    }
+    await client.query("COMMIT");
+    return NextResponse.json({ unitNumber: finalUnitNumber, words });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("POST /api/english-units error:", err);
+    return NextResponse.json({ error: "Failed to save english unit" }, { status: 500 });
+  } finally {
+    client.release();
+  }
+}

@@ -7,18 +7,21 @@ import AppIcon from "@/components/app-icon";
 import { QURAN_SURAHS } from "@/lib/constants";
 import EditHadithModal from "@/components/modals/edit-hadith-modal";
 import AddHadithModal from "@/components/modals/add-hadith-modal";
-import type { Hadith } from "@/lib/types";
+import EnglishUnitModal from "@/components/modals/english-unit-modal";
+import type { Hadith, EnglishUnitWithWords } from "@/lib/types";
 
 type ReferenceSubject = "hadith" | "quran" | "english";
 
 export default function ReferencePage() {
-  const { state, selectStudent, deleteHadith, confirm } = useTracker();
+  const { state, selectStudent, deleteHadith, deleteEnglishUnit, confirm } = useTracker();
   const router = useRouter();
   const [subject, setSubject] = useState<ReferenceSubject>("hadith");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [editHadith, setEditHadith] = useState<Hadith | null>(null);
   const [addHadithOpen, setAddHadithOpen] = useState(false);
+  const [editEnglishUnit, setEditEnglishUnit] = useState<EnglishUnitWithWords | null>(null);
+  const [addEnglishUnitOpen, setAddEnglishUnitOpen] = useState(false);
 
   const uniqueCategories = useMemo(
     () => [...new Set(state.hadiths.map((h) => h.category).filter(Boolean))].sort(),
@@ -37,6 +40,10 @@ export default function ReferencePage() {
 
   const handleDeleteHadith = (number: number) => {
     confirm.ask("هل أنت متأكد من حذف هذا الحديث؟", () => deleteHadith(number));
+  };
+
+  const handleDeleteEnglishUnit = (unitNumber: number) => {
+    confirm.ask("هل أنت متأكد من حذف هذه الوحدة؟ سيتم حذف كل الكلمات داخلها.", () => deleteEnglishUnit(unitNumber));
   };
 
   return (
@@ -116,14 +123,30 @@ export default function ReferencePage() {
 
       {subject === "english" && (
         <div className="panel p-6">
-          <div className="panel-header"><h3 className="panel-title"><span className="panel-title-icon">🔤</span> وحدات الإنجليزية</h3></div>
+          <div className="panel-header">
+            <h3 className="panel-title"><span className="panel-title-icon">🔤</span> وحدات الإنجليزية</h3>
+            <button className="btn btn-primary btn-sm" onClick={() => setAddEnglishUnitOpen(true)}>
+              <AppIcon name="add_box" size={16} />
+              إضافة وحدة
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {state.englishUnits.map((unit) => (
               <div key={unit.unitNumber} className="panel bg-canvas p-4">
-                <h4 className="font-bold text-sm text-text-primary mb-3 flex items-center gap-2">
-                  <AppIcon name="list_alt" size={16} className="text-primary" />
-                  الوحدة {unit.unitNumber}
-                </h4>
+                <div className="flex items-start justify-between mb-3">
+                  <h4 className="font-bold text-sm text-text-primary flex items-center gap-2">
+                    <AppIcon name="list_alt" size={16} className="text-primary" />
+                    الوحدة {unit.unitNumber}
+                  </h4>
+                  <div className="flex gap-1">
+                    <button className="btn btn-icon btn-ghost" title="تعديل" onClick={() => setEditEnglishUnit(unit)}>
+                      <AppIcon name="edit" size={16} />
+                    </button>
+                    <button className="btn btn-icon btn-ghost" title="حذف" onClick={() => handleDeleteEnglishUnit(unit.unitNumber)}>
+                      <AppIcon name="delete" size={16} />
+                    </button>
+                  </div>
+                </div>
                 <div className="space-y-1">
                   {unit.words.map((w, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
@@ -142,6 +165,7 @@ export default function ReferencePage() {
 
       <EditHadithModal hadith={editHadith} open={!!editHadith} onClose={() => setEditHadith(null)} />
       <AddHadithModal open={addHadithOpen} onClose={() => setAddHadithOpen(false)} />
+      <EnglishUnitModal unit={editEnglishUnit} open={!!editEnglishUnit || addEnglishUnitOpen} onClose={() => { setEditEnglishUnit(null); setAddEnglishUnitOpen(false); }} />
     </div>
   );
 }

@@ -47,6 +47,9 @@ interface TrackerContextType {
   addHadith: (text: string, reference: string, explanation: string, category: string) => Promise<void>;
   updateHadith: (oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string) => Promise<boolean>;
   deleteHadith: (number: number) => Promise<void>;
+  addEnglishUnit: (words: { word: string; definition: string }[]) => Promise<void>;
+  updateEnglishUnit: (unitNumber: number, words: { word: string; definition: string }[]) => Promise<void>;
+  deleteEnglishUnit: (unitNumber: number) => Promise<void>;
   toggleHadithStatus: (studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") => Promise<void>;
   toggleSurahStatus: (studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") => Promise<void>;
   toggleSurahPageStatus: (studentId: string, surahNumber: number, pageIndex: number, newStatus: "memorized" | "none") => Promise<void>;
@@ -214,6 +217,52 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       console.error("doDeleteHadith error:", err);
       showToast("فشل حذف الحديث", "error");
     });
+  };
+
+  const doAddEnglishUnit = async (words: { word: string; definition: string }[]) => {
+    const cleanWords = words.filter((w) => w.word.trim() && w.definition.trim());
+    if (cleanWords.length === 0) return;
+    try {
+      const saved = await api<EnglishUnitWithWords>("POST", "/english-units", { words: cleanWords });
+      setState((s) => ({ ...s, englishUnits: [...s.englishUnits, saved] }));
+    } catch (e) { showToast(`فشل حفظ الوحدة: ${(e as Error).message}`, "error"); }
+  };
+
+  const doUpdateEnglishUnit = async (unitNumber: number, words: { word: string; definition: string }[]) => {
+    const cleanWords = words.filter((w) => w.word.trim() && w.definition.trim());
+    if (cleanWords.length === 0) return;
+    setState((s) => ({ ...s, englishUnits: s.englishUnits.map((u) => u.unitNumber === unitNumber ? { ...u, words: cleanWords } : u) }));
+    try {
+      await api("PUT", `/english-units/${unitNumber}`, { words: cleanWords });
+    } catch (err) {
+      console.error("doUpdateEnglishUnit error:", err);
+      showToast("فشل تحديث الوحدة", "error");
+    }
+  };
+
+  const doDeleteEnglishUnit = async (unitNumber: number) => {
+    setState((s) => ({
+      ...s,
+      englishUnits: s.englishUnits.filter((u) => u.unitNumber !== unitNumber),
+      students: s.students.map((st) => ({
+        ...st,
+        memorizedEnglishUnits: st.memorizedEnglishUnits.filter((n) => n !== unitNumber),
+        reviewEnglishUnits: st.reviewEnglishUnits.filter((n) => n !== unitNumber),
+      })),
+    }));
+    try {
+      await api("DELETE", `/english-units/${unitNumber}`);
+      try {
+        const fresh = await api<Student[]>("GET", "/students");
+        const updated = fresh.find((s) => s.id === state.selectedStudentId);
+        if (updated) updateXP(updated.id, updated.xp);
+      } catch (err) {
+        console.error("doDeleteEnglishUnit XP refetch error:", err);
+      }
+    } catch (err) {
+      console.error("doDeleteEnglishUnit error:", err);
+      showToast("فشل حذف الوحدة", "error");
+    }
   };
 
   const doToggleHadithStatus = async (studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") => {
@@ -425,6 +474,7 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     login: doLogin, logout: doLogout, loadAll: doLoadAll, selectStudent: doSelectStudent,
     addStudent: doAddStudent, updateStudent: doUpdateStudent, deleteStudent: doDeleteStudent,
     addHadith: doAddHadith, updateHadith: doUpdateHadith, deleteHadith: doDeleteHadith,
+    addEnglishUnit: doAddEnglishUnit, updateEnglishUnit: doUpdateEnglishUnit, deleteEnglishUnit: doDeleteEnglishUnit,
     toggleHadithStatus: doToggleHadithStatus, toggleSurahStatus: doToggleSurahStatus,
     toggleSurahPageStatus: doToggleSurahPageStatus, markAllSurahPages: doMarkAllSurahPages,
     clearAllSurahPages: doClearAllSurahPages, toggleEnglishStatus: doToggleEnglishStatus,
