@@ -1,19 +1,17 @@
-feat: replace Material Icons font with Flaticon PNG icons via <app-icon>
+feat: use lucide-angular for icons (replaces broken inline-SVG attempt)
 
-The Material Icons font was rendering as raw text in production (CORS, network
-flakiness, font-feature-settings on Safari). Replaced with a single
-AppIconComponent that renders 31 icons as PNGs from cdn-icons-png.flaticon.com.
+The previous attempt used inline SVG strings with bypassSecurityTrustHtml, but
+the source data was repeatedly corrupted. Switched to the official
+lucide-angular package (1.0.0) which supports Angular 21 and ships 1705+
+icons. The user provided the icon mapping.
 
-- Scoped search via CloakBrowser (Playwright-compatible stealth Chromium) to
-  bypass Flaticon's bot protection.
-- For each Material Icons name, picked the best-matching free Flaticon icon
-  (verified all 31 URLs return HTTP 200).
-- Created AppIconComponent (`<app-icon name="..." [size]="..."></app-icon>`)
-  with OnPush change detection, lazy loading, and async decoding.
-- Mapped 72 <span class="material-icons">name</span> usages across 18 components
-  to the new component, preserving size (text-xs..text-3xl) and wrapper utility
-  classes (shrink-0, mt-0.5, input-icon, etc).
-- Removed Material Icons font from index.html and styles.css.
-- Removed now-unused .mat-icon, .material-icons, .material-icons-arrow-rtl CSS.
+- Installed lucide-angular@1.0.0
+- src/app/shared/constants/icons.ts: maps our internal names to Lucide names
+  (e.g. add -> plus, eco -> leaf, emoji_events -> trophy)
+- src/app/shared/components/app-icon/app-icon.component.ts: now renders
+  <lucide-angular> with size, color, strokeWidth, aria-label/role
+- Registers only the 30 icons we use via LucideAngularModule.pick()
+- All sizes, colors, and ARIA wiring preserved
+- Build clean
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
