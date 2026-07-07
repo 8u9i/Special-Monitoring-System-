@@ -1,14 +1,8 @@
-fix: populate student progress arrays from DB on load
+fix: split student-surah-pages catch-all route for POST vs DELETE
 
-GET /api/students had every progress array hardcoded to [] — only xp
-was loaded from the students table. This meant all memorization detail
-(which hadiths, surahs, pages, english units) was lost on page reload.
-
-Now queries all four progress tables (student_hadiths, student_surahs,
-student_surah_pages, student_english_progress) in parallel via ANY($1)
-and populates memorized/review arrays correctly per student.
-
-Icons verified: all 49 unique icon names resolve to valid Lucide v0.547.0
-icons. No changes needed.
+[...rest] catch-all requires at least one path segment, but the client
+POSTs to /api/student-surah-pages with no segments. Split into:
+- route.ts: handles POST (no path segments)
+- [...rest]/route.ts: handles DELETE with [studentId, pageId] segments
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
