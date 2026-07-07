@@ -1,8 +1,0 @@
-fix: resolve Lucide icons by converting kebab-case to PascalCase
-
-lucide-react's icons object uses PascalCase keys (BookOpen, House), but
-ICON_MAP resolves to kebab-case (book-open, house). The lookup was
-silently failing — IconComp was undefined, returned null, rendered
-empty boxes. Added kebabToPascal conversion before lookup.
-
-Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
