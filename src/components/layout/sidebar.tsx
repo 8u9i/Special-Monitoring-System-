@@ -72,7 +72,7 @@ export default function Sidebar() {
       {mobileOpen && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 right-0 z-50 h-full w-64 bg-nav text-nav-text flex flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}>
+      <aside className={`fixed top-0 start-0 z-50 h-full w-64 bg-nav text-nav-text flex flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}>
         {/* Brand */}
         <div className="flex items-center justify-between p-4 border-b border-nav-active">
           <div className="flex items-center gap-2">

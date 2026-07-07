@@ -218,6 +218,7 @@ body {
 .btn-sm { padding: 0.5rem 0.75rem; font-size: 0.8125rem; min-height: 36px; }
 .btn-md { padding: 0.625rem 1.25rem; font-size: 0.875rem; }
 .btn-icon { width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.btn-icon-sm { width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; }
 .btn-lg { padding: 0.85rem 1.5rem; font-size: 1rem; min-height: 48px; }
 
 .tag {
@@ -337,7 +338,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 [dir="rtl"] .progress-fill { float: right; }
 [dir="rtl"] .icon-arrow-back { transform: scaleX(-1); }
-[dir="rtl"] .icon-expand-more { transform: rotate(180deg); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -346,4 +346,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     transition-duration: 0.01ms !important;
   }
   .animate-fade-in { animation: none; opacity: 1; }
+}
+
+@media (max-width: 639px) {
+  .input-field { font-size: 1rem; }
 }

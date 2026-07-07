@@ -67,8 +67,8 @@ export default function ReferencePage() {
             <h3 className="panel-title"><span className="panel-title-icon">📚</span> الأحاديث النبوية</h3>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary"><AppIcon name="search" size={14} /></span>
-                <input className="input-field pr-8 text-sm" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الأحاديث..." />
+                <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary"><AppIcon name="search" size={14} /></span>
+                <input className="input-field pe-8 text-sm" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الأحاديث..." />
               </div>
               <select className="input-field text-sm" style={{ width: "auto" }} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                 <option value="all">كل التصنيفات</option>
@@ -97,7 +97,8 @@ export default function ReferencePage() {
                   className="btn btn-ghost btn-sm mt-3 text-primary flex items-center gap-1"
                   onClick={() => { selectStudent(state.students[0]?.id || ""); router.push("/hadith"); }}
                 >
-                  <AppIcon name="arrow_back" size={14} /> عرض في المسار
+                  <span className="icon-arrow-back"><AppIcon name="arrow_back" size={14} /></span>
+                  عرض في المسار
                 </button>
               </div>
             ))}

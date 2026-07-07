@@ -62,11 +62,11 @@ export default function HadithTrailPage() {
                     <div key={group.category} className={`border transition-all ${isCategoryExpanded ? "border-primary" : "border-border-light"}`}>
                       <button
                         onClick={() => toggleCategory(group.category)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors ${isCategoryExpanded ? "bg-primary-light" : "hover:bg-canvas"}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-start cursor-pointer transition-colors ${isCategoryExpanded ? "bg-primary-light" : "hover:bg-canvas"}`}
                         aria-expanded={isCategoryExpanded}
                       >
                         <AppIcon name="folder" size={18} />
-                        <span className="font-bold text-sm flex-1 text-right text-text-primary">{group.category}</span>
+                        <span className="font-bold text-sm flex-1 text-start text-text-primary">{group.category}</span>
                         <span className="tag tag-primary">{group.hadiths.length}</span>
                         <AppIcon name="expand_more" size={16} className={`text-text-tertiary transition-transform ${isCategoryExpanded ? "rotate-180" : ""}`} />
                       </button>
@@ -79,11 +79,11 @@ export default function HadithTrailPage() {
                               <div key={hadith.number} className="border-b border-border-light last:border-b-0">
                                 <button
                                   onClick={() => toggleHadith(hadith.number)}
-                                  className={`w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors ${isExpanded ? "bg-surface" : "hover:bg-surface"}`}
+                                  className={`w-full flex items-center gap-3 px-4 py-3 text-start cursor-pointer transition-colors ${isExpanded ? "bg-surface" : "hover:bg-surface"}`}
                                   aria-expanded={isExpanded}
                                 >
                                   <span className={`badge-number ${status === "memorized" ? "badge-number-memorized" : status === "review" ? "badge-number-review" : "badge-number-none"}`}>{idx + 1}</span>
-                                  <span className={`font-bold text-sm flex-1 truncate text-right ${status !== "none" ? "text-text-primary" : "text-text-secondary"}`}>الحديث {idx + 1}</span>
+                                  <span className={`font-bold text-sm flex-1 truncate text-start ${status !== "none" ? "text-text-primary" : "text-text-secondary"}`}>الحديث {idx + 1}</span>
                                   <AppIcon name="expand_more" size={16} className={`text-text-tertiary transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                                 </button>
                                 {isExpanded && (

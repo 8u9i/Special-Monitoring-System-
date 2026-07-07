@@ -56,7 +56,7 @@ export default function QuranTrailPage() {
                   <span className="text-2xl font-bold text-primary">{quranProgress.percentage}%</span>
                 </div>
               </div>
-              <div className="flex-1 text-center sm:text-right">
+              <div className="flex-1 text-center sm:text-start">
                 <h3 className="font-tajawal text-lg font-bold text-text-primary mb-2">حفظ <span className="text-primary">{quranProgress.totalMemorized}</span> من 114 سورة</h3>
                 <div className="w-full h-3 bg-canvas overflow-hidden"><div className="progress-fill-green" style={{ width: `${quranProgress.percentage}%` }} /></div>
               </div>
@@ -77,7 +77,7 @@ export default function QuranTrailPage() {
                     const pagesCount = surah.pagesCount || 1;
                     return (
                       <div key={surah.number} className={`border transition-all ${isExpanded ? "border-primary" : "border-border-light"}`}>
-                        <button onClick={() => toggleSurah(surah.number)} className={`w-full flex items-center gap-3 px-4 py-3 text-right cursor-pointer transition-colors ${isExpanded ? "bg-primary-light" : "hover:bg-canvas"}`}>
+                        <button onClick={() => toggleSurah(surah.number)} className={`w-full flex items-center gap-3 px-4 py-3 text-start cursor-pointer transition-colors ${isExpanded ? "bg-primary-light" : "hover:bg-canvas"}`}>
                           <span className={`badge-number ${surahStatus === "memorized" ? "badge-number-memorized" : surahStatus === "review" ? "badge-number-review" : "badge-number-none"}`}>{surah.number}</span>
                           <span className="font-bold text-sm flex-1 text-text-primary">{surah.name}</span>
                           {surah.pagesCount && <span className="text-2xs text-text-tertiary">{countMemorizedPages(surah.number)}/{surah.pagesCount} صفحة</span>}

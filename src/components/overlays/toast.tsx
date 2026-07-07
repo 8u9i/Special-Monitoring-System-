@@ -8,7 +8,7 @@ export default function Toast() {
   if (!toast.message) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-[60] animate-fade-in">
+    <div className="fixed bottom-6 start-6 z-[60] animate-fade-in max-w-[calc(100vw-3rem)]">
       <button
         className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold shadow-lg border ${toast.type === "success" ? "bg-green-light border-green text-tag-green-text" : "bg-rose-light border-rose text-rose"}`}
         onClick={() => toast.show("")}

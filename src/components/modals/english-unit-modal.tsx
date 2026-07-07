@@ -108,27 +108,27 @@ export default function EnglishUnitModal({ unit, open, onClose }: Props) {
               </button>
             </div>
 
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="space-y-2 max-h-96 overflow-y-auto pe-1">
               {rows.map((row, i) => (
-                <div key={i} className="flex items-start gap-2 p-2 bg-canvas border border-border-light">
-                  <div className="flex flex-col gap-1 pt-2">
+                <div key={i} className="flex items-stretch gap-2 p-3 bg-canvas border border-border-light">
+                  <div className="flex flex-col shrink-0">
                     <button
-                      className="btn btn-icon btn-ghost"
-                      style={{ width: 24, height: 24, minHeight: 24 }}
+                      className="btn btn-icon-sm btn-ghost"
                       onClick={() => moveRow(i, -1)}
                       disabled={i === 0}
                       title="رفع"
+                      aria-label="رفع الكلمة"
                     >
-                      <AppIcon name="arrow_upward" size={12} />
+                      <AppIcon name="arrow_upward" size={14} />
                     </button>
                     <button
-                      className="btn btn-icon btn-ghost"
-                      style={{ width: 24, height: 24, minHeight: 24 }}
+                      className="btn btn-icon-sm btn-ghost"
                       onClick={() => moveRow(i, 1)}
                       disabled={i === rows.length - 1}
                       title="إنزال"
+                      aria-label="إنزال الكلمة"
                     >
-                      <AppIcon name="arrow_downward" size={12} />
+                      <AppIcon name="arrow_downward" size={14} />
                     </button>
                   </div>
                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -147,15 +147,17 @@ export default function EnglishUnitModal({ unit, open, onClose }: Props) {
                       placeholder="التعريف / المعنى"
                     />
                   </div>
-                  <button
-                    className="btn btn-icon btn-ghost"
-                    style={{ width: 32, height: 32, minHeight: 32 }}
-                    onClick={() => removeRow(i)}
-                    disabled={rows.length === 1}
-                    title="حذف"
-                  >
-                    <AppIcon name="delete" size={14} />
-                  </button>
+                  <div className="flex items-stretch shrink-0">
+                    <button
+                      className="btn btn-icon btn-ghost"
+                      onClick={() => removeRow(i)}
+                      disabled={rows.length === 1}
+                      title="حذف"
+                      aria-label="حذف الكلمة"
+                    >
+                      <AppIcon name="delete" size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

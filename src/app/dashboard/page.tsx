@@ -119,7 +119,7 @@ export default function DashboardPage() {
               <span className="text-2xl font-bold text-primary">{quranProgress.percentage}%</span>
             </div>
           </div>
-          <div className="flex-1 text-center sm:text-right">
+          <div className="flex-1 text-center sm:text-start">
             <div className="flex items-center gap-2 mb-2">
               <AppIcon name="auto_stories" size={18} />
               <h3 className="font-tajawal text-lg font-bold text-text-primary">تقدم حفظ القرآن الكريم</h3>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                   &ldquo;{hadithOfTheDay.text}&rdquo;
                 </p>
                 <p className="text-xs text-text-secondary mb-4">الراوي: {hadithOfTheDay.reference}</p>
-                <div className="w-full p-4 bg-canvas border border-border-light text-right">
+                <div className="w-full p-4 bg-canvas border border-border-light text-start">
                   <span className="text-xs text-primary font-bold block mb-1.5 flex items-center gap-1">
                     <AppIcon name="spa" size={18} /> الدرس والعمل:
                   </span>
