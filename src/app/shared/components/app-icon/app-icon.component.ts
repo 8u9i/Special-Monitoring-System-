@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, ModuleWithProviders, Provider } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ModuleWithProviders } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import {
   Plus, ArrowLeft, BookOpen, CircleX, Check, CircleCheckBig, CircleCheck,
@@ -8,18 +8,25 @@ import {
 } from 'lucide-angular';
 import { getLucideIconName } from '../../constants/icons';
 
-const lucideProvider: Provider = (LucideAngularModule.pick({
+// LucideAngularModule.pick returns ModuleWithProviders<LucideAngularModule>.
+// Spreading providers from a ModuleWithProviders into a standalone component's
+// `providers` array works at runtime but Angular's strict types reject it.
+// The cleanest workaround: spread the array of Provider objects directly,
+// casting each to a non-EnvironmentProviders shape.
+type SafeProvider = { provide: unknown; useValue?: unknown; useFactory?: (...args: unknown[]) => unknown; multi?: boolean; deps?: unknown[] };
+
+const LUCIDE_PROVIDERS: SafeProvider[] = (LucideAngularModule.pick({
   Plus, ArrowLeft, BookOpen, CircleX, Check, CircleCheckBig, CircleCheck,
   Trash2, CheckCheck, Leaf, Pen, Trophy, TriangleAlert, ChevronDown, Folder,
   Users, Lightbulb, Lock, LogIn, Award, Trees, User, ChartColumn, RotateCcw,
   Flower2, Sparkles, RefreshCw, Languages, TrendingUp, Sun,
-}) as ModuleWithProviders<LucideAngularModule>).providers ?? [];
+}) as ModuleWithProviders<LucideAngularModule>).providers as SafeProvider[];
 
 @Component({
   selector: 'app-icon',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [LucideAngularModule],
-  providers: lucideProvider,
+  providers: LUCIDE_PROVIDERS as never,
   template: `
     @if (lucideName() !== null) {
       <lucide-angular
