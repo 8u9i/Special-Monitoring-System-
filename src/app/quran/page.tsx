@@ -66,11 +66,11 @@ export default function QuranTrailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <StudentStageCard student={student} />
             <div className="space-y-4 lg:col-span-2">
-              <div className="panel p-6">
+              <div className="panel p-4 sm:p-6">
                 <div className="panel-header">
                   <h3 className="panel-title"><span className="panel-title-icon">📖</span> سور القرآن الكريم</h3>
                 </div>
-                <div className="space-y-1 max-h-[600px] overflow-y-auto">
+                <div className="space-y-1 max-h-[60vh] sm:max-h-[600px] overflow-y-auto">
                   {QURAN_SURAHS.map((surah) => {
                     const isExpanded = expandedSurah === surah.number;
                     const surahStatus = getSurahStatus(student, surah.number);
@@ -113,7 +113,7 @@ export default function QuranTrailPage() {
                                 </div>
                               </>
                             ) : (
-                              <div className="grid grid-cols-3 gap-2">
+                              <div className="flex flex-col sm:grid sm:grid-cols-3 gap-2">
                                 {(["memorized", "review", "none"] as const).map((s) => (
                                   <button
                                     key={s}

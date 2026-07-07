@@ -29,7 +29,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-canvas p-4">
-      <div className="w-full max-w-sm bg-surface border border-border p-8">
+      <div className="w-full max-w-sm bg-surface border border-border p-6 sm:p-8">
         {/* Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-light mb-4">
@@ -80,7 +80,7 @@ export default function LoginPage() {
               />
               <button
                 type="button"
-                className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
+                className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <AppIcon name="visibility_off" size={16} /> : <AppIcon name="visibility" size={16} />}

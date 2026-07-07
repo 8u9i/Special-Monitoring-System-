@@ -62,15 +62,15 @@ export default function ReferencePage() {
       </div>
 
       {subject === "hadith" && (
-        <div className="panel p-6">
-          <div className="panel-header">
+        <div className="panel p-4 sm:p-6">
+          <div className="panel-header flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 className="panel-title"><span className="panel-title-icon">📚</span> الأحاديث النبوية</h3>
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial">
                 <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary"><AppIcon name="search" size={14} /></span>
                 <input className="input-field pe-8 text-sm" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الأحاديث..." />
               </div>
-              <select className="input-field text-sm" style={{ width: "auto" }} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+              <select className="input-field text-sm sm:w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                 <option value="all">كل التصنيفات</option>
                 {uniqueCategories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -108,7 +108,7 @@ export default function ReferencePage() {
       )}
 
       {subject === "quran" && (
-        <div className="panel p-6">
+        <div className="panel p-4 sm:p-6">
           <div className="panel-header"><h3 className="panel-title"><span className="panel-title-icon">📖</span> سور القرآن الكريم</h3></div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {QURAN_SURAHS.map((s) => (
@@ -123,8 +123,8 @@ export default function ReferencePage() {
       )}
 
       {subject === "english" && (
-        <div className="panel p-6">
-          <div className="panel-header">
+        <div className="panel p-4 sm:p-6">
+          <div className="panel-header flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 className="panel-title"><span className="panel-title-icon">🔤</span> وحدات الإنجليزية</h3>
             <button className="btn btn-primary btn-sm" onClick={() => setAddEnglishUnitOpen(true)}>
               <AppIcon name="add_box" size={16} />

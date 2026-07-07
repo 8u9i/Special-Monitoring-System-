@@ -27,7 +27,7 @@ export default function EnglishTrailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <StudentStageCard student={student} />
           <div className="space-y-4 lg:col-span-2">
-            <div className="panel p-6">
+            <div className="panel p-4 sm:p-6">
               <div className="panel-header">
                 <h3 className="panel-title"><span className="panel-title-icon">🔤</span> وحدات اللغة الإنجليزية</h3>
               </div>
@@ -56,13 +56,13 @@ export default function EnglishTrailPage() {
             </div>
 
             {selectedUnitData && (
-              <div className="panel p-6">
-                <div className="panel-header">
+              <div className="panel p-4 sm:p-6">
+                <div className="panel-header flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
                   <h3 className="panel-title">
                     <AppIcon name="list_alt" size={18} className="text-primary" />
                     الوحدة {selectedUnitData.unitNumber}
                   </h3>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {(["memorized", "review", "none"] as const).map((s) => {
                       const current = getUnitStatus(student, selectedUnitData.unitNumber);
                       return (

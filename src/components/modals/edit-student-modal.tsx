@@ -61,7 +61,7 @@ export default function EditStudentModal({ student, open, onClose }: Props) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-2">الصورة الرمزية</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {AVATAR_OPTIONS.map((opt) => (
                 <button key={opt.value} className={`avatar-option ${avatar === opt.value ? "selected" : ""}`} onClick={() => setAvatar(opt.value)} type="button">
                   <span className="text-2xl">{opt.emoji}</span>

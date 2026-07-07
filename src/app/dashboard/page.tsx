@@ -141,7 +141,7 @@ export default function DashboardPage() {
 
       {/* Leaderboard + Hadith of Day */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="panel p-6 lg:col-span-2">
+        <div className="panel p-4 sm:p-6 lg:col-span-2">
           <div className="panel-header">
             <h3 className="panel-title">
               <span className="panel-title-icon">🏆</span>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="panel p-6 flex flex-col">
+        <div className="panel p-4 sm:p-6 flex flex-col">
           <div className="panel-header">
             <h3 className="panel-title">
               <span className="panel-title-icon">☀️</span>

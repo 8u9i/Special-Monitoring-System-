@@ -23,9 +23,9 @@ export default function Header({ onAddStudent }: { onAddStudent: () => void }) {
           <h1 className="text-lg font-bold text-text-primary font-tajawal">{route.title}</h1>
           <p className="text-sm text-text-secondary">{route.subtitle}</p>
         </div>
-        <button className="btn btn-primary btn-md" onClick={onAddStudent}>
+        <button className="btn btn-primary btn-md" onClick={onAddStudent} title="إضافة طالب" aria-label="إضافة طالب">
           <AppIcon name="person_add" size={18} />
-          إضافة طالب
+          <span className="hidden sm:inline">إضافة طالب</span>
         </button>
       </div>
     </header>

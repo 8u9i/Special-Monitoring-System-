@@ -48,14 +48,14 @@ export default function HadithTrailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <StudentStageCard student={student} />
           <div className="space-y-4 lg:col-span-2">
-            <div className="panel p-6">
+            <div className="panel p-4 sm:p-6">
               <div className="panel-header">
                 <h3 className="panel-title">
                   <span className="panel-title-icon">📚</span> مسار الأحاديث
                 </h3>
                 <p className="text-xs text-text-secondary">اضغط على الباب لعرض الأحاديث</p>
               </div>
-              <div className="space-y-1 max-h-[600px] overflow-y-auto">
+              <div className="space-y-1 max-h-[60vh] sm:max-h-[600px] overflow-y-auto">
                 {groupedHadiths.map((group) => {
                   const isCategoryExpanded = expandedCategory === group.category;
                   return (
@@ -98,7 +98,7 @@ export default function HadithTrailPage() {
                                     </div>
                                     <div className="pt-3 border-t border-border-light">
                                       <p className="text-xs text-text-secondary font-semibold text-center mb-2">تحديث حالة الحديث لـ {student.name}:</p>
-                                      <div className="grid grid-cols-3 gap-2">
+                                      <div className="flex flex-col sm:grid sm:grid-cols-3 gap-2">
                                         {(["memorized", "review", "none"] as const).map((s) => {
                                           const labels = { memorized: "تم الحفظ", review: "قيد المراجعة", none: "إعادة ضبط" };
                                           const icons = { memorized: "check_circle", review: "menu_book", none: "restart_alt" };
