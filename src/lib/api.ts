@@ -11,13 +11,13 @@ export async function api<T>(method: string, path: string, body?: unknown): Prom
     credentials: "include",
   });
   if (!res.ok) {
-    const text = await res.text();
+    const body = await res.text();
     let message: string;
     try {
-      const json = JSON.parse(text);
-      message = json.error || text;
+      const json = JSON.parse(body);
+      message = json.error || body;
     } catch {
-      message = text || `${method} ${path} failed (${res.status})`;
+      message = body || `${method} ${path} failed (${res.status})`;
     }
     throw new Error(message);
   }

@@ -27,7 +27,7 @@ export default function AppIcon({ name, size = 24, alt, color = "currentColor", 
   }
 
   return (
-    <span className={`inline-flex flex-shrink-0 ${className}`} role={alt ? "img" : undefined} aria-label={alt || undefined} aria-hidden={!alt || undefined}>
+    <span className={`inline-flex flex-shrink-0 ${className}`} role={alt ? "img" : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : true}>
       <IconComp size={size} color={color} strokeWidth={2} />
     </span>
   );

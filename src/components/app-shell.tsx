@@ -45,6 +45,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <a href="#main-content" className="skip-link">تخطي إلى المحتوى</a>
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
@@ -53,7 +54,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           mobileMenuOpen={mobileMenuOpen}
           mobileMenu={<MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />}
         />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main id="main-content" className="flex-1 overflow-y-auto p-4 lg:p-6">
           {children}
         </main>
       </div>

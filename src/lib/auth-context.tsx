@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { api } from "./api";
 
 interface AuthState {
@@ -19,6 +19,18 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<AuthState>({ checked: false, authenticated: false, user: null });
+
+  useEffect(() => {
+    let active = true;
+    api<{ authenticated: boolean }>("GET", "/auth/check")
+      .then((res) => {
+        if (active) setAuth({ checked: true, authenticated: !!res.authenticated, user: null });
+      })
+      .catch(() => {
+        if (active) setAuth({ checked: true, authenticated: false, user: null });
+      });
+    return () => { active = false; };
+  }, []);
 
   const doLogin = useCallback(async (username: string, password: string) => {
     try {
