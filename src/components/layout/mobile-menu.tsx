@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useTracker } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
@@ -37,7 +37,11 @@ export default function MobileMenu({ open, onClose }: Props) {
   const navTo = useCallback((path: string) => { router.push(path); onClose(); }, [router, onClose]);
   const handleLogout = useCallback(async () => { await logout(); router.push("/login"); onClose(); }, [logout, router, onClose]);
 
-  useEffect(() => { onClose(); }, [pathname, onClose]);
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) { mounted.current = true; return; }
+    onClose();
+  }, [pathname, onClose]);
 
   const contextPath = pathname.split("/")[1] || "dashboard";
   const progressLabel: Record<string, string> = { hadith: "حدث", quran: "سورة", english: "وحدة" };
