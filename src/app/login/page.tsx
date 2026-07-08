@@ -23,20 +23,20 @@ export default function LoginPage() {
     if (result.success) {
       router.push("/dashboard");
     } else {
-      setError(result.error || "فشل تسجيل الدخول");
+      setError(result.error || "Login failed");
     }
   };
 
   return (
-    <div className="login-scene">
+    <div className="login-scene" dir="ltr">
       <div className="login-card">
         {/* Brand */}
         <div className="mb-8">
           <div className="login-brand">
             <AppIcon name="eco" size={34} className="text-primary" />
           </div>
-          <h1 className="text-2xl font-bold text-text-primary font-tajawal">يا إخوتي</h1>
-          <p className="text-sm text-text-secondary mt-1">نظام المتابعة الخاص بالحفظ والمراجعة</p>
+          <h1 className="text-2xl font-bold text-text-primary font-tajawal">My Brothers</h1>
+          <p className="text-sm text-text-secondary mt-1">Memorization &amp; Revision Tracking System</p>
         </div>
 
         {/* Error */}
@@ -50,37 +50,38 @@ export default function LoginPage() {
         {/* Form */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">اسم المستخدم</label>
+            <label className="block text-sm font-semibold text-text-secondary mb-1">Username</label>
             <div className="relative">
-              <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
                 <AppIcon name="person" size={18} />
               </span>
               <input
-                className="input-field pe-10"
+                className="input-field ps-10"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="أدخل اسم المستخدم"
-                dir="auto"
+                placeholder="Enter your username"
+                dir="ltr"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">كلمة المرور</label>
+            <label className="block text-sm font-semibold text-text-secondary mb-1">Password</label>
             <div className="relative">
-              <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
                 <AppIcon name="lock" size={18} />
               </span>
               <input
-                className="input-field pe-10 ps-10"
+                className="input-field ps-10 pe-10"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="أدخل كلمة المرور"
+                placeholder="Enter your password"
+                dir="ltr"
               />
               <button
                 type="button"
-                className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
+                className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <AppIcon name="visibility_off" size={16} /> : <AppIcon name="visibility" size={16} />}
@@ -100,12 +101,12 @@ export default function LoginPage() {
           ) : (
             <>
               <AppIcon name="login" size={18} />
-              تسجيل الدخول
+              Sign In
             </>
           )}
         </button>
 
-        <p className="text-center text-2xs text-text-tertiary mt-6">بسم الله الرحمن الرحيم</p>
+        <p className="text-center text-2xs text-text-tertiary mt-6">In the name of Allah, the Most Gracious, the Most Merciful</p>
       </div>
     </div>
   );
