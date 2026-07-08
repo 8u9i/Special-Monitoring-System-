@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import type { Student, Stage } from "./types";
-import { STAGES } from "./constants";
 
 interface ToastState {
   message: string;

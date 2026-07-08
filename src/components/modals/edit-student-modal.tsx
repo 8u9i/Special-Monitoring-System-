@@ -20,7 +20,11 @@ export default function EditStudentModal({ student, open, onClose }: Props) {
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    if (student) { setName(student.name); setAge(student.age?.toString() || ""); setAvatar(student.avatar); setNotes(student.notes || ""); }
+    if (student) {
+      queueMicrotask(() => {
+        setName(student.name); setAge(student.age?.toString() || ""); setAvatar(student.avatar); setNotes(student.notes || "");
+      });
+    }
   }, [student]);
 
   useEffect(() => {

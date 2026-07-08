@@ -2,14 +2,13 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useData, useUI } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { state, selectStudent, getStudentStage } = useData();
-  const { confirm } = useUI();
 
   const stats = useMemo(() => {
     const list = state.students;

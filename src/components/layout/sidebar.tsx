@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useAuth, useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji, getProgressValue } from "@/lib/constants";

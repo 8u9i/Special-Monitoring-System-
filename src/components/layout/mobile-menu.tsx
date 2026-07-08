@@ -39,10 +39,14 @@ export default function MobileMenu({ open, onClose }: Props) {
   const handleLogout = useCallback(async () => { await logout(); router.push("/login"); onClose(); }, [logout, router, onClose]);
 
   const mounted = useRef(false);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
   useEffect(() => {
     if (!mounted.current) { mounted.current = true; return; }
-    onClose();
-  }, [pathname, onClose]);
+    onCloseRef.current();
+  }, [pathname]);
 
   const contextPath = pathname.split("/")[1] || "dashboard";
   const progress = getProgressValue(contextPath, student, state.hadiths.length, state.englishUnits.length);

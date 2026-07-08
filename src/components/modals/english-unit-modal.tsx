@@ -21,13 +21,15 @@ export default function EnglishUnitModal({ unit, open, onClose }: Props) {
 
   useEffect(() => {
     if (open) {
-      if (unit) {
-        setUnitNumber(unit.unitNumber);
-        setRows(unit.words.length > 0 ? [...unit.words] : [{ word: "", definition: "" }]);
-      } else {
-        setUnitNumber(0);
-        setRows([{ word: "", definition: "" }]);
-      }
+      queueMicrotask(() => {
+        if (unit) {
+          setUnitNumber(unit.unitNumber);
+          setRows(unit.words.length > 0 ? [...unit.words] : [{ word: "", definition: "" }]);
+        } else {
+          setUnitNumber(0);
+          setRows([{ word: "", definition: "" }]);
+        }
+      });
     }
   }, [open, unit]);
 

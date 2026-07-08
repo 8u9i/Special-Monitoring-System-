@@ -40,7 +40,6 @@ export async function GET(req: NextRequest) {
 
     const buildMap = <T extends Record<string, unknown>>(
       rows: T[],
-      key: string,
     ): Map<string, T[]> => {
       const map = new Map<string, T[]>();
       for (const r of rows) {
@@ -52,10 +51,10 @@ export async function GET(req: NextRequest) {
       return map;
     };
 
-    const hadithMap = buildMap(hadithsRes.rows, "student_id");
-    const surahMap = buildMap(surahsRes.rows, "student_id");
-    const pagesMap = buildMap(pagesRes.rows, "student_id");
-    const englishMap = buildMap(englishRes.rows, "student_id");
+    const hadithMap = buildMap(hadithsRes.rows);
+    const surahMap = buildMap(surahsRes.rows);
+    const pagesMap = buildMap(pagesRes.rows);
+    const englishMap = buildMap(englishRes.rows);
 
     const full = students.map((s: Record<string, unknown>) => {
       const sid = s.id as string;

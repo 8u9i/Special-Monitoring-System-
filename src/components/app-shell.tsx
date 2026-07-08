@@ -12,7 +12,7 @@ import CelebrationModal from "@/components/overlays/celebration-modal";
 import AddStudentModal from "@/components/modals/add-student-modal";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { auth, logout } = useAuth();
+  const { auth } = useAuth();
   const { loadAll } = useData();
   const router = useRouter();
   const [addStudentOpen, setAddStudentOpen] = useState(false);

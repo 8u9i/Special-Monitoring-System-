@@ -57,7 +57,9 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const loadedRef = useRef(false);
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   const doLoadAll = useCallback(async (force = false) => {
     if (!force && loadedRef.current) return;
@@ -245,7 +247,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       updateXP(studentId, r.xp);
       const student = prevStudents.find((s) => s.id === studentId);
       if (student && newStatus === "memorized") {
-        const oldStage = getStudentStage(student);
+        const oldStage = STAGES.find((s) => student.xp >= s.minXP && student.xp <= s.maxXP) || STAGES[0];
         const newSt = { ...student, memorizedHadithNumbers: [...student.memorizedHadithNumbers, hadithNumber] };
         const newStage = STAGES.find((s) => computeXP(newSt) >= s.minXP && computeXP(newSt) <= s.maxXP) || STAGES[0];
         if (newStage.level > oldStage.level && onCelebration) onCelebration(student, newStage);
@@ -255,7 +257,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       console.error("doToggleHadithStatus error:", err);
       showToastExternal("فشل تحديث حالة الحديث", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal, updateXP, onCelebration]);
 
   const doToggleSurahStatus = useCallback(async (studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") => {
     const prevStudents = stateRef.current.students;

@@ -9,7 +9,7 @@ import AddStudentModal from "@/components/modals/add-student-modal";
 import type { Student } from "@/lib/types";
 
 export default function StagesPage() {
-  const { state, getStudentStage, selectStudent, deleteStudent, cheatUnlockAll, resetStudentProgress } = useData();
+  const { state, getStudentStage, deleteStudent, cheatUnlockAll, resetStudentProgress } = useData();
   const { confirm } = useUI();
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [addStudentOpen, setAddStudentOpen] = useState(false);

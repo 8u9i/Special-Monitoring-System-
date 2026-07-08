@@ -25,8 +25,10 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
 
   useEffect(() => {
     if (hadith) {
-      setNumber(hadith.number); setText(hadith.text); setReference(hadith.reference);
-      setExplanation(hadith.explanation); setCategory(hadith.category); setError("");
+      queueMicrotask(() => {
+        setNumber(hadith.number); setText(hadith.text); setReference(hadith.reference);
+        setExplanation(hadith.explanation); setCategory(hadith.category); setError("");
+      });
     }
   }, [hadith]);
 
