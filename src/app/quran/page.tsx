@@ -50,7 +50,7 @@ export default function QuranTrailPage() {
               <div className="relative w-28 h-28 shrink-0">
                 <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
                   <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-border-light)" strokeWidth="8" />
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" strokeWidth="8" strokeLinecap="round" strokeDasharray={326.73} strokeDashoffset={326.73 * (1 - quranProgress.percentage / 100)} className="transition-all duration-1000 ease-out" />
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" strokeWidth="8" strokeLinecap="round" strokeDasharray={2 * Math.PI * 52} strokeDashoffset={2 * Math.PI * 52 * (1 - quranProgress.percentage / 100)} className="transition-all duration-1000 ease-out" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-2xl font-bold text-primary">{quranProgress.percentage}%</span>
@@ -118,7 +118,7 @@ export default function QuranTrailPage() {
                                   <button
                                     key={s}
                                     onClick={() => toggleSurahStatus(student.id, surah.number, s)}
-                                    className={`btn btn-sm ${surahStatus === s ? (s === "memorized" ? "btn-primary" : s === "review" ? "bg-amber text-text-primary border-none" : "bg-border text-text-secondary border-none") : "btn-outline"}`}
+                                    className={`btn btn-sm ${surahStatus === s ? (s === "memorized" ? "btn-primary" : s === "review" ? "btn-review" : "btn-none") : "btn-outline"}`}
                                   >
                                     {s === "memorized" ? "تم الحفظ" : s === "review" ? "قيد المراجعة" : "إعادة ضبط"}
                                   </button>

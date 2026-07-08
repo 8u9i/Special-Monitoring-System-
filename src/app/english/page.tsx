@@ -69,7 +69,7 @@ export default function EnglishTrailPage() {
                         <button
                           key={s}
                           onClick={() => toggleEnglishStatus(student.id, selectedUnitData.unitNumber, s)}
-                          className={`btn btn-sm ${current === s ? (s === "memorized" ? "btn-primary" : s === "review" ? "bg-amber text-text-primary border-none" : "bg-border text-text-secondary border-none") : "btn-outline"}`}
+                          className={`btn btn-sm ${current === s ? (s === "memorized" ? "btn-primary" : s === "review" ? "btn-review" : "btn-none") : "btn-outline"}`}
                         >
                           <AppIcon name={s === "memorized" ? "check_circle" : s === "review" ? "sync" : "restart_alt"} size={16} />
                           {s === "memorized" ? "تم الحفظ" : s === "review" ? "مراجعة" : "مسح"}

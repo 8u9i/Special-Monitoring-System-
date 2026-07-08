@@ -28,12 +28,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-canvas p-4">
-      <div className="w-full max-w-sm bg-surface border border-border p-6 sm:p-8">
+    <div className="login-scene">
+      <div className="login-card">
         {/* Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-light mb-4">
-            <AppIcon name="eco" size={32} className="text-primary" />
+        <div className="mb-8">
+          <div className="login-brand">
+            <AppIcon name="eco" size={34} className="text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-text-primary font-tajawal">يا إخوتي</h1>
           <p className="text-sm text-text-secondary mt-1">نظام المتابعة الخاص بالحفظ والمراجعة</p>

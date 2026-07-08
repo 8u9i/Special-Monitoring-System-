@@ -107,7 +107,7 @@ export default function HadithTrailPage() {
                                             <button
                                               key={s}
                                               onClick={() => handleStatus(student.id, hadith.number, s)}
-                                              className={`btn btn-sm flex items-center justify-center gap-1.5 ${isActive ? (s === "memorized" ? "btn-primary" : s === "review" ? "bg-amber text-text-primary border-none" : "bg-border text-text-secondary border-none") : "btn-outline"}`}
+                                              className={`btn btn-sm flex items-center justify-center gap-1.5 ${isActive ? (s === "memorized" ? "btn-primary" : s === "review" ? "btn-review" : "btn-none") : "btn-outline"}`}
                                             >
                                               <AppIcon name={icons[s]} size={18} />
                                               {labels[s]}

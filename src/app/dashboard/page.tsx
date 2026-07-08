@@ -111,8 +111,8 @@ export default function DashboardPage() {
               <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-border-light)" strokeWidth="8" />
               <circle cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" strokeWidth="8"
                 strokeLinecap="round"
-                strokeDasharray={326.73}
-                strokeDashoffset={326.73 * (1 - quranProgress.percentage / 100)}
+                strokeDasharray={2 * Math.PI * 52}
+                strokeDashoffset={2 * Math.PI * 52 * (1 - quranProgress.percentage / 100)}
                 className="transition-all duration-1000 ease-out" />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
