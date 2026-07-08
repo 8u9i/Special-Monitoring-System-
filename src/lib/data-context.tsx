@@ -43,9 +43,14 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | null>(null);
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface DataProviderProps {
   children: React.ReactNode;
-  showToast: (msg: string, type: "success" | "error") => void;
+  showToast: (msg: string, type?: "success" | "error", action?: ToastAction) => void;
   onCelebration?: (student: Student, stage: Stage) => void;
 }
 
@@ -174,15 +179,22 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const doDeleteHadith = useCallback(async (number: number) => {
     const prevHadiths = stateRef.current.hadiths;
+    const removed = prevHadiths.find((h) => h.number === number);
     setState((s) => ({ ...s, hadiths: s.hadiths.filter((h) => h.number !== number) }));
     try {
       await api("DELETE", `/hadiths/${number}`);
+      if (removed) {
+        showToastExternal("تم حذف الحديث", "success", {
+          label: "تراجع",
+          onClick: () => { void doAddHadith(removed.text, removed.reference, removed.explanation, removed.category); },
+        });
+      }
     } catch (err) {
       setState((s) => ({ ...s, hadiths: prevHadiths }));
       console.error("doDeleteHadith error:", err);
       showToastExternal("فشل حذف الحديث", "error");
     }
-  }, [showToastExternal]);
+  }, [showToastExternal, doAddHadith]);
 
   const doAddEnglishUnit = useCallback(async (words: { word: string; definition: string }[]) => {
     const cleanWords = words.filter((w) => w.word.trim() && w.definition.trim());
@@ -209,6 +221,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const doDeleteEnglishUnit = useCallback(async (unitNumber: number) => {
     const prevState = stateRef.current;
+    const removed = prevState.englishUnits.find((u) => u.unitNumber === unitNumber);
     setState((s) => ({
       ...s, englishUnits: s.englishUnits.filter((u) => u.unitNumber !== unitNumber),
       students: s.students.map((st) => ({
@@ -218,19 +231,18 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     }));
     try {
       await api("DELETE", `/english-units/${unitNumber}`);
-      try {
-        const fresh = await api<Student[]>("GET", "/students");
-        const updated = fresh.find((s) => s.id === stateRef.current.selectedStudentId);
-        if (updated) updateXP(updated.id, updated.xp);
-      } catch (err) {
-        console.error("doDeleteEnglishUnit XP refetch error:", err);
+      if (removed) {
+        showToastExternal("تم حذف الوحدة", "success", {
+          label: "تراجع",
+          onClick: () => { void doAddEnglishUnit(removed.words.map((w) => ({ word: w.word, definition: w.definition }))); },
+        });
       }
     } catch (err) {
       setState(() => prevState);
       console.error("doDeleteEnglishUnit error:", err);
       showToastExternal("فشل حذف الوحدة", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal, updateXP, doAddEnglishUnit]);
 
   const doToggleHadithStatus = useCallback(async (studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") => {
     const prevStudents = stateRef.current.students;

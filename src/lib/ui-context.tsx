@@ -3,9 +3,15 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import type { Student, Stage } from "./types";
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface ToastState {
   message: string;
   type: "success" | "error";
+  action: ToastAction | null;
 }
 
 interface ConfirmState {
@@ -21,7 +27,12 @@ interface CelebrationState {
 }
 
 interface UIContextType {
-  toast: { message: string; type: "success" | "error"; show: (msg: string, type?: "success" | "error") => void };
+  toast: {
+    message: string;
+    type: "success" | "error";
+    action: ToastAction | null;
+    show: (msg: string, type?: "success" | "error", action?: ToastAction) => void;
+  };
   confirm: { open: boolean; message: string; onConfirm: (() => void) | null; ask: (msg: string, fn: () => void) => void; close: () => void };
   celebration: { show: boolean; student: Student | null; stage: Stage | null; trigger: (s: Student, stg: Stage) => void; dismiss: () => void };
 }
@@ -29,15 +40,15 @@ interface UIContextType {
 const UIContext = createContext<UIContextType | null>(null);
 
 export function UIProvider({ children }: { children: React.ReactNode }) {
-  const [toastMsg, setToastMsg] = useState<ToastState>({ message: "", type: "success" });
+  const [toastMsg, setToastMsg] = useState<ToastState>({ message: "", type: "success", action: null });
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [confirmState, setConfirmState] = useState<ConfirmState>({ open: false, message: "", onConfirm: null });
   const [celebrationState, setCelebrationState] = useState<CelebrationState>({ show: false, student: null, stage: null });
 
-  const showToast = useCallback((msg: string, type: "success" | "error" = "success") => {
-    setToastMsg({ message: msg, type });
+  const showToast = useCallback((msg: string, type: "success" | "error" = "success", action: ToastAction | null = null) => {
+    setToastMsg({ message: msg, type, action });
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastMsg({ message: "", type: "success" }), 4000);
+    toastTimer.current = setTimeout(() => setToastMsg({ message: "", type: "success", action: null }), action ? 6000 : 4000);
   }, []);
 
   const confirmAsk = useCallback((msg: string, fn: () => void) => {
