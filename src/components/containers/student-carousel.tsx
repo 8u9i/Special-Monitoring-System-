@@ -1,12 +1,12 @@
 "use client";
 
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 import { usePathname } from "next/navigation";
 
 export default function StudentCarousel() {
-  const { state, selectStudent } = useTracker();
+  const { state, selectStudent } = useData();
   const pathname = usePathname();
   const currentPath = pathname.split("/")[1] || "dashboard";
 

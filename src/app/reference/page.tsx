@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useTracker } from "@/lib/tracker-context";
+import { useData, useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { QURAN_SURAHS } from "@/lib/constants";
 import EditHadithModal from "@/components/modals/edit-hadith-modal";
@@ -13,7 +13,8 @@ import type { Hadith, EnglishUnitWithWords } from "@/lib/types";
 type ReferenceSubject = "hadith" | "quran" | "english";
 
 export default function ReferencePage() {
-  const { state, selectStudent, deleteHadith, deleteEnglishUnit, confirm } = useTracker();
+  const { state, selectStudent, deleteHadith, deleteEnglishUnit } = useData();
+  const { confirm } = useUI();
   const router = useRouter();
   const [subject, setSubject] = useState<ReferenceSubject>("hadith");
   const [searchQuery, setSearchQuery] = useState("");

@@ -1,4 +1,23 @@
-import type { Stage, Surah } from "./types";
+import type { Stage, Surah, Student } from "./types";
+
+export interface ProgressValue {
+  done: number;
+  total: number;
+  label: string;
+}
+
+/**
+ * Calculate progress
+ */
+export function getProgressValue(contextPath: string, student: Student | null, hadithsCount: number, englishUnitsCount: number): ProgressValue {
+  if (!student) return { done: 0, total: 0, label: "" };
+  switch (contextPath) {
+    case "hadith": return { done: student.memorizedHadithNumbers.length, total: hadithsCount, label: "حدث" };
+    case "quran": return { done: student.memorizedSurahNumbers.length, total: 114, label: "سورة" };
+    case "english": return { done: student.memorizedEnglishUnits.length, total: englishUnitsCount, label: "وحدة" };
+    default: return { done: 0, total: 0, label: "" };
+  }
+}
 
 export const QURAN_SURAHS: Surah[] = [
   { number: 1, name: "الفاتحة" },

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import { AVATAR_OPTIONS } from "@/lib/constants";
 import AppIcon from "@/components/app-icon";
 
 export default function AddStudentModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { addStudent } = useTracker();
+  const { addStudent } = useData();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [avatar, setAvatar] = useState("avatar-leaf");

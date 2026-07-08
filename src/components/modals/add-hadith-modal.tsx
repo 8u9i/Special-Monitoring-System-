@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 
 export default function AddHadithModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { state, addHadith } = useTracker();
+  const { state, addHadith } = useData();
   const [text, setText] = useState("");
   const [reference, setReference] = useState("رواية صحيحة");
   const [explanation, setExplanation] = useState("");

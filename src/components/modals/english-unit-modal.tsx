@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import type { EnglishUnitWithWords } from "@/lib/types";
 
@@ -15,7 +15,7 @@ interface Props {
 
 export default function EnglishUnitModal({ unit, open, onClose }: Props) {
   const isEdit = !!unit;
-  const { addEnglishUnit, updateEnglishUnit } = useTracker();
+  const { addEnglishUnit, updateEnglishUnit } = useData();
   const [unitNumber, setUnitNumber] = useState<number>(0);
   const [rows, setRows] = useState<WordRow[]>([{ word: "", definition: "" }]);
 

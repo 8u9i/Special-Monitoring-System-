@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import { AVATAR_OPTIONS } from "@/lib/constants";
 import AppIcon from "@/components/app-icon";
 import type { Student } from "@/lib/types";
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function EditStudentModal({ student, open, onClose }: Props) {
-  const { updateStudent } = useTracker();
+  const { updateStudent } = useData();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [avatar, setAvatar] = useState("avatar-leaf");

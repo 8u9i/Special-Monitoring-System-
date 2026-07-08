@@ -1,10 +1,10 @@
 "use client";
 
-import { useTracker } from "@/lib/tracker-context";
+import { useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 
 export default function ConfirmModal() {
-  const { confirm } = useTracker();
+  const { confirm } = useUI();
   if (!confirm.open) return null;
 
   return (

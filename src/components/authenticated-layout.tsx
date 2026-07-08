@@ -2,11 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTracker } from "@/lib/tracker-context";
+import { useAuth, useData } from "@/lib/tracker-context";
 import AppShell from "@/components/app-shell";
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
-  const { auth, loadAll } = useTracker();
+  const { auth } = useAuth();
+  const { loadAll } = useData();
   const router = useRouter();
 
   useEffect(() => {

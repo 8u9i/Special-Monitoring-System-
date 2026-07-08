@@ -44,11 +44,11 @@
   --color-tag-green-text: #9CC8B5;
   --color-tag-blue-text: #8FBEC1;
   --color-nav-text: #EEEEEE;
-  --color-nav-text-muted: #8A929C;
+  --color-nav-text-muted: #9CA5B0;
   --color-nav-text-subtle: #6B7280;
   --color-text-primary: #EEEEEE;
   --color-text-secondary: #B5BCC4;
-  --color-text-tertiary: #8A929C;
+  --color-text-tertiary: #9CA5B0;
   --color-text-inverse: #222831;
   --color-text-inverse-muted: #6B7280;
   --color-border: #3A414B;
@@ -85,7 +85,7 @@ body.dark {
   --color-nav-text-subtle: #5C636E;
   --color-text-primary: #F2F4F6;
   --color-text-secondary: #B5BCC4;
-  --color-text-tertiary: #8A929C;
+  --color-text-tertiary: #9CA5B0;
   --color-text-inverse: #131820;
   --color-text-inverse-muted: #5C636E;
   --color-border: #2A3038;
@@ -123,7 +123,7 @@ body.dark {
     --color-nav-text-subtle: #5C636E;
     --color-text-primary: #F2F4F6;
     --color-text-secondary: #B5BCC4;
-    --color-text-tertiary: #8A929C;
+    --color-text-tertiary: #9CA5B0;
     --color-text-inverse: #131820;
     --color-text-inverse-muted: #5C636E;
     --color-border: #2A3038;
@@ -354,4 +354,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @media (max-width: 639px) {
   .input-field { font-size: 1rem; }
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary, #76ABAE);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+}
+.skip-link:focus {
+  top: 0;
 }

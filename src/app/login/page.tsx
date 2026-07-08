@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTracker } from "@/lib/tracker-context";
+import { useAuth } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useTracker();
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleLogin = async () => {

@@ -1,12 +1,12 @@
 "use client";
 
 import type { Student } from "@/lib/types";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 
 export default function StudentStageCard({ student }: { student: Student }) {
-  const { getStudentStage, getStudentNextStageInfo } = useTracker();
+  const { getStudentStage, getStudentNextStageInfo } = useData();
   const stage = getStudentStage(student);
   const nextInfo = getStudentNextStageInfo(student);
   const isMaxed = !nextInfo;

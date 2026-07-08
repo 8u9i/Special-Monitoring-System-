@@ -14,7 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body className="min-h-screen bg-canvas text-text-primary font-body">
-        <Providers>{children}</Providers>
+        <a href="#main-content" className="skip-link">تخطى إلى المحتوى الرئيسي</a>
+        <Providers><div id="main-content">{children}</div></Providers>
       </body>
     </html>
   );

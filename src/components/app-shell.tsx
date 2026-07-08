@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTracker } from "@/lib/tracker-context";
+import { useAuth, useData } from "@/lib/tracker-context";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import MobileMenu from "@/components/layout/mobile-menu";
@@ -12,7 +12,8 @@ import CelebrationModal from "@/components/overlays/celebration-modal";
 import AddStudentModal from "@/components/modals/add-student-modal";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { auth, loadAll, logout } = useTracker();
+  const { auth, logout } = useAuth();
+  const { loadAll } = useData();
   const router = useRouter();
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

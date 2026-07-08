@@ -1,11 +1,11 @@
 "use client";
 
-import { useTracker } from "@/lib/tracker-context";
+import { useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 
 export default function CelebrationModal() {
-  const { celebration } = useTracker();
+  const { celebration } = useUI();
   if (!celebration.show || !celebration.student || !celebration.stage) return null;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData, useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 import EditStudentModal from "@/components/modals/edit-student-modal";
@@ -9,7 +9,8 @@ import AddStudentModal from "@/components/modals/add-student-modal";
 import type { Student } from "@/lib/types";
 
 export default function StagesPage() {
-  const { state, getStudentStage, selectStudent, confirm, deleteStudent, cheatUnlockAll, resetStudentProgress } = useTracker();
+  const { state, getStudentStage, selectStudent, deleteStudent, cheatUnlockAll, resetStudentProgress } = useData();
+  const { confirm } = useUI();
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [addStudentOpen, setAddStudentOpen] = useState(false);
 

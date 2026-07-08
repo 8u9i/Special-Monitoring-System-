@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTracker } from "@/lib/tracker-context";
+import { useAuth } from "@/lib/tracker-context";
 
 export default function Home() {
-  const { auth } = useTracker();
+  const { auth } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

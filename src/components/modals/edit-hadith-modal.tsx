@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import type { Hadith } from "@/lib/types";
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function EditHadithModal({ hadith, open, onClose }: Props) {
-  const { state, updateHadith } = useTracker();
+  const { state, updateHadith } = useData();
   const [number, setNumber] = useState<number>(0);
   const [text, setText] = useState("");
   const [reference, setReference] = useState("");

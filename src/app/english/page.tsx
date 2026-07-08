@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import StudentCarousel from "@/components/containers/student-carousel";
 import StudentStageCard from "@/components/containers/student-stage-card";
 import type { Student } from "@/lib/types";
 
 export default function EnglishTrailPage() {
-  const { state, toggleEnglishStatus } = useTracker();
+  const { state, toggleEnglishStatus } = useData();
   const student = state.students.find((s) => s.id === state.selectedStudentId) || null;
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
 

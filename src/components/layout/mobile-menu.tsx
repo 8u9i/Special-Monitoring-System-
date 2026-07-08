@@ -2,9 +2,9 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useCallback, useRef } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useAuth, useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
-import { getAvatarEmoji } from "@/lib/constants";
+import { getAvatarEmoji, getProgressValue } from "@/lib/constants";
 
 interface NavItem {
   label: string;
@@ -30,7 +30,8 @@ interface Props {
 export default function MobileMenu({ open, onClose }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const { state, logout, getStudentStage } = useTracker();
+  const { logout } = useAuth();
+  const { state, getStudentStage } = useData();
   const student = state.students.find((s) => s.id === state.selectedStudentId) || null;
   const stage = student ? getStudentStage(student) : null;
 
@@ -44,17 +45,7 @@ export default function MobileMenu({ open, onClose }: Props) {
   }, [pathname, onClose]);
 
   const contextPath = pathname.split("/")[1] || "dashboard";
-  const progressLabel: Record<string, string> = { hadith: "حدث", quran: "سورة", english: "وحدة" };
-  const getProgressValue = () => {
-    if (!student) return { done: 0, total: 0, label: "" };
-    switch (contextPath) {
-      case "hadith": return { done: student.memorizedHadithNumbers.length, total: state.hadiths.length, label: progressLabel.hadith };
-      case "quran": return { done: student.memorizedSurahNumbers.length, total: 114, label: progressLabel.quran };
-      case "english": return { done: student.memorizedEnglishUnits.length, total: state.englishUnits.length, label: progressLabel.english };
-      default: return { done: 0, total: 0, label: "" };
-    }
-  };
-  const progress = getProgressValue();
+  const progress = getProgressValue(contextPath, student, state.hadiths.length, state.englishUnits.length);
 
   if (!open) return null;
 

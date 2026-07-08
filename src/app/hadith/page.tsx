@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData, useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import StudentCarousel from "@/components/containers/student-carousel";
 import StudentStageCard from "@/components/containers/student-stage-card";
 import type { Hadith, Student } from "@/lib/types";
 
 export default function HadithTrailPage() {
-  const { state, toggleHadithStatus, celebration } = useTracker();
+  const { state, toggleHadithStatus } = useData();
+  const { celebration } = useUI();
   const student = state.students.find((s) => s.id === state.selectedStudentId) || null;
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [expandedHadithNumber, setExpandedHadithNumber] = useState<number | null>(null);

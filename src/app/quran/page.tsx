@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTracker } from "@/lib/tracker-context";
+import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 import StudentCarousel from "@/components/containers/student-carousel";
 import StudentStageCard from "@/components/containers/student-stage-card";
@@ -9,7 +9,7 @@ import { QURAN_SURAHS } from "@/lib/constants";
 import type { Student } from "@/lib/types";
 
 export default function QuranTrailPage() {
-  const { state, toggleSurahStatus, toggleSurahPageStatus, markAllSurahPages, clearAllSurahPages } = useTracker();
+  const { state, toggleSurahStatus, toggleSurahPageStatus, markAllSurahPages, clearAllSurahPages } = useData();
   const student = state.students.find((s) => s.id === state.selectedStudentId) || null;
   const [expandedSurah, setExpandedSurah] = useState<number | null>(null);
 
