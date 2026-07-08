@@ -91,8 +91,8 @@ export default function ReferencePage() {
                     <button className="btn btn-icon btn-ghost" title="حذف" onClick={() => handleDeleteHadith(h.number)}><AppIcon name="delete" size={16} /></button>
                   </div>
                 </div>
-                <p className="font-amiri text-sm font-bold text-text-primary leading-relaxed mb-2">&ldquo;{h.text}&rdquo;</p>
                 <p className="text-xs text-text-secondary mb-1">{h.reference}</p>
+                <p className="font-amiri text-sm font-bold text-text-primary leading-relaxed mb-2">&ldquo;{h.text}&rdquo;</p>
                 <span className="tag tag-amber text-2xs">{h.category}</span>
                 <button
                   className="btn btn-ghost btn-sm mt-3 text-primary flex items-center gap-1"
