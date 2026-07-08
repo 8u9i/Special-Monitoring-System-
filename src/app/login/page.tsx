@@ -52,11 +52,11 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">اسم المستخدم</label>
             <div className="relative">
-              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary">
                 <AppIcon name="person" size={18} />
               </span>
               <input
-                className="input-field ps-10"
+                className="input-field pe-10"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -68,11 +68,11 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">كلمة المرور</label>
             <div className="relative">
-              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary">
                 <AppIcon name="lock" size={18} />
               </span>
               <input
-                className="input-field ps-10 pe-10"
+                className="input-field pe-10 ps-10"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -80,7 +80,7 @@ export default function LoginPage() {
               />
               <button
                 type="button"
-                className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
+                className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <AppIcon name="visibility_off" size={16} /> : <AppIcon name="visibility" size={16} />}
