@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-scene" dir="ltr">
+    <div className="login-scene">
       <div className="login-card">
         {/* Brand */}
         <div className="mb-8">
@@ -52,36 +52,34 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">Username</label>
             <div className="relative">
-              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="login-input-icon login-input-icon--start">
                 <AppIcon name="person" size={18} />
               </span>
               <input
-                className="input-field ps-10"
+                className="input-field login-input login-input--start-icon"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                dir="ltr"
               />
             </div>
           </div>
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">Password</label>
             <div className="relative">
-              <span className="absolute inset-inline-start-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+              <span className="login-input-icon login-input-icon--start">
                 <AppIcon name="lock" size={18} />
               </span>
               <input
-                className="input-field ps-10 pe-10"
+                className="input-field login-input login-input--start-icon login-input--end-icon"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                dir="ltr"
               />
               <button
                 type="button"
-                className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
+                className="login-input-icon login-input-icon--end text-text-tertiary hover:text-text-secondary"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <AppIcon name="visibility_off" size={16} /> : <AppIcon name="visibility" size={16} />}

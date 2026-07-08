@@ -439,6 +439,37 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .login-card { padding: 2rem; }
 }
 
+.login-scene {
+  direction: ltr;
+}
+
+.login-scene .login-input {
+  padding-left: calc(var(--spacing) * 10);
+  padding-right: 0.75rem;
+}
+
+.login-scene .login-input--end-icon {
+  padding-right: calc(var(--spacing) * 10);
+}
+
+.login-scene .login-input-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  pointer-events: none;
+}
+
+.login-scene .login-input-icon--start {
+  left: calc(var(--spacing) * 3);
+  color: var(--color-text-tertiary);
+}
+
+.login-scene .login-input-icon--end {
+  right: calc(var(--spacing) * 3);
+  pointer-events: auto;
+}
+
 .login-brand {
   display: inline-flex;
   align-items: center;
