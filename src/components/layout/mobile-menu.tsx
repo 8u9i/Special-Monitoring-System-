@@ -58,7 +58,7 @@ export default function MobileMenu({ open, onClose }: Props) {
     <>
       <div
         role="menu"
-        className="lg:hidden absolute top-full inset-x-0 bg-nav text-nav-text border-b border-nav-active max-h-[calc(100vh-80px)] overflow-y-auto animate-fade-in shadow-lg"
+        className="lg:hidden absolute top-full inset-x-0 z-30 bg-nav text-nav-text border-b border-nav-active max-h-[calc(100vh-80px)] overflow-y-auto animate-fade-in shadow-lg"
       >
         {student && (
           <div className="p-4 border-b border-nav-active">
