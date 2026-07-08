@@ -67,11 +67,11 @@ export default function ReferencePage() {
           <div className="panel-header flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 className="panel-title"><span className="panel-title-icon">📚</span> الأحاديث النبوية</h3>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              <div className="relative flex-1 sm:flex-initial">
+              <div className="relative flex-1 sm:flex-initial min-w-0">
                 <span className="absolute inset-inline-end-3 top-1/2 -translate-y-1/2 text-text-tertiary"><AppIcon name="search" size={14} /></span>
-                <input className="input-field pe-8 text-sm" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الأحاديث..." />
+                <input className="input-field pe-8 text-sm w-full" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث في الأحاديث..." />
               </div>
-              <select className="input-field text-sm sm:w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+              <select className="input-field text-sm w-full sm:w-44 sm:max-w-[12rem] truncate" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                 <option value="all">كل التصنيفات</option>
                 {uniqueCategories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
