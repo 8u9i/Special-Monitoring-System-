@@ -20,8 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-canvas text-text-primary font-body">
-        <a href="#main-content" className="skip-link">تخطى إلى المحتوى الرئيسي</a>
-        <Providers><div id="main-content">{children}</div></Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

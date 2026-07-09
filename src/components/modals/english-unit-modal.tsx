@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useData } from "@/lib/tracker-context";
+import { useDialog } from "@/lib/use-dialog";
 import AppIcon from "@/components/app-icon";
 import type { EnglishUnitWithWords } from "@/lib/types";
 
@@ -18,6 +19,7 @@ export default function EnglishUnitModal({ unit, open, onClose }: Props) {
   const { addEnglishUnit, updateEnglishUnit } = useData();
   const [unitNumber, setUnitNumber] = useState<number>(0);
   const [rows, setRows] = useState<WordRow[]>([{ word: "", definition: "" }]);
+  const dialogRef = useDialog(open);
 
   useEffect(() => {
     if (open) {
@@ -78,9 +80,9 @@ export default function EnglishUnitModal({ unit, open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-overlay" onClick={onClose} />
-      <div className="relative modal-panel max-w-2xl animate-fade-in">
+      <div className="relative modal-panel max-w-2xl animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="english-unit-title" ref={dialogRef} tabIndex={-1}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="panel-title">
+          <h2 id="english-unit-title" className="panel-title">
             <AppIcon name={isEdit ? "edit_note" : "add_box"} size={20} className="text-primary" />
             {isEdit ? "تعديل وحدة الإنجليزية" : "إضافة وحدة إنجليزية جديدة"}
           </h2>

@@ -25,7 +25,15 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const id = req.nextUrl.pathname.split("/").pop();
-    await pool.query("DELETE FROM students WHERE id = $1", [id]);
+    // Cascade: also remove the student's progress rows to avoid orphans.
+    await pool.query(
+      `DELETE FROM student_hadiths WHERE student_id = $1;
+       DELETE FROM student_surahs WHERE student_id = $1;
+       DELETE FROM student_surah_pages WHERE student_id = $1;
+       DELETE FROM student_english_progress WHERE student_id = $1;
+       DELETE FROM students WHERE id = $1;`,
+      [id]
+    );
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("DELETE /api/students/[id] error:", err);

@@ -2,22 +2,13 @@
 
 import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
-import { getAvatarEmoji } from "@/lib/constants";
+import { getAvatarEmoji, getProgressValue } from "@/lib/constants";
 import { usePathname } from "next/navigation";
 
 export default function StudentCarousel() {
   const { state, selectStudent } = useData();
   const pathname = usePathname();
   const currentPath = pathname.split("/")[1] || "dashboard";
-
-  const getRouteProgress = (student: typeof state.students[0]) => {
-    switch (currentPath) {
-      case "hadith": return { done: student.memorizedHadithNumbers.length, total: state.hadiths.length };
-      case "quran": return { done: student.memorizedSurahNumbers.length, total: 114 };
-      case "english": return { done: student.memorizedEnglishUnits.length, total: state.englishUnits.length };
-      default: return { done: 0, total: 0 };
-    }
-  };
 
   return (
     <div className="bg-surface-elevated border-b border-border p-3">
@@ -28,7 +19,7 @@ export default function StudentCarousel() {
       <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory scroll-ps-3">
         {state.students.map((s) => {
           const active = s.id === state.selectedStudentId;
-          const progress = getRouteProgress(s);
+          const progress = getProgressValue(currentPath, s, state.hadiths.length, state.englishUnits.length);
           return (
             <button
               key={s.id}

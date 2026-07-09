@@ -51,7 +51,7 @@ export default function StagesPage() {
             <h3 className="font-bold text-text-primary">الطلاب النشطون</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {students.map(({ student, completion }, idx) => {
+            {students.map(({ student, completion }) => {
               const stage = getStudentStage(student);
               return (
                 <div key={student.id} className="panel bg-canvas p-4">

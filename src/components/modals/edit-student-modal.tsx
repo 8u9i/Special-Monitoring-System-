@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useData } from "@/lib/tracker-context";
 import { AVATAR_OPTIONS } from "@/lib/constants";
+import { useDialog } from "@/lib/use-dialog";
 import AppIcon from "@/components/app-icon";
 import type { Student } from "@/lib/types";
 
@@ -18,6 +19,7 @@ export default function EditStudentModal({ student, open, onClose }: Props) {
   const [age, setAge] = useState("");
   const [avatar, setAvatar] = useState("avatar-leaf");
   const [notes, setNotes] = useState("");
+  const dialogRef = useDialog(open);
 
   useEffect(() => {
     if (student) {
@@ -44,9 +46,9 @@ export default function EditStudentModal({ student, open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-overlay" onClick={onClose} />
-      <div className="relative modal-panel max-w-md animate-fade-in">
+      <div className="relative modal-panel max-w-md animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="edit-student-title" ref={dialogRef} tabIndex={-1}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="panel-title">
+          <h2 id="edit-student-title" className="panel-title">
             <AppIcon name="edit" size={20} className="text-primary" />
             تعديل بيانات الطالب
           </h2>

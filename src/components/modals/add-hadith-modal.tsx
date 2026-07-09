@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useData } from "@/lib/tracker-context";
+import { useDialog } from "@/lib/use-dialog";
 import AppIcon from "@/components/app-icon";
 
 function splitBlocks(value: string): string[] {
@@ -19,6 +20,7 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
   const [bulk, setBulk] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [error, setError] = useState("");
+  const dialogRef = useDialog(open);
 
   const categories = [...new Set(state.hadiths.map((h) => h.category).filter(Boolean))].sort();
 
@@ -30,8 +32,10 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
 
   useEffect(() => {
     if (open) {
-      setText(""); setExplanation(""); setCategory("");
-      setBulk(false); setShowNewCategory(false); setError("");
+      queueMicrotask(() => {
+        setText(""); setExplanation(""); setCategory("");
+        setBulk(false); setShowNewCategory(false); setError("");
+      });
     }
   }, [open]);
 
@@ -60,9 +64,9 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-overlay" onClick={onClose} />
-      <div className="relative modal-panel max-w-lg animate-fade-in">
+      <div className="relative modal-panel max-w-lg animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="add-hadith-title" ref={dialogRef} tabIndex={-1}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="panel-title">
+          <h2 id="add-hadith-title" className="panel-title">
             <AppIcon name="add_box" size={20} className="text-primary" />
             إضافة حديث شريف جديد
           </h2>

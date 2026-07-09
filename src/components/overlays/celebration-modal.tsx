@@ -1,20 +1,22 @@
 "use client";
 
 import { useUI } from "@/lib/tracker-context";
+import { useDialog } from "@/lib/use-dialog";
 import AppIcon from "@/components/app-icon";
 import { getAvatarEmoji } from "@/lib/constants";
 
 export default function CelebrationModal() {
   const { celebration } = useUI();
+  const dialogRef = useDialog(celebration.show);
   if (!celebration.show || !celebration.student || !celebration.stage) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-overlay" />
-      <div className="relative modal-panel max-w-sm text-center animate-fade-in">
+      <div className="relative modal-panel max-w-sm text-center animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="celebration-title" ref={dialogRef} tabIndex={-1}>
         <div className="text-5xl animate-bounce mb-4">👑</div>
         <AppIcon name={celebration.stage.badgeIcon} size={40} className="text-primary mx-auto mb-2" />
-        <h2 className="text-xl font-bold text-primary font-tajawal mb-1">مبارك!</h2>
+        <h2 id="celebration-title" className="text-xl font-bold text-primary font-tajawal mb-1">مبارك!</h2>
         <p className="text-lg font-semibold text-text-primary">
           {getAvatarEmoji(celebration.student.avatar)} {celebration.student.name}
         </p>

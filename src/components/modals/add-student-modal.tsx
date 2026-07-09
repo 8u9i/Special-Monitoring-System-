@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useData } from "@/lib/tracker-context";
 import { AVATAR_OPTIONS } from "@/lib/constants";
+import { useDialog } from "@/lib/use-dialog";
 import AppIcon from "@/components/app-icon";
 
 export default function AddStudentModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -11,6 +12,7 @@ export default function AddStudentModal({ open, onClose }: { open: boolean; onCl
   const [age, setAge] = useState("");
   const [avatar, setAvatar] = useState("avatar-leaf");
   const [notes, setNotes] = useState("");
+  const dialogRef = useDialog(open);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -28,11 +30,11 @@ export default function AddStudentModal({ open, onClose }: { open: boolean; onCl
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-overlay" onClick={onClose} />
-      <div className="relative modal-panel max-w-md animate-fade-in">
+      <div className="relative modal-panel max-w-md animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="add-student-title" ref={dialogRef} tabIndex={-1}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="panel-title">
+          <h2 id="add-student-title" className="panel-title">
             <AppIcon name="person_add" size={20} className="text-primary" />
             تسجيل طالب جديد
           </h2>

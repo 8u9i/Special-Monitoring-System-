@@ -101,9 +101,12 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
     };
     const prevStudents = stateRef.current.students;
+    // Insert optimistically with a temporary id so the UI is responsive...
     setState((s) => ({ ...s, students: [...s.students, newStudent], selectedStudentId: newStudent.id }));
     try {
-      await api("POST", "/students", newStudent);
+      // ...then replace with the server-generated record (real id, real joinedAt).
+      const saved = await api<Student>("POST", "/students", newStudent);
+      setState((s) => ({ ...s, students: s.students.map((st) => st.id === newStudent.id ? saved : st), selectedStudentId: saved.id }));
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doAddStudent error:", err);
@@ -114,7 +117,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
   const doUpdateStudent = useCallback(async (id: string, name: string, age?: number, avatar?: string, notes?: string) => {
     const payload = {
       id, name: name.trim(), age, avatar: avatar || "avatar-leaf",
-      notes: notes?.trim(), joinedAt: new Date().toISOString().split("T")[0],
+      notes: notes?.trim(),
     };
     const prevStudents = stateRef.current.students;
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === id ? { ...st, name: name.trim(), age, avatar: avatar || st.avatar, notes: notes?.trim() } : st) }));
@@ -134,7 +137,8 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       selectedStudentId: s.selectedStudentId === id ? (s.students.length > 1 ? s.students.find((st) => st.id !== id)!.id : null) : s.selectedStudentId,
     }));
     try {
-      await api("DELETE", `/students/${id}`);
+      // Cascade: delete the student and all of their progress in one round trip.
+      await api("DELETE", `/students/${id}?cascade=1`);
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doDeleteStudent error:", err);
@@ -412,34 +416,33 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const doResetStudentProgress = useCallback(async (studentId: string) => {
     const prevStudents = stateRef.current.students;
-    setState((s) => ({ ...s, students: s.students.map((st) => {
-      if (st.id !== studentId) return st;
-      return { ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [] };
-    }) }));
+    const cleared = {
+      memorizedHadithNumbers: [], reviewHadithNumbers: [],
+      memorizedSurahNumbers: [], reviewSurahNumbers: [],
+      memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
+    };
+    setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, ...cleared } : st) }));
     try {
-      await Promise.allSettled(
-        stateRef.current.hadiths.map((h) =>
-          api("DELETE", `/student-hadiths/${studentId}/${h.number}`)
-        )
-      );
+      await api("DELETE", `/students/${studentId}/progress`);
+      showToastExternal("تم تصفير تقدم الطالب", "success");
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doResetStudentProgress error:", err);
+      showToastExternal("فشل تصفير تقدم الطالب", "error");
     }
-    showToastExternal("تم تصفير تقدم الطالب", "success");
   }, [showToastExternal]);
 
   const doResetAllProgress = useCallback(async () => {
     const prevStudents = stateRef.current.students;
-    const allHadiths = stateRef.current.hadiths;
-    setState((s) => ({ ...s, students: s.students.map((st) => ({
-      ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
-    })) }));
+    const cleared = {
+      memorizedHadithNumbers: [], reviewHadithNumbers: [],
+      memorizedSurahNumbers: [], reviewSurahNumbers: [],
+      memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
+    };
+    setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, ...cleared })) }));
     try {
       await Promise.allSettled(
-        prevStudents.flatMap((st) => allHadiths.map((h) =>
-          api("DELETE", `/student-hadiths/${st.id}/${h.number}`)
-        ))
+        prevStudents.map((st) => api("DELETE", `/students/${st.id}/progress`))
       );
       showToastExternal("تم تصفير تقدم جميع الطلاب", "success");
     } catch (err) {
@@ -449,11 +452,11 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     }
   }, [showToastExternal]);
 
-  const getStudentStage = useCallback((student: Student): Stage => {
+  function getStudentStage(student: Student): Stage {
     const { hadiths, englishUnits } = stateRef.current;
     const overall = getCompletion(student, hadiths.length, englishUnits.length).overall;
     return STAGES.find((s) => overall >= s.minPct && overall <= s.maxPct) || STAGES[0];
-  }, []);
+  }
 
   const ctx = {
     state,
