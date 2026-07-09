@@ -38,6 +38,7 @@ interface DataContextType {
   toggleEnglishStatus: (studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") => Promise<void>;
   cheatUnlockAll: (studentId: string) => Promise<void>;
   resetStudentProgress: (studentId: string) => Promise<void>;
+  resetAllProgress: () => Promise<void>;
   getStudentStage: (student: Student) => Stage;
   getStudentNextStageInfo: (student: Student) => { nextStage: Stage; remaining: number } | null;
 }
@@ -448,6 +449,26 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     showToastExternal("تم تصفير تقدم الطالب", "success");
   }, [showToastExternal]);
 
+  const doResetAllProgress = useCallback(async () => {
+    const prevStudents = stateRef.current.students;
+    const allHadiths = stateRef.current.hadiths;
+    setState((s) => ({ ...s, students: s.students.map((st) => ({
+      ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
+    })) }));
+    try {
+      await Promise.allSettled(
+        prevStudents.flatMap((st) => allHadiths.map((h) =>
+          api("DELETE", `/student-hadiths/${st.id}/${h.number}`)
+        ))
+      );
+      showToastExternal("تم تصفير تقدم جميع الطلاب", "success");
+    } catch (err) {
+      setState((s) => ({ ...s, students: prevStudents }));
+      console.error("doResetAllProgress error:", err);
+      showToastExternal("فشل تصفير تقدم الطلاب", "error");
+    }
+  }, [showToastExternal]);
+
   const getStudentStage = useCallback((student: Student): Stage => {
     return STAGES.find((s) => student.xp >= s.minXP && student.xp <= s.maxXP) || STAGES[0];
   }, []);
@@ -467,7 +488,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     toggleHadithStatus: doToggleHadithStatus, toggleSurahStatus: doToggleSurahStatus,
     toggleSurahPageStatus: doToggleSurahPageStatus, markAllSurahPages: doMarkAllSurahPages,
     clearAllSurahPages: doClearAllSurahPages, toggleEnglishStatus: doToggleEnglishStatus,
-    cheatUnlockAll: doCheatUnlockAll, resetStudentProgress: doResetStudentProgress,
+    cheatUnlockAll: doCheatUnlockAll, resetStudentProgress: doResetStudentProgress, resetAllProgress: doResetAllProgress,
     getStudentStage, getStudentNextStageInfo,
   };
 

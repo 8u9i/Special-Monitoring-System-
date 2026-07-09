@@ -9,7 +9,7 @@ import AddStudentModal from "@/components/modals/add-student-modal";
 import type { Student } from "@/lib/types";
 
 export default function StagesPage() {
-  const { state, getStudentStage, deleteStudent, cheatUnlockAll, resetStudentProgress } = useData();
+  const { state, getStudentStage, deleteStudent, cheatUnlockAll, resetStudentProgress, resetAllProgress } = useData();
   const { confirm } = useUI();
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [addStudentOpen, setAddStudentOpen] = useState(false);
@@ -35,6 +35,9 @@ export default function StagesPage() {
           </div>
           <button className="btn btn-primary btn-md w-full" onClick={() => setAddStudentOpen(true)}>
             <AppIcon name="person_add" size={16} /> إضافة طالب جديد
+          </button>
+          <button className="btn btn-outline btn-md w-full text-rose border-rose" onClick={() => confirm.ask("سيؤدي هذا إلى تصفير تقدم جميع الطلاب بالكامل. متأكد؟", () => resetAllProgress())}>
+            <AppIcon name="restart_alt" size={16} /> تصفير كل نقاط XP
           </button>
         </div>
 
