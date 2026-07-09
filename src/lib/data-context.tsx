@@ -152,9 +152,11 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
   const doAddBulkHadiths = useCallback(async (texts: string[], explanations: string[], category: string) => {
     if (texts.length === 0) return;
     const cat = category.trim() || "عام";
+    const startNumber = stateRef.current.hadiths.reduce((max, h) => Math.max(max, h.number), 0) + 1;
     const results = await Promise.allSettled(
       texts.map((t, i) =>
         api<Hadith>("POST", "/hadiths", {
+          number: startNumber + i,
           text: t,
           explanation: explanations[i] || "شرح مبسط", category: cat, points: 100,
         })
