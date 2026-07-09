@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import type { Student, Hadith, EnglishUnitWithWords, Stage } from "./types";
-import { STAGES } from "./constants";
+import { STAGES, getCompletion } from "./constants";
 import { api } from "./api";
 
 interface AppState {
@@ -40,7 +40,6 @@ interface DataContextType {
   resetStudentProgress: (studentId: string) => Promise<void>;
   resetAllProgress: () => Promise<void>;
   getStudentStage: (student: Student) => Stage;
-  getStudentNextStageInfo: (student: Student) => { nextStage: Stage; remaining: number } | null;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -94,16 +93,12 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     setState((s) => ({ ...s, selectedStudentId: id }));
   }, []);
 
-  const updateXP = useCallback((studentId: string, xp: number) => {
-    setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, xp } : st) }));
-  }, []);
-
   const doAddStudent = useCallback(async (name: string, age?: number, avatar = "avatar-leaf", notes?: string) => {
     if (!name.trim()) return;
     const newStudent: Student = {
       id: "student-" + Date.now(), name: name.trim(), age, avatar, notes: notes?.trim(),
       joinedAt: new Date().toISOString().split("T")[0], memorizedHadithNumbers: [], reviewHadithNumbers: [],
-      memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
+      memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
     };
     const prevStudents = stateRef.current.students;
     setState((s) => ({ ...s, students: [...s.students, newStudent], selectedStudentId: newStudent.id }));
@@ -125,15 +120,12 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === id ? { ...st, name: name.trim(), age, avatar: avatar || st.avatar, notes: notes?.trim() } : st) }));
     try {
       await api("PUT", `/students/${id}`, payload);
-      const fresh = await api<Student[]>("GET", "/students");
-      const updated = fresh.find((s) => s.id === id);
-      if (updated) updateXP(id, updated.xp);
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doUpdateStudent error:", err);
       showToastExternal("فشل تحديث بيانات الطالب", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doDeleteStudent = useCallback(async (id: string) => {
     const prevStudents = stateRef.current.students;
@@ -272,7 +264,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       console.error("doDeleteEnglishUnit error:", err);
       showToastExternal("فشل حذف الوحدة", "error");
     }
-  }, [showToastExternal, updateXP, doAddEnglishUnit]);
+  }, [showToastExternal, doAddEnglishUnit]);
 
   const doToggleHadithStatus = useCallback(async (studentId: string, hadithNumber: number, newStatus: "memorized" | "review" | "none") => {
     const prevStudents = stateRef.current.students;
@@ -285,13 +277,12 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       return { ...st, memorizedHadithNumbers: memorized, reviewHadithNumbers: review };
     }) }));
     try {
-      const r = await api<{ xp: number }>("POST", "/student-hadiths", { studentId, hadithNumber, status: newStatus });
-      updateXP(studentId, r.xp);
+      await api("POST", "/student-hadiths", { studentId, hadithNumber, status: newStatus });
       const student = prevStudents.find((s) => s.id === studentId);
       if (student && newStatus === "memorized") {
-        const oldStage = STAGES.find((s) => student.xp >= s.minXP && student.xp <= s.maxXP) || STAGES[0];
+        const oldStage = getStudentStage(student);
         const newSt = { ...student, memorizedHadithNumbers: [...student.memorizedHadithNumbers, hadithNumber] };
-        const newStage = STAGES.find((s) => computeXP(newSt) >= s.minXP && computeXP(newSt) <= s.maxXP) || STAGES[0];
+        const newStage = getStudentStage(newSt);
         if (newStage.level > oldStage.level && onCelebration) onCelebration(student, newStage);
       }
     } catch (err) {
@@ -299,7 +290,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       console.error("doToggleHadithStatus error:", err);
       showToastExternal("فشل تحديث حالة الحديث", "error");
     }
-  }, [showToastExternal, updateXP, onCelebration]);
+  }, [showToastExternal, onCelebration]);
 
   const doToggleSurahStatus = useCallback(async (studentId: string, surahNumber: number, newStatus: "memorized" | "review" | "none") => {
     const prevStudents = stateRef.current.students;
@@ -312,14 +303,13 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       return { ...st, memorizedSurahNumbers: memorized, reviewSurahNumbers: review };
     }) }));
     try {
-      const r = await api<{ xp: number }>("POST", "/student-surahs", { studentId, surahNumber, status: newStatus });
-      updateXP(studentId, r.xp);
+      await api("POST", "/student-surahs", { studentId, surahNumber, status: newStatus });
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doToggleSurahStatus error:", err);
       showToastExternal("فشل تحديث حالة السورة", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doToggleSurahPageStatus = useCallback(async (studentId: string, surahNumber: number, pageIndex: number, newStatus: "memorized" | "none") => {
     const pageId = `${surahNumber}-${pageIndex}`;
@@ -332,15 +322,15 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     }) }));
     try {
       const r = newStatus === "memorized"
-        ? await api<{ xp: number }>("POST", "/student-surah-pages", { studentId, pageId })
-        : await api<{ xp: number }>("DELETE", `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
-      updateXP(studentId, r.xp);
+        ? await api("POST", "/student-surah-pages", { studentId, pageId })
+        : await api("DELETE", `/student-surah-pages/${studentId}/${encodeURIComponent(pageId)}`);
+      void r;
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doToggleSurahPageStatus error:", err);
       showToastExternal("فشل تحديث صفحة السورة", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doMarkAllSurahPages = useCallback(async (studentId: string, surahNumber: number, pageCount: number) => {
     const prevStudents = stateRef.current.students;
@@ -356,14 +346,13 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, memorizedSurahPages: memorized } : st) }));
     try {
       const pageIds = Array.from({ length: pageCount }, (_, i) => `${surahNumber}-${i + 1}`);
-      const r = await api<{ xp: number }>("POST", "/student-surah-pages/batch", { studentId, pageIds });
-      updateXP(studentId, r.xp);
+      await api("POST", "/student-surah-pages/batch", { studentId, pageIds });
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doMarkAllSurahPages error:", err);
       showToastExternal("فشل حفظ جميع الصفحات", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doClearAllSurahPages = useCallback(async (studentId: string, surahNumber: number, pageCount: number) => {
     const prevStudents = stateRef.current.students;
@@ -374,14 +363,13 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     setState((s) => ({ ...s, students: s.students.map((st) => st.id === studentId ? { ...st, memorizedSurahPages: memorized } : st) }));
     try {
       const pageIds = Array.from({ length: pageCount }, (_, i) => `${surahNumber}-${i + 1}`);
-      const r = await api<{ xp: number }>("DELETE", `/student-surah-pages/batch/${studentId}`, { pageIds });
-      updateXP(studentId, r.xp);
+      await api("DELETE", `/student-surah-pages/batch/${studentId}`, { pageIds });
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doClearAllSurahPages error:", err);
       showToastExternal("فشل مسح الصفحات", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doToggleEnglishStatus = useCallback(async (studentId: string, unitNumber: number, newStatus: "memorized" | "review" | "none") => {
     const prevStudents = stateRef.current.students;
@@ -394,14 +382,13 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       return { ...st, memorizedEnglishUnits: memorized, reviewEnglishUnits: review };
     }) }));
     try {
-      const r = await api<{ xp: number }>("POST", "/student-english-progress", { studentId, unitNumber, status: newStatus });
-      updateXP(studentId, r.xp);
+      await api("POST", "/student-english-progress", { studentId, unitNumber, status: newStatus });
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doToggleEnglishStatus error:", err);
       showToastExternal("فشل تحديث حالة الوحدة الإنجليزية", "error");
     }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doCheatUnlockAll = useCallback(async (studentId: string) => {
     const hadiths = stateRef.current.hadiths;
@@ -421,20 +408,13 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     } else {
       showToastExternal("تم فتح كل الأحاديث!", "success");
     }
-    try {
-      const fresh = await api<Student[]>("GET", "/students");
-      const updated = fresh.find((s) => s.id === studentId);
-      if (updated) updateXP(studentId, updated.xp);
-    } catch (err) {
-      console.error("doCheatUnlockAll XP refetch error:", err);
-    }
-  }, [showToastExternal, updateXP]);
+  }, [showToastExternal]);
 
   const doResetStudentProgress = useCallback(async (studentId: string) => {
     const prevStudents = stateRef.current.students;
     setState((s) => ({ ...s, students: s.students.map((st) => {
       if (st.id !== studentId) return st;
-      return { ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0 };
+      return { ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [] };
     }) }));
     try {
       await Promise.allSettled(
@@ -451,30 +431,29 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const doResetAllProgress = useCallback(async () => {
     const prevStudents = stateRef.current.students;
-    setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, xp: 0 })) }));
+    const allHadiths = stateRef.current.hadiths;
+    setState((s) => ({ ...s, students: s.students.map((st) => ({
+      ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [],
+    })) }));
     try {
       await Promise.allSettled(
-        prevStudents.map((st) =>
-          api("PUT", `/students/${st.id}`, { id: st.id, name: st.name, age: st.age, avatar: st.avatar, notes: st.notes, joinedAt: st.joinedAt, xp: 0 })
-        )
+        prevStudents.flatMap((st) => allHadiths.map((h) =>
+          api("DELETE", `/student-hadiths/${st.id}/${h.number}`)
+        ))
       );
-      showToastExternal("تم تصفير نقاط XP لجميع الطلاب", "success");
+      showToastExternal("تم تصفير تقدم جميع الطلاب", "success");
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doResetAllProgress error:", err);
-      showToastExternal("فشل تصفير نقاط XP", "error");
+      showToastExternal("فشل تصفير تقدم الطلاب", "error");
     }
   }, [showToastExternal]);
 
   const getStudentStage = useCallback((student: Student): Stage => {
-    return STAGES.find((s) => student.xp >= s.minXP && student.xp <= s.maxXP) || STAGES[0];
+    const { hadiths, englishUnits } = stateRef.current;
+    const overall = getCompletion(student, hadiths.length, englishUnits.length).overall;
+    return STAGES.find((s) => overall >= s.minPct && overall <= s.maxPct) || STAGES[0];
   }, []);
-
-  const getStudentNextStageInfo = useCallback((student: Student) => {
-    const current = getStudentStage(student);
-    const next = STAGES.find((s) => s.level === current.level + 1);
-    return next ? { nextStage: next, remaining: next.minXP - student.xp } : null;
-  }, [getStudentStage]);
 
   const ctx = {
     state,
@@ -486,7 +465,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     toggleSurahPageStatus: doToggleSurahPageStatus, markAllSurahPages: doMarkAllSurahPages,
     clearAllSurahPages: doClearAllSurahPages, toggleEnglishStatus: doToggleEnglishStatus,
     cheatUnlockAll: doCheatUnlockAll, resetStudentProgress: doResetStudentProgress, resetAllProgress: doResetAllProgress,
-    getStudentStage, getStudentNextStageInfo,
+    getStudentStage,
   };
 
   return (
@@ -496,14 +475,6 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
   );
 }
 
-function computeXP(s: Student): number {
-  return (
-    s.memorizedHadithNumbers.length * 100 +
-    s.memorizedSurahNumbers.length * 150 +
-    (s.memorizedSurahPages?.length || 0) * 20 +
-    s.memorizedEnglishUnits.length * 100
-  );
-}
 
 export function useData(): DataContextType {
   const ctx = useContext(DataContext);

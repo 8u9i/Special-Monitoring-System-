@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool, { recalculateXP } from "@/lib/db";
+import pool from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
 export async function DELETE(
@@ -14,9 +14,7 @@ export async function DELETE(
       "DELETE FROM student_hadiths WHERE student_id = $1 AND hadith_number = $2",
       [studentId, parseInt(hadithNumber)]
     );
-    const xp = await recalculateXP(pool, studentId);
-    await pool.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
-    return NextResponse.json({ success: true, xp });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("DELETE /api/student-hadiths/[studentId]/[hadithNumber] error:", err);
     return NextResponse.json({ error: "Failed to delete hadith status" }, { status: 500 });

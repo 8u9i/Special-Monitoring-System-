@@ -6,6 +6,30 @@ export interface ProgressValue {
   label: string;
 }
 
+export interface CompletionBreakdown {
+  hadith: number;
+  quran: number;
+  english: number;
+  overall: number;
+}
+
+/**
+ * Overall completion across the three subjects, equal-weighted.
+ * Percentages are 0-100 integers.
+ */
+export function getCompletion(
+  student: Student,
+  hadithsCount: number,
+  englishUnitsCount: number
+): CompletionBreakdown {
+  const pct = (done: number, total: number) => (total > 0 ? Math.round((done / total) * 100) : 0);
+  const hadith = pct(student.memorizedHadithNumbers.length, hadithsCount);
+  const quran = pct(student.memorizedSurahNumbers.length, 114);
+  const english = pct(student.memorizedEnglishUnits.length, englishUnitsCount);
+  const overall = Math.round((hadith + quran + english) / 3);
+  return { hadith, quran, english, overall };
+}
+
 /**
  * Calculate progress
  */
@@ -137,11 +161,11 @@ export const QURAN_SURAHS: Surah[] = [
 ];
 
 export const STAGES: Stage[] = [
-  { level: 1, name: "مرحلة البذرة", minXP: 0, maxXP: 1000, description: "بداية مباركة ونبتة صالحة في رياض المعرفة.", badgeIcon: "eco" },
-  { level: 2, name: "مرحلة الشتلة", minXP: 1001, maxXP: 3000, description: "تنمو المعرفة وتترسخ خطى الحفظ في القلوب.", badgeIcon: "yard" },
-  { level: 3, name: "مرحلة الغصن", minXP: 3001, maxXP: 6000, description: "غصن يافع يرتوي بالقرآن والسنة واللغة النافعة.", badgeIcon: "nature" },
-  { level: 4, name: "مرحلة الشجرة المثمرة", minXP: 6001, maxXP: 10000, description: "أثمر السعي والجد، وبدأت الحكمة تظهر.", badgeIcon: "local_florist" },
-  { level: 5, name: "مرحلة الظل الممتد", minXP: 10001, maxXP: 999999, description: "تاج الحافظين، يظلل من حوله بنور وسكينة وعلم واسع.", badgeIcon: "park" },
+  { level: 1, name: "مرحلة البذرة", minPct: 0, maxPct: 20, description: "بداية مباركة ونبتة صالحة في رياض المعرفة.", badgeIcon: "eco" },
+  { level: 2, name: "مرحلة الشتلة", minPct: 21, maxPct: 50, description: "تنمو المعرفة وتترسخ خطى الحفظ في القلوب.", badgeIcon: "yard" },
+  { level: 3, name: "مرحلة الغصن", minPct: 51, maxPct: 80, description: "غصن يافع يرتوي بالقرآن والسنة واللغة النافعة.", badgeIcon: "nature" },
+  { level: 4, name: "مرحلة الشجرة المثمرة", minPct: 81, maxPct: 99, description: "أثمر السعي والجد، وبدأت الحكمة تظهر.", badgeIcon: "local_florist" },
+  { level: 5, name: "مرحلة الظل الممتد", minPct: 100, maxPct: 100, description: "تاج الحافظين، يظلل من حوله بنور وسكينة وعلم واسع.", badgeIcon: "park" },
 ];
 
 export const AVATAR_MAP: Record<string, string> = {

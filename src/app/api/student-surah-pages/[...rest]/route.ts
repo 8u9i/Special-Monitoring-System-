@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool, { recalculateXP } from "@/lib/db";
+import pool from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
-async function doSingle(studentId: string, pageId: string): Promise<{ xp: number }> {
+async function doSingle(studentId: string, pageId: string): Promise<{ success: true }> {
   await pool.query(
     "DELETE FROM student_surah_pages WHERE student_id = $1 AND page_id = $2",
     [studentId, pageId]
   );
-  const xp = await recalculateXP(pool, studentId);
-  await pool.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
-  return { xp };
+  return { success: true };
 }
 
-async function doBatch(studentId: string, pageIds: string[]): Promise<{ xp: number }> {
+async function doBatch(studentId: string, pageIds: string[]): Promise<{ success: true }> {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -22,10 +20,8 @@ async function doBatch(studentId: string, pageIds: string[]): Promise<{ xp: numb
         [studentId, pageId]
       );
     }
-    const xp = await recalculateXP(client, studentId);
-    await client.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
     await client.query("COMMIT");
-    return { xp };
+    return { success: true };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;

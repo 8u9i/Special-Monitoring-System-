@@ -12,7 +12,6 @@ export interface Student {
   memorizedSurahPages: string[];
   memorizedEnglishUnits: number[];
   reviewEnglishUnits: number[];
-  xp: number;
 }
 
 export interface Hadith {
@@ -31,8 +30,8 @@ export interface EnglishUnitWithWords {
 export interface Stage {
   level: number;
   name: string;
-  minXP: number;
-  maxXP: number;
+  minPct: number;
+  maxPct: number;
   description: string;
   badgeIcon: string;
 }

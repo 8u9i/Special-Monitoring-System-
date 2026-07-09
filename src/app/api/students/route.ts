@@ -89,7 +89,6 @@ export async function GET(req: NextRequest) {
         reviewEnglishUnits: englishRows
           .filter((r) => r["status"] === "review")
           .map((r) => r["unit_number"] as number),
-        xp: s.xp || 0,
       };
     });
     return NextResponse.json(full);
@@ -105,10 +104,10 @@ export async function POST(req: NextRequest) {
   try {
     const { id, name, age, avatar, notes, joinedAt } = await req.json();
     const { rows } = await pool.query(
-      "INSERT INTO students (id, name, age, avatar, notes, joined_at, xp) VALUES ($1, $2, $3, $4, $5, $6, 0) RETURNING *",
+      "INSERT INTO students (id, name, age, avatar, notes, joined_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [id, name, age ?? null, avatar || "avatar-leaf", notes || null, joinedAt || new Date().toISOString().split("T")[0]]
     );
-    return NextResponse.json({ ...rows[0], xp: 0 });
+    return NextResponse.json(rows[0]);
   } catch (err) {
     console.error("POST /api/students error:", err);
     return NextResponse.json({ error: "Failed to save student" }, { status: 500 });

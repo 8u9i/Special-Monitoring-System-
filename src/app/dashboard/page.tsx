@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
-import { getAvatarEmoji } from "@/lib/constants";
+import ProgressBar from "@/components/progress-bar";
+import { getAvatarEmoji, getCompletion } from "@/lib/constants";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -12,11 +13,15 @@ export default function DashboardPage() {
 
   const stats = useMemo(() => {
     const list = state.students;
-    if (list.length === 0) return { totalStudents: 0, totalXP: 0, averageXP: 0, topStudent: null as typeof list[0] | null };
-    const totalXP = list.reduce((sum, s) => sum + s.xp, 0);
-    const topStudent = list.reduce((a, b) => (a.xp > b.xp ? a : b));
-    return { totalStudents: list.length, totalXP, averageXP: Math.round((totalXP / list.length) * 10) / 10, topStudent: topStudent.xp > 0 ? topStudent : null };
-  }, [state.students]);
+    if (list.length === 0) return { totalStudents: 0, averageCompletion: 0, topStudent: null as typeof list[0] | null };
+    const averageCompletion = Math.round(list.reduce((sum, s) => sum + getCompletion(s, state.hadiths.length, state.englishUnits.length).overall, 0) / list.length);
+    const topStudent = list.reduce((a, b) => {
+      const ca = getCompletion(a, state.hadiths.length, state.englishUnits.length).overall;
+      const cb = getCompletion(b, state.hadiths.length, state.englishUnits.length).overall;
+      return ca >= cb ? a : b;
+    });
+    return { totalStudents: list.length, averageCompletion, topStudent: getCompletion(topStudent, state.hadiths.length, state.englishUnits.length).overall > 0 ? topStudent : null };
+  }, [state.students, state.hadiths.length, state.englishUnits.length]);
 
   const quranProgress = useMemo(() => {
     const student = state.students.find((s) => s.id === state.selectedStudentId);
@@ -26,8 +31,13 @@ export default function DashboardPage() {
   }, [state.students, state.selectedStudentId]);
 
   const sortedStudents = useMemo(
-    () => [...state.students].sort((a, b) => b.xp - a.xp),
-    [state.students]
+    () =>
+      [...state.students].sort(
+        (a, b) =>
+          getCompletion(b, state.hadiths.length, state.englishUnits.length).overall -
+          getCompletion(a, state.hadiths.length, state.englishUnits.length).overall
+      ),
+    [state.students, state.hadiths.length, state.englishUnits.length]
   );
 
   const hadithOfTheDay = useMemo(() => {
@@ -58,28 +68,26 @@ export default function DashboardPage() {
         <div className="panel p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-primary-light flex items-center justify-center">
-              <AppIcon name="emoji_events" size={18} />
+              <AppIcon name="done_all" size={18} />
             </div>
-            <span className="text-xs text-text-secondary font-semibold">مجموع النقاط</span>
+            <span className="text-xs text-text-secondary font-semibold">متوسط الإنجاز</span>
           </div>
-          <p className="text-3xl font-bold text-primary-dark">{stats.totalXP}</p>
+          <p className="text-3xl font-bold text-primary-dark">{stats.averageCompletion}%</p>
           <p className="text-xs text-text-secondary mt-2 font-medium flex items-center gap-1">
-            <AppIcon name="done_all" size={18} /> حصيلة الحفظ
+            <AppIcon name="query_stats" size={18} /> عبر المواد الثلاث
           </p>
         </div>
 
         <div className="panel p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-amber-light flex items-center justify-center">
-              <AppIcon name="query_stats" size={18} />
+              <AppIcon name="trending_up" size={18} />
             </div>
-            <span className="text-xs text-text-secondary font-semibold">متوسط الطالب</span>
+            <span className="text-xs text-text-secondary font-semibold">إجمالي الأحاديث</span>
           </div>
-          <p className="text-3xl font-bold text-text-primary">
-            {stats.averageXP} <span className="text-sm font-medium text-text-secondary">XP</span>
-          </p>
+          <p className="text-3xl font-bold text-text-primary">{state.hadiths.length}</p>
           <p className="text-xs text-text-secondary mt-2 font-medium flex items-center gap-1">
-            <AppIcon name="trending_up" size={18} /> معدل مستمر
+            <AppIcon name="menu_book" size={18} /> في المنهج
           </p>
         </div>
 
@@ -94,7 +102,7 @@ export default function DashboardPage() {
             <>
               <p className="text-lg font-bold text-text-primary truncate">{stats.topStudent.name}</p>
               <p className="text-xs text-primary-dark mt-2 font-bold bg-primary-light px-3 py-1 inline-block">
-                {stats.topStudent.xp} نقطة
+                {getCompletion(stats.topStudent, state.hadiths.length, state.englishUnits.length).overall}% إنجاز
               </p>
             </>
           ) : (
@@ -127,14 +135,7 @@ export default function DashboardPage() {
             <p className="text-sm text-text-secondary mb-4">
               حفظ <span className="font-bold text-primary">{quranProgress.totalMemorized}</span> من 114 سورة
             </p>
-            <div className="w-full h-3 bg-canvas overflow-hidden flex">
-              <div className="progress-fill-green" style={{ width: `${quranProgress.percentage}%` }} />
-            </div>
-            <div className="flex items-center justify-between mt-2 text-xs">
-              <span className="text-text-tertiary">0</span>
-              <span className="text-text-secondary font-semibold">{quranProgress.totalMemorized} / 114 سورة</span>
-              <span className="text-text-tertiary">114</span>
-            </div>
+            <ProgressBar value={quranProgress.percentage} variant="green" showLabel label={`${quranProgress.totalMemorized} / 114`} />
           </div>
         </div>
       </div>
@@ -152,7 +153,8 @@ export default function DashboardPage() {
 
           <div className="space-y-2">
             {sortedStudents.map((student, idx) => {
-              const isTop = idx === 0 && student.xp > 0;
+              const overall = getCompletion(student, state.hadiths.length, state.englishUnits.length).overall;
+              const isTop = idx === 0 && overall > 0;
               const stage = getStudentStage(student);
               return (
                 <div key={student.id}
@@ -174,7 +176,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 text-xs text-text-secondary mt-0.5">
                         <span className="font-semibold text-primary-dark">{stage.name}</span>
                         <span className="text-text-tertiary">·</span>
-                        <span>{student.xp} نقطة</span>
+                        <span>{overall}% إنجاز</span>
                       </div>
                     </div>
                   </div>

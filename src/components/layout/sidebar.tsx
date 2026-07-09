@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useCallback } from "react";
 import { useAuth, useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
+import ProgressBar from "@/components/progress-bar";
 import { getAvatarEmoji, getProgressValue } from "@/lib/constants";
 
 interface NavItem {
@@ -57,9 +58,7 @@ export default function Sidebar() {
                   <div className="flex justify-between text-2xs text-nav-text-muted mb-1">
                     <span>{progress.done} / {progress.total} {progress.label}</span>
                   </div>
-                  <div className="progress-bar bg-nav-active">
-                    <div className="progress-fill" style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }} />
-                  </div>
+                  <ProgressBar value={Math.round((progress.done / progress.total) * 100)} variant="primary" size="sm" />
                 </div>
               )}
             </div>

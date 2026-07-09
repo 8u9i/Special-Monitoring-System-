@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool, { recalculateXP } from "@/lib/db";
+import pool from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
 async function doSingle(req: NextRequest): Promise<NextResponse> {
@@ -8,9 +8,7 @@ async function doSingle(req: NextRequest): Promise<NextResponse> {
     "INSERT INTO student_surah_pages (student_id, page_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
     [studentId, pageId]
   );
-  const xp = await recalculateXP(pool, studentId);
-  await pool.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
-  return NextResponse.json({ success: true, xp });
+  return NextResponse.json({ success: true });
 }
 
 async function doBatch(req: NextRequest): Promise<NextResponse> {
@@ -24,10 +22,8 @@ async function doBatch(req: NextRequest): Promise<NextResponse> {
         [studentId, pageId]
       );
     }
-    const xp = await recalculateXP(client, studentId);
-    await client.query("UPDATE students SET xp = $1 WHERE id = $2", [xp, studentId]);
     await client.query("COMMIT");
-    return NextResponse.json({ success: true, xp });
+    return NextResponse.json({ success: true });
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;

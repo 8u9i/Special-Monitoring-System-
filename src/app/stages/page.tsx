@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import { useData, useUI } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
-import { getAvatarEmoji } from "@/lib/constants";
+import ProgressBar from "@/components/progress-bar";
+import { getAvatarEmoji, getCompletion } from "@/lib/constants";
 import EditStudentModal from "@/components/modals/edit-student-modal";
 import AddStudentModal from "@/components/modals/add-student-modal";
 import type { Student } from "@/lib/types";
@@ -14,13 +15,13 @@ export default function StagesPage() {
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [addStudentOpen, setAddStudentOpen] = useState(false);
 
-  const stats = useMemo(() => {
-    const list = state.students;
-    if (list.length === 0) return { totalXP: 0, topStudentName: "" };
-    const totalXP = list.reduce((sum, s) => sum + s.xp, 0);
-    const top = list.reduce((a, b) => (a.xp > b.xp ? a : b));
-    return { totalXP, topStudentName: top.xp > 0 ? top.name : "" };
-  }, [state.students]);
+  const students = useMemo(
+    () =>
+      state.students
+        .map((s) => ({ student: s, completion: getCompletion(s, state.hadiths.length, state.englishUnits.length) }))
+        .sort((a, b) => b.completion.overall - a.completion.overall),
+    [state.students, state.hadiths.length, state.englishUnits.length]
+  );
 
   return (
     <div className="space-y-6">
@@ -30,14 +31,16 @@ export default function StagesPage() {
           <div className="panel p-5">
             <h3 className="panel-title mb-4">أدوات الإدارة</h3>
             <div className="text-2xl font-bold text-primary-dark mb-2">{state.students.length}</div>
-            <p className="text-xs text-text-secondary mb-1">إجمالي XP: {stats.totalXP}</p>
-            {stats.topStudentName && <p className="text-xs text-text-tertiary">الصدارة: {stats.topStudentName}</p>}
+            <p className="text-xs text-text-secondary mb-1">إجمالي الإنجاز: {students.length > 0 ? Math.round(students.reduce((sum, s) => sum + s.completion.overall, 0) / students.length) : 0}%</p>
+            {students[0] && students[0].completion.overall > 0 && (
+              <p className="text-xs text-text-tertiary">الصدارة: {students[0].student.name}</p>
+            )}
           </div>
           <button className="btn btn-primary btn-md w-full" onClick={() => setAddStudentOpen(true)}>
             <AppIcon name="person_add" size={16} /> إضافة طالب جديد
           </button>
-          <button className="btn btn-outline btn-md w-full text-rose border-rose" onClick={() => confirm.ask("سيؤدي هذا إلى جعل نقاط XP صفراً لجميع الطلاب مع إبقاء تقدمهم. متأكد؟", () => resetAllProgress())}>
-            <AppIcon name="restart_alt" size={16} /> تصفير كل نقاط XP
+          <button className="btn btn-outline btn-md w-full text-rose border-rose" onClick={() => confirm.ask("سيؤدي هذا إلى تصفير تقدم جميع الطلاب بالكامل. متأكد؟", () => resetAllProgress())}>
+            <AppIcon name="restart_alt" size={16} /> تصفير كل التقدم
           </button>
         </div>
 
@@ -48,9 +51,8 @@ export default function StagesPage() {
             <h3 className="font-bold text-text-primary">الطلاب النشطون</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {state.students.map((student) => {
+            {students.map(({ student, completion }, idx) => {
               const stage = getStudentStage(student);
-              const progress = Math.min(Math.round((student.xp / (stage.maxXP > 10000 ? stage.minXP : stage.maxXP)) * 100), 100);
               return (
                 <div key={student.id} className="panel bg-canvas p-4">
                   <div className="flex items-start justify-between mb-3">
@@ -68,15 +70,41 @@ export default function StagesPage() {
                       </button>
                     </div>
                   </div>
-                  <span className="tag tag-primary text-2xs mb-2">{stage.name}</span>
+                  <span className="tag tag-primary text-2xs mb-3">{stage.name}</span>
                   {student.notes && <p className="text-2xs text-text-tertiary mb-2 truncate">{student.notes}</p>}
-                  <div className="mt-3">
-                    <div className="flex justify-between text-2xs text-text-tertiary mb-1">
-                      <span>{student.memorizedHadithNumbers.length}/{state.hadiths.length} حديث</span>
-                      <span>{student.xp} XP</span>
+
+                  <div className="space-y-2.5">
+                    <div>
+                      <div className="flex items-center justify-between text-2xs text-text-secondary mb-1">
+                        <span className="flex items-center gap-1"><AppIcon name="menu_book" size={14} className="text-primary" /> الأحاديث</span>
+                        <span className="font-semibold">{completion.hadith}%</span>
+                      </div>
+                      <ProgressBar value={completion.hadith} variant="primary" size="sm" />
                     </div>
-                    <div className="progress-bar"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
+                    <div>
+                      <div className="flex items-center justify-between text-2xs text-text-secondary mb-1">
+                        <span className="flex items-center gap-1"><AppIcon name="auto_stories" size={14} className="text-green" /> القرآن</span>
+                        <span className="font-semibold">{completion.quran}%</span>
+                      </div>
+                      <ProgressBar value={completion.quran} variant="green" size="sm" />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between text-2xs text-text-secondary mb-1">
+                        <span className="flex items-center gap-1"><AppIcon name="translate" size={14} className="text-blue" /> الإنجليزية</span>
+                        <span className="font-semibold">{completion.english}%</span>
+                      </div>
+                      <ProgressBar value={completion.english} variant="blue" size="sm" />
+                    </div>
                   </div>
+
+                  <div className="mt-3 pt-3 border-t border-border-light">
+                    <div className="flex items-center justify-between text-2xs text-text-tertiary mb-1.5">
+                      <span>الإنجاز الكلي</span>
+                      <span className="font-bold text-primary-dark">{completion.overall}%</span>
+                    </div>
+                    <ProgressBar value={completion.overall} variant="amber" />
+                  </div>
+
                   {/* Admin actions */}
                   <div className="flex gap-2 mt-3 pt-3 border-t border-border-light">
                     <button
@@ -95,7 +123,7 @@ export default function StagesPage() {
                 </div>
               );
             })}
-            {state.students.length === 0 && (
+            {students.length === 0 && (
               <div className="col-span-full empty-state"><p className="empty-state-text">لا يوجد طلاب مسجلون</p></div>
             )}
           </div>

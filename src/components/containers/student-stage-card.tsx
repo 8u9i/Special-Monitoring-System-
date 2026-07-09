@@ -3,17 +3,14 @@
 import type { Student } from "@/lib/types";
 import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
-import { getAvatarEmoji } from "@/lib/constants";
+import ProgressBar from "@/components/progress-bar";
+import { getAvatarEmoji, getCompletion } from "@/lib/constants";
 
 export default function StudentStageCard({ student }: { student: Student }) {
-  const { getStudentStage, getStudentNextStageInfo } = useData();
+  const { state, getStudentStage } = useData();
   const stage = getStudentStage(student);
-  const nextInfo = getStudentNextStageInfo(student);
-  const isMaxed = !nextInfo;
-
-  const progressPercent = isMaxed
-    ? 100
-    : Math.min(Math.round(((student.xp - stage.minXP) / (nextInfo!.nextStage.minXP - stage.minXP)) * 100), 100);
+  const completion = getCompletion(student, state.hadiths.length, state.englishUnits.length);
+  const isMaxed = completion.overall >= 100;
 
   return (
     <div className="panel p-5">
@@ -32,12 +29,10 @@ export default function StudentStageCard({ student }: { student: Student }) {
           ) : (
             <div className="mt-4">
               <div className="flex justify-between text-xs text-text-tertiary mb-1.5">
-                <span>{student.xp} XP</span>
-                <span>{nextInfo!.nextStage.minXP} XP — {nextInfo!.remaining} متبقي</span>
+                <span>الإنجاز الكلي</span>
+                <span>{completion.overall}%</span>
               </div>
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
-              </div>
+              <ProgressBar value={completion.overall} variant="amber" />
             </div>
           )}
         </div>
@@ -48,3 +43,4 @@ export default function StudentStageCard({ student }: { student: Student }) {
     </div>
   );
 }
+
