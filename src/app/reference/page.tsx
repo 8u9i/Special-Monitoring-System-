@@ -33,7 +33,7 @@ export default function ReferencePage() {
     let result = state.hadiths;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((h) => h.text.includes(q) || h.category.includes(q) || h.reference.includes(q));
+      result = result.filter((h) => h.text.includes(q) || h.category.includes(q));
     }
     if (categoryFilter !== "all") result = result.filter((h) => h.category === categoryFilter);
     return result;
@@ -91,8 +91,7 @@ export default function ReferencePage() {
                     <button className="btn btn-icon btn-ghost" title="حذف" onClick={() => handleDeleteHadith(h.number)}><AppIcon name="delete" size={16} /></button>
                   </div>
                 </div>
-                <p className="text-xs text-text-secondary mb-1">{h.reference}</p>
-                <p className="font-fustat text-xl font-light text-text-primary leading-relaxed mb-2">&ldquo;{h.text}&rdquo;</p>
+                <p className="font-hadith text-xl font-light text-text-primary leading-relaxed mb-2">&ldquo;{h.text}&rdquo;</p>
                 <span className="tag tag-amber text-2xs">{h.category}</span>
                 <button
                   className="btn btn-ghost btn-sm mt-3 text-primary flex items-center gap-1"

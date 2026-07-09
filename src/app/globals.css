@@ -2,6 +2,7 @@
 
 @theme {
   --font-amiri: "Amiri", serif;
+  --font-hadith: "IBM Plex Sans Arabic", "Amiri", serif;
   --font-fustat: "Fustat", "Tajawal", sans-serif;
   --font-cause: "Cause", cursive;
   --font-inter: "Inter", sans-serif;

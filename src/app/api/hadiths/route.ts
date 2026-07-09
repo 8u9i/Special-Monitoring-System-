@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const { rows } = await pool.query("SELECT * FROM hadiths ORDER BY number");
     return NextResponse.json(rows.map((r: Record<string, unknown>) => ({
-      number: r.number, text: r.text, reference: r.reference,
+      number: r.number, text: r.text,
       explanation: r.explanation, category: r.category, points: r.points,
     })));
   } catch (err) {
@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
   if (!(await requireAuth(req)))
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { number, text, reference, explanation, category, points } = await req.json();
+    const { number, text, explanation, category, points } = await req.json();
     const finalNumber = number || (await pool.query("SELECT COALESCE(MAX(number) + 1, 1) AS nxt FROM hadiths")).rows[0].nxt;
     const { rows } = await pool.query(
-      "INSERT INTO hadiths (number, text, reference, explanation, category, points) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (number) DO UPDATE SET text = $2, reference = $3, explanation = $4, category = $5, points = $6 RETURNING *",
-      [finalNumber, text, reference || "", explanation || "", category || "عام", points || 100]
+      "INSERT INTO hadiths (number, text, explanation, category, points) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (number) DO UPDATE SET text = $2, explanation = $3, category = $4, points = $5 RETURNING *",
+      [finalNumber, text, explanation || "", category || "عام", points || 100]
     );
     return NextResponse.json(rows[0]);
   } catch (err) {

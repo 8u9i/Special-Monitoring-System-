@@ -229,10 +229,9 @@ export default function DashboardPage() {
               <div className="flex-1 flex flex-col items-center justify-center text-center px-2">
                 <span className="tag tag-primary mb-4">الحديث رقم {hadithOfTheDay.number}</span>
                 <h4 className="font-bold text-base text-text-primary mb-3">{hadithOfTheDay.category}</h4>
-                <p className="font-fustat text-xl font-light text-primary-dark leading-relaxed mb-4">
+                <p className="font-hadith text-xl font-light text-primary-dark leading-relaxed mb-4">
                   &ldquo;{hadithOfTheDay.text}&rdquo;
                 </p>
-                <p className="text-xs text-text-secondary mb-4">الراوي: {hadithOfTheDay.reference}</p>
                 <div className="w-full p-4 bg-canvas border border-border-light text-start">
                   <span className="text-xs text-primary font-bold block mb-1.5 flex items-center gap-1">
                     <AppIcon name="spa" size={18} /> الدرس والعمل:

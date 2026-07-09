@@ -15,7 +15,6 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
   const { state, updateHadith } = useData();
   const [number, setNumber] = useState<number>(0);
   const [text, setText] = useState("");
-  const [reference, setReference] = useState("");
   const [explanation, setExplanation] = useState("");
   const [category, setCategory] = useState("");
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -26,7 +25,7 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
   useEffect(() => {
     if (hadith) {
       queueMicrotask(() => {
-        setNumber(hadith.number); setText(hadith.text); setReference(hadith.reference);
+        setNumber(hadith.number); setText(hadith.text);
         setExplanation(hadith.explanation); setCategory(hadith.category); setError("");
       });
     }
@@ -40,10 +39,10 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
 
   const submit = useCallback(async () => {
     if (!hadith) return;
-    const ok = await updateHadith(hadith.number, number, text, reference, explanation, category);
+    const ok = await updateHadith(hadith.number, number, text, explanation, category);
     if (!ok) setError("رقم الحديث موجود مسبقاً");
     else onClose();
-  }, [hadith, number, text, reference, explanation, category, updateHadith, onClose]);
+  }, [hadith, number, text, explanation, category, updateHadith, onClose]);
 
   if (!open || !hadith) return null;
 
@@ -68,7 +67,7 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">نص الحديث *</label>
-            <textarea className="input-field font-amiri text-base leading-relaxed" rows={4} value={text} onChange={(e) => setText(e.target.value)} />
+            <textarea className="input-field font-hadith text-base leading-relaxed" rows={4} value={text} onChange={(e) => setText(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">التصنيف</label>
@@ -86,10 +85,6 @@ export default function EditHadithModal({ hadith, open, onClose }: Props) {
                 <button className="btn btn-ghost btn-sm" onClick={() => setShowNewCategory(false)}>رجوع</button>
               </div>
             )}
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">المرجع</label>
-            <input className="input-field" type="text" value={reference} onChange={(e) => setReference(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">الشرح</label>

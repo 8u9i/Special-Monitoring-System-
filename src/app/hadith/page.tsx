@@ -89,9 +89,8 @@ export default function HadithTrailPage() {
                                 {isExpanded && (
                                   <div className="border-t border-border-light p-4 bg-surface">
                                     <div className="p-4 bg-amber-light border text-center mb-4" style={{ borderColor: `color-mix(in srgb, var(--color-amber) 20%, transparent)` }}>
-                                      <p className="font-amiri text-base font-bold text-text-primary leading-relaxed select-all">&ldquo;{hadith.text}&rdquo;</p>
+                                      <p className="font-hadith text-base font-bold text-text-primary leading-relaxed select-all">&ldquo;{hadith.text}&rdquo;</p>
                                     </div>
-                                    <p className="text-xs text-text-secondary mb-3"><span className="font-semibold">الراوي:</span> {hadith.reference}</p>
                                     <div className="p-3 bg-canvas border border-border-light mb-4">
                                       <span className="text-xs text-primary font-bold flex items-center gap-1 mb-1"><AppIcon name="spa" size={18} /> المعنى المبسط:</span>
                                       <p className="text-xs text-text-secondary leading-relaxed">{hadith.explanation}</p>

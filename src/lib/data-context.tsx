@@ -23,8 +23,9 @@ interface DataContextType {
   addStudent: (name: string, age?: number, avatar?: string, notes?: string) => Promise<void>;
   updateStudent: (id: string, name: string, age?: number, avatar?: string, notes?: string) => Promise<void>;
   deleteStudent: (id: string) => Promise<void>;
-  addHadith: (text: string, reference: string, explanation: string, category: string) => Promise<void>;
-  updateHadith: (oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string) => Promise<boolean>;
+  addHadith: (text: string, explanation: string, category: string) => Promise<void>;
+  addBulkHadiths: (texts: string[], explanations: string[], category: string) => Promise<void>;
+  updateHadith: (oldNumber: number, newNumber: number, text: string, explanation: string, category: string) => Promise<boolean>;
   deleteHadith: (number: number) => Promise<void>;
   addEnglishUnit: (words: { word: string; definition: string }[]) => Promise<void>;
   updateEnglishUnit: (unitNumber: number, words: { word: string; definition: string }[]) => Promise<void>;
@@ -148,20 +149,40 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     }
   }, [showToastExternal]);
 
-  const doAddHadith = useCallback(async (text: string, reference: string, explanation: string, category: string) => {
+  const doAddBulkHadiths = useCallback(async (texts: string[], explanations: string[], category: string) => {
+    if (texts.length === 0) return;
+    const cat = category.trim() || "عام";
+    const results = await Promise.allSettled(
+      texts.map((t, i) =>
+        api<Hadith>("POST", "/hadiths", {
+          text: t,
+          explanation: explanations[i] || "شرح مبسط", category: cat, points: 100,
+        })
+      )
+    );
+    const saved = results
+      .filter((r): r is PromiseFulfilledResult<Hadith> => r.status === "fulfilled")
+      .map((r) => r.value);
+    const failures = results.length - saved.length;
+    if (saved.length > 0) setState((s) => ({ ...s, hadiths: [...s.hadiths, ...saved] }));
+    if (failures > 0) showToastExternal(`فشل حفظ ${failures} من أصل ${results.length} حديث`, "error");
+    else showToastExternal(`تمت إضافة ${saved.length} حديث`, "success");
+  }, [showToastExternal]);
+
+  const doAddHadith = useCallback(async (text: string, explanation: string, category: string) => {
     if (!text.trim()) return;
-    const payload = { text: text.trim(), reference: reference.trim() || "رواية صحيحة", explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100 };
+    const payload = { text: text.trim(), explanation: explanation.trim() || "شرح مبسط", category: category.trim() || "عام", points: 100 };
     try {
       const saved = await api<Hadith>("POST", "/hadiths", payload);
       setState((s) => ({ ...s, hadiths: [...s.hadiths, saved] }));
     } catch (e) { showToastExternal(`فشل حفظ الحديث: ${(e as Error).message}`, "error"); }
   }, [showToastExternal]);
 
-  const doUpdateHadith = useCallback(async (oldNumber: number, newNumber: number, text: string, reference: string, explanation: string, category: string): Promise<boolean> => {
+  const doUpdateHadith = useCallback(async (oldNumber: number, newNumber: number, text: string, explanation: string, category: string): Promise<boolean> => {
     if (!text.trim() || !newNumber) return false;
     if (oldNumber !== newNumber && stateRef.current.hadiths.some((h) => h.number === newNumber)) return false;
     const prevState = stateRef.current;
-    setState((s) => ({ ...s, hadiths: s.hadiths.map((h) => h.number === oldNumber ? { ...h, number: newNumber, text: text.trim(), reference: reference.trim(), explanation: explanation.trim(), category: category.trim() } : h) }));
+    setState((s) => ({ ...s, hadiths: s.hadiths.map((h) => h.number === oldNumber ? { ...h, number: newNumber, text: text.trim(), explanation: explanation.trim(), category: category.trim() } : h) }));
     if (oldNumber !== newNumber) {
       setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, memorizedHadithNumbers: st.memorizedHadithNumbers.map((n) => n === oldNumber ? newNumber : n), reviewHadithNumbers: st.reviewHadithNumbers.map((n) => n === oldNumber ? newNumber : n) })) }));
     }
@@ -186,7 +207,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       if (removed) {
         showToastExternal("تم حذف الحديث", "success", {
           label: "تراجع",
-          onClick: () => { void doAddHadith(removed.text, removed.reference, removed.explanation, removed.category); },
+          onClick: () => { void doAddHadith(removed.text, removed.explanation, removed.category); },
         });
       }
     } catch (err) {
@@ -433,7 +454,7 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
     state,
     loadAll: doLoadAll, selectStudent: doSelectStudent,
     addStudent: doAddStudent, updateStudent: doUpdateStudent, deleteStudent: doDeleteStudent,
-    addHadith: doAddHadith, updateHadith: doUpdateHadith, deleteHadith: doDeleteHadith,
+    addHadith: doAddHadith, addBulkHadiths: doAddBulkHadiths, updateHadith: doUpdateHadith, deleteHadith: doDeleteHadith,
     addEnglishUnit: doAddEnglishUnit, updateEnglishUnit: doUpdateEnglishUnit, deleteEnglishUnit: doDeleteEnglishUnit,
     toggleHadithStatus: doToggleHadithStatus, toggleSurahStatus: doToggleSurahStatus,
     toggleSurahPageStatus: doToggleSurahPageStatus, markAllSurahPages: doMarkAllSurahPages,

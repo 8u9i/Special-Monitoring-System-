@@ -4,13 +4,21 @@ import { useState, useEffect, useCallback } from "react";
 import { useData } from "@/lib/tracker-context";
 import AppIcon from "@/components/app-icon";
 
+function splitBlocks(value: string): string[] {
+  return value
+    .split(/\n\s*\n/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+}
+
 export default function AddHadithModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { state, addHadith } = useData();
+  const { state, addBulkHadiths } = useData();
   const [text, setText] = useState("");
-  const [reference, setReference] = useState("رواية صحيحة");
   const [explanation, setExplanation] = useState("");
   const [category, setCategory] = useState("");
+  const [bulk, setBulk] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
+  const [error, setError] = useState("");
 
   const categories = [...new Set(state.hadiths.map((h) => h.category).filter(Boolean))].sort();
 
@@ -20,12 +28,32 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
     return () => window.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (open) {
+      setText(""); setExplanation(""); setCategory("");
+      setBulk(false); setShowNewCategory(false); setError("");
+    }
+  }, [open]);
+
   const submit = useCallback(async () => {
-    if (!text.trim()) return;
-    await addHadith(text.trim(), reference.trim(), explanation.trim(), category.trim());
-    setText(""); setReference("رواية صحيحة"); setExplanation(""); setCategory("");
+    if (bulk) {
+      const texts = splitBlocks(text);
+      const explanations = splitBlocks(explanation);
+      if (texts.length === 0) {
+        setError("أدخل حديثاً واحداً على الأقل (افصل بين الأحاديث بسطر فارغ).");
+        return;
+      }
+      await addBulkHadiths(texts, explanations, category.trim());
+      onClose();
+      return;
+    }
+    if (!text.trim()) {
+      setError("نص الحديث مطلوب.");
+      return;
+    }
+    await addBulkHadiths([text.trim()], explanation.trim() ? [explanation.trim()] : [], category.trim());
     onClose();
-  }, [text, reference, explanation, category, addHadith, onClose]);
+  }, [bulk, text, explanation, category, addBulkHadiths, onClose]);
 
   if (!open) return null;
 
@@ -42,16 +70,52 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
         </div>
 
         <div className="space-y-4">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-sm font-semibold text-text-secondary">
+            <input
+              type="checkbox"
+              className="w-4 h-4 accent-[var(--color-primary)]"
+              checked={bulk}
+              onChange={(e) => setBulk(e.target.checked)}
+            />
+            إضافة متعددة (افصل بين كل حديث وشرحه بسطر فارغ)
+          </label>
+
           <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">نص الحديث *</label>
+            <label className="block text-sm font-semibold text-text-secondary mb-1">
+              {bulk ? "نصوص الأحاديث *" : "نص الحديث *"}
+            </label>
             <textarea
-              className="input-field font-amiri text-base leading-relaxed"
-              rows={4}
+              className="input-field font-hadith text-base leading-relaxed"
+              rows={bulk ? 8 : 4}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="اكتب نص الحديث الشريف..."
+              placeholder={bulk ? "الحديث الأول\n\nالحديث الثاني\n\nالحديث الثالث" : "اكتب نص الحديث الشريف..."}
             />
+            {bulk && (
+              <p className="text-2xs text-text-tertiary mt-1">
+                كل فراغ بين السطور يبدأ حديثاً جديداً. رقم {splitBlocks(text).length} حديث.
+              </p>
+            )}
           </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-text-secondary mb-1">
+              {bulk ? "الشروح (تطابق ترتيب الأحاديث)" : "الشرح"}
+            </label>
+            <textarea
+              className="input-field"
+              rows={bulk ? 6 : 2}
+              value={explanation}
+              onChange={(e) => setExplanation(e.target.value)}
+              placeholder={bulk ? "شرح الحديث الأول\n\nشرح الحديث الثاني" : "شرح مبسط للحديث..."}
+            />
+            {bulk && (
+              <p className="text-2xs text-text-tertiary mt-1">
+                اختياري — افصل كل شرح بسطر فارغ. رقم {splitBlocks(explanation).length} شرح.
+              </p>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-text-secondary mb-1">التصنيف</label>
             {!showNewCategory ? (
@@ -69,21 +133,15 @@ export default function AddHadithModal({ open, onClose }: { open: boolean; onClo
               </div>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">المرجع</label>
-            <input className="input-field" type="text" value={reference} onChange={(e) => setReference(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-1">الشرح</label>
-            <textarea className="input-field" rows={2} value={explanation} onChange={(e) => setExplanation(e.target.value)} placeholder="شرح مبسط للحديث..." />
-          </div>
+
+          {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
         </div>
 
         <div className="flex gap-3 mt-6">
           <button className="btn btn-outline btn-md flex-1" onClick={onClose}>إلغاء</button>
-          <button className="btn btn-primary btn-md flex-1" onClick={submit} disabled={!text.trim()}>
+          <button className="btn btn-primary btn-md flex-1" onClick={submit} disabled={!text.trim() && !bulk}>
             <AppIcon name="check" size={18} />
-            إضافة الحديث
+            {bulk ? `إضافة ${splitBlocks(text).length || 0} حديث` : "إضافة الحديث"}
           </button>
         </div>
       </div>
