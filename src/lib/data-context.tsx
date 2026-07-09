@@ -189,8 +189,14 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
       setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, memorizedHadithNumbers: st.memorizedHadithNumbers.map((n) => n === oldNumber ? newNumber : n), reviewHadithNumbers: st.reviewHadithNumbers.map((n) => n === oldNumber ? newNumber : n) })) }));
     }
     try {
-      const hadith = stateRef.current.hadiths.find((h) => h.number === newNumber);
-      if (hadith) await api("POST", "/hadiths", hadith);
+      const existing = stateRef.current.hadiths.find((h) => h.number === oldNumber);
+      await api("POST", "/hadiths", {
+        number: newNumber,
+        text: text.trim(),
+        explanation: explanation.trim() || "شرح مبسط",
+        category: category.trim() || "عام",
+        points: existing?.points ?? 100,
+      });
     } catch (err) {
       setState((s) => ({ ...s, hadiths: prevState.hadiths }));
       console.error("doUpdateHadith error:", err);
