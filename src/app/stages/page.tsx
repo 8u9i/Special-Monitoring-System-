@@ -36,7 +36,7 @@ export default function StagesPage() {
           <button className="btn btn-primary btn-md w-full" onClick={() => setAddStudentOpen(true)}>
             <AppIcon name="person_add" size={16} /> إضافة طالب جديد
           </button>
-          <button className="btn btn-outline btn-md w-full text-rose border-rose" onClick={() => confirm.ask("سيؤدي هذا إلى تصفير تقدم جميع الطلاب بالكامل. متأكد؟", () => resetAllProgress())}>
+          <button className="btn btn-outline btn-md w-full text-rose border-rose" onClick={() => confirm.ask("سيؤدي هذا إلى جعل نقاط XP صفراً لجميع الطلاب مع إبقاء تقدمهم. متأكد؟", () => resetAllProgress())}>
             <AppIcon name="restart_alt" size={16} /> تصفير كل نقاط XP
           </button>
         </div>

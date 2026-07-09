@@ -451,21 +451,18 @@ export function DataProvider({ children, showToast: showToastExternal, onCelebra
 
   const doResetAllProgress = useCallback(async () => {
     const prevStudents = stateRef.current.students;
-    const allHadiths = stateRef.current.hadiths;
-    setState((s) => ({ ...s, students: s.students.map((st) => ({
-      ...st, memorizedHadithNumbers: [], reviewHadithNumbers: [], memorizedSurahNumbers: [], reviewSurahNumbers: [], memorizedSurahPages: [], memorizedEnglishUnits: [], reviewEnglishUnits: [], xp: 0,
-    })) }));
+    setState((s) => ({ ...s, students: s.students.map((st) => ({ ...st, xp: 0 })) }));
     try {
       await Promise.allSettled(
-        prevStudents.flatMap((st) => allHadiths.map((h) =>
-          api("DELETE", `/student-hadiths/${st.id}/${h.number}`)
-        ))
+        prevStudents.map((st) =>
+          api("PUT", `/students/${st.id}`, { id: st.id, name: st.name, age: st.age, avatar: st.avatar, notes: st.notes, joinedAt: st.joinedAt, xp: 0 })
+        )
       );
-      showToastExternal("تم تصفير تقدم جميع الطلاب", "success");
+      showToastExternal("تم تصفير نقاط XP لجميع الطلاب", "success");
     } catch (err) {
       setState((s) => ({ ...s, students: prevStudents }));
       console.error("doResetAllProgress error:", err);
-      showToastExternal("فشل تصفير تقدم الطلاب", "error");
+      showToastExternal("فشل تصفير نقاط XP", "error");
     }
   }, [showToastExternal]);
 
